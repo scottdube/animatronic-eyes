@@ -46,8 +46,37 @@ what it is, not how it was paired or which board read it.
 The PCA9685 runs at 60 Hz, with counts out of 4096. `reference/Servo numbers.png`
 and `reference/Wiring.png` are the kit's servo numbering and wiring.
 
-## Open questions before rebuilding controller support
+## Board and the rebuild
 
-- Which board is in the mechanism? The stock kit is an Uno/Nano, which has no
-  Bluetooth, so a DS4 needs either an ESP32 (Bluepad32) or a USB Host Shield.
-- Is the kit's joystick board still attached, or was it removed?
+**ESP32-WROOM-32 DevKit** (micro-USB) on a breadboard. Scott confirmed the
+module, and the board is in `docs/board.jpg`. It has Bluetooth Classic, so the
+DS4 pairs to it directly with no USB Host Shield.
+
+**Evidence for the lost version's library:** `~/Documents/Arduino/libraries/PS4Controller`
+(pablomarquez76/PS4_Controller_Host v1.1.0, core-3.x compatible) was installed
+**2025-05-30**. Hypothesis, not established: the lost sketch used it.
+
+`firmware/EyeMech_PS4/EyeMech_PS4.ino` is the rebuild from 2026-09-24. It keeps
+the kit's servo math unchanged, and the stick input is converted to the kit's
+0..1023 range. Left stick = eyes, Cross = blink, D-pad up/down = lid trim.
+Compiles clean against esp32 core 3.3.7 with the IDE's bundled arduino-cli:
+
+    "/Applications/Arduino IDE.app/Contents/Resources/app/lib/backend/resources/arduino-cli" \
+      compile --fqbn esp32:esp32:esp32 --config-file ~/.arduinoIDE/arduino-cli.yaml firmware/EyeMech_PS4
+
+**NOT yet flashed or run on the mechanism.** Unverified: axis directions
+(`INVERT_X`/`INVERT_Y`), and whether the DS4 connects.
+
+## Pairing trap
+
+This library can only connect to the Bluetooth MAC the controller has stored.
+It cannot put the controller into pairing mode. `PS4_HOST_MAC` empty = the
+ESP32's own MAC. If the clone was paired to a PS4 console or another MAC, set
+that MAC in the sketch, or rewrite the controller's stored MAC over USB with
+sixaxispairer. Bluepad32 is the fallback if the clone refuses; it pairs DS4
+clones without MAC games but needs its own board package.
+
+## Open questions
+
+- Is the PCA9685 wired to SDA 21 / SCL 22? The photo shows servo leads and
+  jumpers but not where they land, so this is assumed.
