@@ -47,7 +47,7 @@ button.pri{background:var(--acc);color:var(--bg);border-color:var(--acc)}
 a{color:var(--acc)}
 h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--line)}
 #mode{font-size:1.15em;font-weight:600}.sc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.sc button{padding:10px 4px}
+.sc button{padding:10px 4px}.pr{grid-template-columns:repeat(4,1fr)}
 </style></head><body>
 <h1>EyeMech</h1>
 <div class="mut" id="bi"></div>
@@ -64,7 +64,8 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <div class="row"><label>Pupil centre left / right <span id="v_parkX"></span></label>
 <input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit centre, + = right</div></div>
 <p class="mut">Lid presets, % open. D-pad up/down steps closed ‹ squint ‹ normal ‹ wide; power-up is normal,
-a blink goes to closed. Moving a slider shows that preset.</p>
+a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
+<div class="sc pr"><button data-k="lidWide">▲ Wide</button><button data-k="lidNormal">● Normal</button><button data-k="lidSquint">◒ Squint</button><button data-k="lidClosed">▬ Closed</button></div>
 <div class="row"><label>▲ Wide <span id="v_lidWide"></span>%</label><input type="range" id="lidWide" min="0" max="100" step="1"></div>
 <div class="row"><label>● Normal <span id="v_lidNormal"></span>%</label><input type="range" id="lidNormal" min="0" max="100" step="1"></div>
 <div class="row"><label>◒ Squint <span id="v_lidSquint"></span>%</label><input type="range" id="lidSquint" min="0" max="100" step="1"></div>
@@ -131,7 +132,9 @@ K.forEach(k=>$(k).addEventListener('input',e=>{const o=$('v_'+k);if(o)o.textCont
 $('save').onclick=async()=>{show(await j('/save',{method:'POST'}));poll()};
 $('revert').onclick=async()=>{show(await j('/revert',{method:'POST'}));poll()};
 $('defaults').onclick=async()=>{show(await j('/defaults',{method:'POST'}));poll()};
-document.querySelectorAll('.sc button').forEach(b=>b.onclick=async()=>{
+// Preset buttons show a preset: re-sending its current value switches the eyes to it
+document.querySelectorAll('.pr button').forEach(b=>b.onclick=()=>{pend=b.dataset.k+'='+$(b.dataset.k).value;send()});
+document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
  const r=await fetch('/scene?cmd='+b.dataset.c,{method:'POST'});
  $('scm').textContent=r.ok?'':'⚠ '+(await r.text());poll()});
 async function poll(){try{const s=await j('/status');
