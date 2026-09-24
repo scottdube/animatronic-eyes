@@ -73,9 +73,9 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <div class="row"><label>Bottom lids come up <span id="v_lowLidCurve"></span></label>
 <input type="range" id="lowLidCurve" min="25" max="300" step="5"><div class="mut">50 = gently, 100 = same as the top, higher = further up. Closed and wide don't change</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
-<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
+<input type="range" id="lidMin" min="160" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
 <div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
-<input type="range" id="lowLidMax" min="400" max="480" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
+<input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
 <div class="row"><label>Lid balance <span id="v_lidBalance"></span></label>
