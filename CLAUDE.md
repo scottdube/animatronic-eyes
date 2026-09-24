@@ -365,3 +365,4 @@ horn moves compares two uncontrolled eyes, it does not show which servo pair the
 the original squint fix (+29) shrank the viewer's-LEFT eye, but the too-open eye was the viewer's RIGHT, so the
 balance was correcting the wrong eye and Scott's horn nudges were compensating for it.
 Scott: "Horns are aligned" — arrived as balance went to 0; which balance he aligned against not yet confirmed.
+Normal photo at lidBalance +15: viewer's-left eye still far wider than the right (top lid well clear of the pupil). Stepped to +30.
