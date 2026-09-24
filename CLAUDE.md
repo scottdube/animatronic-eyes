@@ -330,3 +330,9 @@ Four presets (Wide/Normal/Squint/Closed, % open); the D-pad and idle pick betwee
 at the same % as the tops; 50 left the bottoms too open at 60). Squint shown at the default 35 (photo): pupils
 about half covered, reads as squint; awaiting his call. Wide not yet reviewed. idleMode is 0 live while
 tuning: set it back to 1 BEFORE Save, or Save stores idle off.
+**Squint photo: the eye on Scott's right (viewer's right) is more open than the other, top AND bottom lid.**
+Measured from the photo only. Known contributor, not an established cause: the kit's closed pulses are not
+mirrors (2=400/4=240, 3=240/5=400), and the open side mirrors with 680-x, so pulse travel from closed differs
+per servo (2: 400→200 = 200, 4: 240→480 = 240; 3: 240→480 = 240, 5: 400→200 = 200). That predicts ONE lid
+per eye more open, not both lids of one eye, so it does not explain the photo alone. Linkage/horn spline
+offsets are the other candidate.
