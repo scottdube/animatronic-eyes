@@ -292,3 +292,20 @@ WebServer (one client at a time) and several open pages polling /status every 2 
   (2026-09-24). The old build keeps running (nothing is half-written), and an immediate retry
   succeeded both times. Cause not established; free heap was ~34–40 KB both times vs ~43 KB on
   clean boots. `./build.sh ota` does not retry. Check `build` in `/status` after every OTA.
+
+## Up/down servo RUNAWAY during idle (reported 2026-09-24, OPEN)
+
+Scott, twice: while a scene (idle) ran, the bottom-centre servo (servo 1, eye up/down) swung
+the horn ~180° the wrong way, "up over the top" instead of small moves low down, and kept running
+until he cut power. Once the horn popped off and the motor ran on. The first horn loss
+earlier the same day was probably the same event. Idle stopped and idleMode 0 set live (unsaved) at his "stop".
+**Measured:** `/status` after it: same boot as the last OTA (unsaved trim 5 still live), `pcaResets` 0,
+so the PCA9685 did not reset in this boot. **Software bounds:** every source reaches servo 1
+only through `map(yval,0,1023,250,500)`, and yval is bounded 0..1023 (stick constrained ±128), so
+commanded pulses stay in the kit's 1.0–2.0 ms. Idle's vertical travel (±120 around 512 → pulses ~346–404) is
+SMALLER than full stick. A 1–2 ms pulse cannot make a servo spin continuously; that means the
+servo can't reach its target (linkage jammed or past a stop, or gears/pot slipping).
+**Hypotheses, none tested:** (a) the up/down linkage goes over-centre at the edge of travel since
+the horn was re-seated, then jams and stalls; (b) supply current limit/brownout under idle's fast
+moves (the bench supply may be current-limited; the dead-servo event earlier fits a supply in protection);
+(c) a damaged servo 1 after the first horn loss.
