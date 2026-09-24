@@ -17,11 +17,15 @@ struct EyeSettings {
   int lidMin;        // upper lid open limit, 280 (kit) .. 160; Scott's original used 250
   int lowLidMax;     // lower lid open limit, 400 (kit) .. 520
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
-  // Per-lid trims at each end, pulse counts, + = more open whichever way the servo turns.
-  // A horn has one adjustment (and ~17° spline steps) but a lid has two ends to fit.
-  // L/R = as seen facing the eyes: L = servos 4 (top) + 5 (bottom), R = servos 2 + 3.
-  int topLClosed, topLOpen, botLClosed, botLOpen;
-  int topRClosed, topROpen, botRClosed, botROpen;
+  // Per-preset, per-lid trims, pulse counts, + = more open whichever way the servo turns.
+  // Horns alone can't fit it (one adjustment, ~17° spline steps) and the linkage isn't
+  // linear, so each preset gets its own; between presets the trim blends by lid %.
+  // Prefix c/s/n/w = closed/squint/normal/wide. L/R = as seen facing the eyes:
+  // L = servos 4 (top) + 5 (bottom), R = servos 2 + 3. Keep these 16 together, in order.
+  int cTopL, cBotL, cTopR, cBotR;
+  int sTopL, sBotL, sTopR, sBotR;
+  int nTopL, nBotL, nTopR, nBotR;
+  int wTopL, wBotL, wTopR, wBotR;
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
   // Alive idle
@@ -38,6 +42,9 @@ struct EyeSettings {
 };
 
 extern EyeSettings settings;
+
+// Trim for preset p (0 closed, 1 squint, 2 normal, 3 wide) and lid l (0 topL, 1 botL, 2 topR, 3 botR)
+inline int lidTrim(int p, int l) { return (&settings.cTopL)[p * 4 + l]; }
 
 // Where the eyes rest with the stick centred, in the kit's 0..1023 units.
 inline int restX() { return 512 + settings.parkX; }

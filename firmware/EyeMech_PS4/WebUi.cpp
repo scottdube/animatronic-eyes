@@ -79,16 +79,11 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
-<div class="mut"><b>Left eye (as you face it)</b>: − more closed, + more open. Closed trims show closed, open trims show wide</div>
-<div class="row"><label>Top lid, closed <span id="v_topLClosed"></span></label><input type="range" id="topLClosed" min="-60" max="60" step="1"></div>
-<div class="row"><label>Top lid, wide <span id="v_topLOpen"></span></label><input type="range" id="topLOpen" min="-60" max="60" step="1"></div>
-<div class="row"><label>Bottom lid, closed <span id="v_botLClosed"></span></label><input type="range" id="botLClosed" min="-60" max="60" step="1"></div>
-<div class="row"><label>Bottom lid, wide <span id="v_botLOpen"></span></label><input type="range" id="botLOpen" min="-60" max="60" step="1"></div>
-<div class="mut"><b>Right eye (as you face it)</b>: − more closed, + more open. Closed trims show closed, open trims show wide</div>
-<div class="row"><label>Top lid, closed <span id="v_topRClosed"></span></label><input type="range" id="topRClosed" min="-60" max="60" step="1"></div>
-<div class="row"><label>Top lid, wide <span id="v_topROpen"></span></label><input type="range" id="topROpen" min="-60" max="60" step="1"></div>
-<div class="row"><label>Bottom lid, closed <span id="v_botRClosed"></span></label><input type="range" id="botRClosed" min="-60" max="60" step="1"></div>
-<div class="row"><label>Bottom lid, wide <span id="v_botROpen"></span></label><input type="range" id="botROpen" min="-60" max="60" step="1"></div>
+<div class="row"><b>Lid trims for: <span id="trp">● Normal</span></b><div class="mut">Pick a preset with the buttons above, then match the eyes. − more closed, + more open. Left/right as you face the eyes</div></div>
+<div class="row"><label>Left eye, top lid <span id="v_tTopL"></span></label><input type="range" id="tTopL" min="-60" max="60" step="1"></div>
+<div class="row"><label>Left eye, bottom lid <span id="v_tBotL"></span></label><input type="range" id="tBotL" min="-60" max="60" step="1"></div>
+<div class="row"><label>Right eye, top lid <span id="v_tTopR"></span></label><input type="range" id="tTopR" min="-60" max="60" step="1"></div>
+<div class="row"><label>Right eye, bottom lid <span id="v_tBotR"></span></label><input type="range" id="tBotR" min="-60" max="60" step="1"></div>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
@@ -116,11 +111,17 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','topLClosed','topLOpen','botLClosed','botLOpen','topRClosed','topROpen','botRClosed','botROpen','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
-function show(v){K.forEach(k=>{$(k).value=v[k];const o=$('v_'+k);if(o)o.textContent=v[k]});dirty=v.dirty}
+// Trims: one set of four sliders edits the selected preset's (prefix c/s/n/w)
+const T=['TopL','BotL','TopR','BotR'],P={lidClosed:['c','▬ Closed'],lidSquint:['s','◒ Squint'],lidNormal:['n','● Normal'],lidWide:['w','▲ Wide']};
+let V={},tp='n';
+function showT(){T.forEach(t=>{const v=V[tp+t];if(v===undefined)return;$('t'+t).value=v;$('v_t'+t).textContent=v})}
+function show(v){V=v;K.forEach(k=>{$(k).value=v[k];const o=$('v_'+k);if(o)o.textContent=v[k]});showT();dirty=v.dirty}
+T.forEach(t=>$('t'+t).addEventListener('input',e=>{$('v_t'+t).textContent=e.target.value;V[tp+t]=+e.target.value;
+ pend=tp+t+'='+e.target.value;send()}));
 // A request lost to a restart (OTA) can hang forever, and send() waits on each
 // one: give up after 3 s so later slider moves still go out.
 async function j(u,o){const c=new AbortController(),t=setTimeout(()=>c.abort(),3000);
@@ -133,7 +134,8 @@ $('save').onclick=async()=>{show(await j('/save',{method:'POST'}));poll()};
 $('revert').onclick=async()=>{show(await j('/revert',{method:'POST'}));poll()};
 $('defaults').onclick=async()=>{show(await j('/defaults',{method:'POST'}));poll()};
 // Preset buttons show a preset: re-sending its current value switches the eyes to it
-document.querySelectorAll('.pr button').forEach(b=>b.onclick=()=>{pend=b.dataset.k+'='+$(b.dataset.k).value;send()});
+document.querySelectorAll('.pr button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;tp=P[k][0];$('trp').textContent=P[k][1];showT();
+ pend=k+'='+$(k).value;send()});
 document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
  const r=await fetch('/scene?cmd='+b.dataset.c,{method:'POST'});
  $('scm').textContent=r.ok?'':'⚠ '+(await r.text());poll()});

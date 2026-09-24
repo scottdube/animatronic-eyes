@@ -21,10 +21,10 @@ static const Field SETTINGS[] = {
     F(lowLidCurve, 25, 300, 50),
     F(lidMin, 160, 280, 280),
     F(lowLidMax, 400, 520, 400),  F(lidFollow, 0, 100, 100),
-    F(topLClosed, -60, 60, 0),    F(topLOpen, -60, 60, 0),
-    F(botLClosed, -60, 60, 0),    F(botLOpen, -60, 60, 0),
-    F(topRClosed, -60, 60, 0),    F(topROpen, -60, 60, 0),
-    F(botRClosed, -60, 60, 0),    F(botROpen, -60, 60, 0),
+    F(cTopL, -60, 60, 0), F(cBotL, -60, 60, 0), F(cTopR, -60, 60, 0), F(cBotR, -60, 60, 0),
+    F(sTopL, -60, 60, 0), F(sBotL, -60, 60, 0), F(sTopR, -60, 60, 0), F(sBotR, -60, 60, 0),
+    F(nTopL, -60, 60, 0), F(nBotL, -60, 60, 0), F(nTopR, -60, 60, 0), F(nBotR, -60, 60, 0),
+    F(wTopL, -60, 60, 0), F(wBotL, -60, 60, 0), F(wTopR, -60, 60, 0), F(wBotR, -60, 60, 0),
     F(blinkBtn, 0, 2, 0),
     F(idleMode, 0, 2, 1),
     F(autoIdleSecs, 5, 600, 20),  F(idleRunMins, 0, 120, 5),
@@ -33,6 +33,8 @@ static const Field SETTINGS[] = {
     F(emptyAction, 0, 2, 2),      F(emptyMins, 1, 60, 5),
 };
 #undef F
+static_assert(offsetof(EyeSettings, wBotR) - offsetof(EyeSettings, cTopL) == 15 * sizeof(int),
+              "lidTrim() indexes the 16 trims as one array");
 static const size_t N = sizeof SETTINGS / sizeof SETTINGS[0];
 
 static int &ref(EyeSettings &s, const Field &f) { return *(int *)((char *)&s + f.offset); }

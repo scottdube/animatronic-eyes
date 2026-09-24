@@ -122,8 +122,11 @@ void applyLiveSetting(const String &key) {
     }
   if (key == "lowLidCurve") sceneCommand("stop");  // hold still so the bottoms can be judged
   // A lid trim shows the end it trims: closed trims on the closed preset, open trims on wide
-  if (key.endsWith("Closed") && key != "lidClosed") { sceneCommand("stop"); lidIdx = 0; }
-  if (key.endsWith("Open")) { sceneCommand("stop"); lidIdx = 3; }
+  // A lid trim shows the preset it trims (cTopL = closed, sTopL = squint, ...)
+  if (key.length() == 5 && strchr("csnw", key[0]) && (key.endsWith("L") || key.endsWith("R"))) {
+    sceneCommand("stop");
+    lidIdx = strchr("csnw", key[0]) - "csnw";
+  }
   if (key == "") lidIdx = 2;
   // Setting the pupil centre: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
@@ -266,11 +269,27 @@ int followLid(int kit, int centre) {
   return centre + (kit - centre) * settings.lidFollow / 100;
 }
 
-// One lid servo between its trimmed closed and open pulses; frac 0 = closed .. 1 = open.
-// Clamped to the SG90's safe range (~0.6-2.4 ms at 60 Hz) whatever the trims say.
-int lidPulse(int closed, int open, int dir, int closedTrim, int openTrim, float frac) {
-  float c = closed + dir * closedTrim, o = open + dir * openTrim;
-  return constrain((int)lroundf(c + (o - c) * frac), 150, 600);
+// Trim for lid l at `pct` % open: each preset's trim sits at that preset's own %, and
+// in between (idle's moves, a blink on the way down) it blends linearly.
+float trimAt(int l, int pct) {
+  int idx[4] = {0, 1, 2, 3};
+  for (int a = 1; a < 4; a++)  // presets sorted by their % (the sliders can reorder them)
+    for (int b = a; b > 0 && lidPct(idx[b]) < lidPct(idx[b - 1]); b--) std::swap(idx[b], idx[b - 1]);
+  if (pct <= lidPct(idx[0])) return lidTrim(idx[0], l);
+  for (int k = 1; k < 4; k++) {
+    int p0 = lidPct(idx[k - 1]), p1 = lidPct(idx[k]);
+    if (pct <= p1) {
+      if (p1 == p0) return lidTrim(idx[k], l);
+      return lidTrim(idx[k - 1], l) + (lidTrim(idx[k], l) - lidTrim(idx[k - 1], l)) * float(pct - p0) / (p1 - p0);
+    }
+  }
+  return lidTrim(idx[3], l);
+}
+
+// One lid servo: the untrimmed pulse plus the trim in the direction that opens it
+// (dir -1: pulse falls as the lid opens), clamped to the SG90's safe ~0.6-2.4 ms.
+int lidPulse(float base, int dir, float trim) {
+  return constrain((int)lroundf(base + dir * trim), 150, 600);
 }
 
 void loop() {
@@ -315,12 +334,10 @@ void loop() {
   // nearly shut like the kit's trim; 100 = same % as the top. 0% and 100% always
   // stay closed and open, so blink and wide are unchanged.
   float top = lid / 100.0f, bot = powf(top, settings.lowLidCurve / 100.0f);
-  // Each lid's ends get their own trim (EyeSettings): + = more open, so dir is the
-  // way that servo opens (-1: pulse falls as the lid opens).
-  uplidpulse = lidPulse(400, upOpen, -1, settings.topRClosed, settings.topROpen, top);
-  lolidpulse = lidPulse(240, loOpen, +1, settings.botRClosed, settings.botROpen, bot);
-  altuplidpulse = lidPulse(240, 680 - upOpen, +1, settings.topLClosed, settings.topLOpen, top);
-  altlolidpulse = lidPulse(400, 680 - loOpen, -1, settings.botLClosed, settings.botLOpen, bot);
+  uplidpulse = lidPulse(400 + (upOpen - 400) * top, -1, trimAt(2, lid));           // top R
+  lolidpulse = lidPulse(240 + (loOpen - 240) * bot, +1, trimAt(3, lid));           // bottom R
+  altuplidpulse = lidPulse(240 + ((680 - upOpen) - 240) * top, +1, trimAt(0, lid)); // top L
+  altlolidpulse = lidPulse(400 + ((680 - loOpen) - 400) * bot, -1, trimAt(1, lid)); // bottom L
 
   pwm.setPWM(0, 0, lexpulse);
   pwm.setPWM(1, 0, leypulse);
