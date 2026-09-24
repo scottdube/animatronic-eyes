@@ -264,3 +264,11 @@ PCA9685 lost logic power (a bumped jumper) and reset into sleep; the sketch conf
 setup(). Build 5688032 reads the prescaler back every second and re-inits on a mismatch; `/status`
 now has `pca`, `pcaPrescale` (101 = 60 Hz; 30 = power-on default) and `pcaResets`. First boot of it:
 pca true, prescale 101. If servos still don't move with pca true, it is servo V+ (not visible to software).
+**Outcome:** still nothing after the re-init with pca true, so the PCA9685 hypothesis is **ruled out**
+for this event. **Scott pulled the power and reapplied it, and everything moved again.** The fault was on
+the power side. Whether the servo supply latched off (e.g. overcurrent from a stalled servo while the horn was
+off) is NOT established. **Consequence:** the servos were limp during the lid-horn re-seat above, so the
+"180 out" lids and the four different lid positions were unpowered servos, not a mechanical fault, and that
+re-seat is void. Redone with all six servos holding in Sleep at kit centre: servo 0 = 330
+(x 512), servo 1 = 375 (y 512), lids closed 2=400, 3=240, 4=240, 5=400.
+**Lesson: before re-seating a horn, check the servo is holding (push the arm and feel it resist).**
