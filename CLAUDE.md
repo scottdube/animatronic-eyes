@@ -353,3 +353,8 @@ Caveat: lidBalance +29 scales wide too, so the balanced eye opens only 71% of it
 190/490: no buzz (Scott). Stepped to 180/500.
 **Presets done and SAVED 2026-09-24:** wide at lidMin 180 / lowLidMax 500 (no buzz, "that's good"), normal 60,
 squint 35, closed 0, bottoms curve 100, lidBalance +29, idleMode back to 1 (automatic).
+**Horns re-set at wide (Scott, after the save):** matched the horns with the eyes at wide; normal then no
+longer matches. Expected, not a new fault: lidBalance +29 scales one eye's whole travel from closed, so that
+eye is at 71% at wide and 43% at normal while the other is at 100% / 60%. A horn offset set at one point cannot
+match at the others while the balance scales. Proposed: lidBalance 0, horns seated at ONE reference (closed),
+then check normal and wide.
