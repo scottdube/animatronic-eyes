@@ -257,3 +257,10 @@ the pupil centre after the horn is back on, before trusting parkY 270.
 "180 out" and each of the four lids sat differently. Held all lids at the kit's closed command
 (Sleep: servo 2=400, 3=240, 4=240, 5=400), and Scott re-seated all four horns so each lid is just
 closed there. That is now the mechanical reference for the lids. Open position not yet checked.
+
+**Nothing moved after the horn work (2026-09-24).** After Wake, no servo moved or buzzed while
+`/status` showed the controller connected and the loop running. **Hypothesis, untested:** the
+PCA9685 lost logic power (a bumped jumper) and reset into sleep; the sketch configured it only in
+setup(). Build 5688032 reads the prescaler back every second and re-inits on a mismatch; `/status`
+now has `pca`, `pcaPrescale` (101 = 60 Hz; 30 = power-on default) and `pcaResets`. First boot of it:
+pca true, prescale 101. If servos still don't move with pca true, it is servo V+ (not visible to software).
