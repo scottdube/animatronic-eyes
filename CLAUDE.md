@@ -358,3 +358,6 @@ longer matches. Expected, not a new fault: lidBalance +29 scales one eye's whole
 eye is at 71% at wide and 43% at normal while the other is at 100% / 60%. A horn offset set at one point cannot
 match at the others while the balance scales. Proposed: lidBalance 0, horns seated at ONE reference (closed),
 then check normal and wide.
+**Eye mapping, from the normal photo with lidBalance +29:** the eye on the VIEWER'S RIGHT (Scott's right facing
+the eyes) was the tighter one, so servos 4+5 = viewer's-right eye, servos 2+3 = viewer's-left eye. Balance then
+set to 0 live (reversible; saved value is still +29) to see normal with no scaling.
