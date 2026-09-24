@@ -358,7 +358,10 @@ longer matches. Expected, not a new fault: lidBalance +29 scales one eye's whole
 eye is at 71% at wide and 43% at normal while the other is at 100% / 60%. A horn offset set at one point cannot
 match at the others while the balance scales. Proposed: lidBalance 0, horns seated at ONE reference (closed),
 then check normal and wide.
-**Eye mapping, from the normal photo with lidBalance +29:** the eye on the VIEWER'S RIGHT (Scott's right facing
-the eyes) was the tighter one, so servos 4+5 = viewer's-right eye, servos 2+3 = viewer's-left eye. Balance then
-set to 0 live (reversible; saved value is still +29) to see normal with no scaling.
+**Eye mapping, CORRECTED:** servos 4+5 = the eye on the VIEWER'S LEFT (Scott's left facing the eyes; the
+robot's right eye); servos 2+3 = viewer's right. Measured: that eye got wider the moment lidBalance went +29 → 0
+(Scott watching). My first reading from the normal photo said the opposite and was WRONG: a photo taken after
+horn moves compares two uncontrolled eyes, it does not show which servo pair the balance acts on. Consequence:
+the original squint fix (+29) shrank the viewer's-LEFT eye, but the too-open eye was the viewer's RIGHT, so the
+balance was correcting the wrong eye and Scott's horn nudges were compensating for it.
 Scott: "Horns are aligned" — arrived as balance went to 0; which balance he aligned against not yet confirmed.
