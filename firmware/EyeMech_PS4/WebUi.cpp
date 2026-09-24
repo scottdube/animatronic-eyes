@@ -1,5 +1,6 @@
 #include "WebUi.h"
 #include "EyeSettings.h"
+#include "Scenes.h"
 #include "secrets.h"
 #include <Update.h>
 #include <WebServer.h>
@@ -44,25 +45,60 @@ input[type=range]{width:100%;height:32px}select{font-size:1em;padding:6px;width:
 .btns{display:flex;gap:8px;margin-top:20px}button{flex:1;font-size:1em;padding:12px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
 button.pri{background:var(--acc);color:var(--bg);border-color:var(--acc)}
 a{color:var(--acc)}
+h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--line)}
+#mode{font-size:1.15em;font-weight:600}.sc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sc button{padding:10px 4px}
 </style></head><body>
 <h1>EyeMech</h1>
 <div class="mut" id="bi"></div>
 <div id="st">…</div>
+<div id="mode">…</div>
+<div class="sc"><button data-c="idle">∿ Idle</button><button data-c="play">▶ Play</button><button data-c="record">⏺ Record</button>
+<button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button></div>
+<div class="mut" id="scm">Record needs the controller: it records what you do with it.</div>
+<h2>Eyes and lids</h2>
 <div class="row"><label>Eye rest height <span id="v_parkY"></span></label>
 <input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = centre, higher = lower</div></div>
 <div class="row"><label>Eye rest left / right <span id="v_parkX"></span></label>
 <input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = centre, + = right</div></div>
 <div class="row"><label>Lid opening at power-up <span id="v_bootTrim"></span></label>
 <input type="range" id="bootTrim" min="-40" max="40" step="5"><div class="mut">40 = fully open (applies now, too)</div></div>
+<div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
+<input type="range" id="lidMin" min="250" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch. Lower opens the top lids further: watch for a straining servo</div></div>
+<div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
+<input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
+<h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
 <div class="row"><label>Lid trim per D-pad press <span id="v_trimStep"></span></label>
 <input type="range" id="trimStep" min="1" max="20" step="1"></div>
+<h2>Alive idle</h2>
+<div class="row"><label>Idle</label>
+<select id="idleMode"><option value="0">Off</option><option value="1">Automatic when left alone</option><option value="2">Manual only (Triangle or this page)</option></select></div>
+<div class="row"><label>Automatic after <span id="v_autoIdleSecs"></span> s alone</label>
+<input type="range" id="autoIdleSecs" min="5" max="600" step="5"></div>
+<div class="row"><label>Manual start runs <span id="v_idleRunMins"></span> min</label>
+<input type="range" id="idleRunMins" min="0" max="120" step="1"><div class="mut">0 = until stopped</div></div>
+<div class="row"><label>Time between glances <span id="v_glanceTenths"></span> ×0.1 s</label>
+<input type="range" id="glanceTenths" min="5" max="50" step="1"></div>
+<div class="row"><label>How far glances go <span id="v_glanceRange"></span>%</label>
+<input type="range" id="glanceRange" min="10" max="100" step="5"></div>
+<div class="row"><label>Blinks per minute <span id="v_blinkRate"></span></label>
+<input type="range" id="blinkRate" min="0" max="30" step="1"></div>
+<h2>Bench radar (Home Assistant)</h2>
+<div class="row"><label>When someone arrives</label>
+<select id="arriveAction"><option value="0">Nothing (still wakes from sleep)</option><option value="1">Alive idle</option><option value="2">Play the recording, then idle</option></select></div>
+<div class="row"><label>When the bench is empty</label>
+<select id="emptyAction"><option value="0">Keep going</option><option value="1">Rest</option><option value="2">Sleep (lids closed)</option></select></div>
+<div class="row"><label>… after <span id="v_emptyMins"></span> min empty</label>
+<input type="range" id="emptyMins" min="1" max="60" step="1"></div>
 <div class="btns"><button class="pri" id="save">Save</button><button id="revert">Revert</button><button id="defaults">Defaults</button></div>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','bootTrim','blinkBtn','trimStep'];let dirty=false,busy=false,pend=null;
+const K=['parkY','parkX','bootTrim','lidMin','lidFollow','blinkBtn','trimStep','idleMode','autoIdleSecs','idleRunMins',
+ 'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
+const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
 function show(v){K.forEach(k=>{$(k).value=v[k];const o=$('v_'+k);if(o)o.textContent=v[k]});dirty=v.dirty}
 async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(r.status);return r.json()}
@@ -73,9 +109,13 @@ K.forEach(k=>$(k).addEventListener('input',e=>{const o=$('v_'+k);if(o)o.textCont
 $('save').onclick=async()=>{show(await j('/save',{method:'POST'}));poll()};
 $('revert').onclick=async()=>{show(await j('/revert',{method:'POST'}));poll()};
 $('defaults').onclick=async()=>{show(await j('/defaults',{method:'POST'}));poll()};
+document.querySelectorAll('.sc button').forEach(b=>b.onclick=async()=>{
+ const r=await fetch('/scene?cmd='+b.dataset.c,{method:'POST'});
+ $('scm').textContent=r.ok?'':'⚠ '+(await r.text());poll()});
 async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
- ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved');
+ ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
+ $('mode').textContent=(M[s.mode]||s.mode)+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
  $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
 j('/values').then(show).then(poll);setInterval(poll,2000);
 </script></body></html>)HTML";
@@ -135,9 +175,31 @@ void webBegin() {
   });
   server.on("/defaults", HTTP_POST, [] {
     if (!authorised()) return;
-    settings = EyeSettings();
+    resetSettings(settings);
     applyLiveSetting("");
     sendJson(settingsJson());  // not saved until Save
+  });
+
+  // idle | play | record | stop | sleep | wake
+  server.on("/scene", HTTP_POST, [] {
+    if (!authorised()) return;
+    String c = server.arg("cmd");
+    if (!sceneCommand(c)) {
+      server.send(409, "text/plain", "can't " + c + " now (idle off? no recording? no controller?)\n");
+      return;
+    }
+    sendJson(eyeStatusJson());
+  });
+  // Home Assistant, from the bench radar
+  server.on("/presence", HTTP_POST, [] {
+    if (!authorised()) return;
+    String st = server.arg("state");
+    if (st != "on" && st != "off") {
+      server.send(400, "text/plain", "state=on|off\n");
+      return;
+    }
+    scenePresence(st == "on");
+    sendJson(eyeStatusJson());
   });
 
   server.on("/update", HTTP_GET, [] {
