@@ -20,6 +20,14 @@ editor) account that has since been closed. Searched 2026-09-24, all empty:
 - Arduino IDE recent-sketches list, both sketchbooks, GitHub repos, both Trashes
 - no Time Machine on this Mac
 
+**Best lead: `low_tier_code_mod_ps4.zip`**, about 2 KB, which Scott sent by
+iMessage to **John** in May 2024. As of 2026-09-24 the Mac's copy fails
+to download (iCloud copy expired), the iPhone doesn't have it, and it isn't in
+Gmail or Drive. **Scott asked John to send it back on 2026-09-24. Awaiting a
+reply.** The Mac's `~/Library/Messages` is behind Full Disk Access, so the
+shell cannot read it. If the zip arrives, diff it against
+`firmware/EyeMech_PS4`, and prefer flashing it over the rebuild.
+
 **Not searched:** the Mini, the 2014 MacBook Air, any Windows box. A compiled
 board cannot give the source back.
 
