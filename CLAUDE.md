@@ -172,3 +172,18 @@ hold-P4-10s-then-press sequence cleared it without a power cycle (see above).
 - A PCA9685 is on the board (`docs/board-pca9685.jpg`, blue board with six
   servo leads and a 6-wire jumper to the ESP32). Whether the jumpers land on
   SDA 21 / SCL 22 is still unread, so that remains an assumption.
+
+## Requested 2026-09-24 (not built yet)
+
+Scott asked for Wi-Fi OTA plus a web settings page "just like the Info Orbs"
+(`~/code/hot-info-orbs/firmware/src/core/ota`, `.../settings`). Scope he chose:
+- **Park + lids:** eye rest height and left/right, and lid opening at power-up, as live sliders
+- **Buttons:** which button blinks, and the trim step
+- **Scenes:** the eyes run on their own for a set time, and later from a sensor trigger.
+  This is its own subsystem, designed after OTA and settings.
+
+Established so far: switching to the `min_spiffs` layout (2 × 1.875 MB app slots)
+keeps NVS at 0x9000/0x5000, the same as `default`, so the bond survives the one USB flash
+that changes the layout. Unlike the Orbs, settings must **apply live, with no restart**,
+because a restart drops the controller. **The open risk is Wi-Fi + Classic BT on one
+radio.** Spike it first: Wi-Fi on only, then check stick feel and reconnect.
