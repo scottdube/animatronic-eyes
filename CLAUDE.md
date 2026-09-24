@@ -52,9 +52,39 @@ and `reference/Wiring.png` are the kit's servo numbering and wiring.
 module, and the board is in `docs/board.jpg`. It has Bluetooth Classic, so the
 DS4 pairs to it directly with no USB Host Shield.
 
-**Evidence for the lost version's library:** `~/Documents/Arduino/libraries/PS4Controller`
-(pablomarquez76/PS4_Controller_Host v1.1.0, core-3.x compatible) was installed
-**2025-05-30**. Hypothesis, not established: the lost sketch used it.
+**The lost version used PS4Controller: ESTABLISHED** from the flash backup
+(below), which contains the library's L2CAP channel names `PS4-HIDC`/`PS4-HIDI`.
+The installed copy is `~/Documents/Arduino/libraries/PS4Controller`
+(pablomarquez76/PS4_Controller_Host v1.1.0), installed 2025-05-30.
+
+## Flash backup of the working board: `backup/`
+
+`board-flash-2026-09-24.bin` is the full 4 MB read of the board before anything
+was flashed over it. It was verified with `verify-flash` (digest matched), and
+`SHA256SUMS` is alongside. This is the only surviving copy of the lost sketch,
+and only in compiled form. Chip: ESP32-D0WD-V3 rev 3.1, 4 MB, base MAC
+d4:8a:fc:9e:7a:cc. Default partition table (app0/app1 at 0x10000/0x150000, nvs
+at 0x9000). To restore it:
+
+    ~/Library/Arduino15/packages/esp32/tools/esptool_py/5.1.0/esptool \
+      --port /dev/cu.usbserial-0001 -b 115200 write-flash 0 backup/board-flash-2026-09-24.bin
+
+**Baud trap:** this board's CP2102 corrupts reads at 921600 and 460800. Use
+115200 (a 4 MB read takes about 6.5 min).
+
+**What the dump says:**
+- NVS holds a Bluetooth bond with **8c:41:f2:a1:49:dc**, including a link key.
+  That is the controller's own address.
+- No MAC string appears anywhere in the app. So the lost sketch most likely
+  called `PS4.begin()` with no argument, using the ESP32's own BT MAC. Inferred
+  from an absence, so treat it as likely rather than proven.
+- No web page or HTML strings. The Wi-Fi and SSID strings are IDF SmartConfig
+  logs from the core, not the sketch.
+- **The dump contains the pairing link key.** Do not push this repo to a public
+  remote. The kit's NC-SA license is a second reason.
+
+**Upload without "Erase All Flash".** A normal upload leaves NVS, and with it
+the bond, intact. A full erase throws the pairing away.
 
 `firmware/EyeMech_PS4/EyeMech_PS4.ino` is the rebuild from 2026-09-24. It keeps
 the kit's servo math unchanged, and the stick input is converted to the kit's
@@ -78,5 +108,6 @@ clones without MAC games but needs its own board package.
 
 ## Open questions
 
-- Is the PCA9685 wired to SDA 21 / SCL 22? The photo shows servo leads and
-  jumpers but not where they land, so this is assumed.
+- A PCA9685 is on the board (`docs/board-pca9685.jpg`, blue board with six
+  servo leads and a 6-wire jumper to the ESP32). Whether the jumpers land on
+  SDA 21 / SCL 22 is still unread, so that remains an assumption.
