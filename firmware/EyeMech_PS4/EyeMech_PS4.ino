@@ -16,6 +16,11 @@
 #include <PS4Controller.h>
 #include <esp_mac.h>
 
+// esp32 core 3.x frees the Bluetooth controller's memory at boot unless a BT
+// library registers itself, and PS4Controller predates that and doesn't. Without
+// this override PS4.begin() fails with "Bluetooth FAILED to start".
+extern "C" bool btInUse() { return true; }
+
 // The controller only connects to the Bluetooth MAC it has stored. Leave this
 // empty to use the ESP32's own MAC (printed at boot); otherwise set it to the
 // MAC the controller is paired to, e.g. "a0:5a:5c:12:34:56".

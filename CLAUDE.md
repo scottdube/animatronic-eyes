@@ -6,7 +6,7 @@ May 2024. License is **CC BY-NC-SA 4.0** (`reference/License.html`), so the
 kit files may be shared with attribution, non-commercially, under the same
 license. Keep that in mind before this repo gets a public remote.
 
-## State: the controller version is LOST
+## State: the controller version was lost, then RECOVERED 2026-09-24
 
 Scott had edited the sketch to drive the eyes from a **game controller**. That
 version was not found anywhere. It likely lived only in an Arduino Cloud (web
@@ -23,8 +23,8 @@ editor) account that has since been closed. Searched 2026-09-24, all empty:
 **Best lead: `low_tier_code_mod_ps4.zip`**, about 2 KB, which Scott sent by
 iMessage to **John** in May 2024. As of 2026-09-24 the Mac's copy fails
 to download (iCloud copy expired), the iPhone doesn't have it, and it isn't in
-Gmail or Drive. **Scott asked John to send it back on 2026-09-24. Awaiting a
-reply.** The Mac's `~/Library/Messages` is behind Full Disk Access, so the
+Gmail or Drive. **John sent it back on 2026-09-24. It is now
+`firmware/Low_Tier_Code_mod_ps4/`, and the zip is in `reference/original-zip/`.** The Mac's `~/Library/Messages` is behind Full Disk Access, so the
 shell cannot read it. If the zip arrives, diff it against
 `firmware/EyeMech_PS4`, and prefer flashing it over the rebuild.
 
@@ -106,8 +106,27 @@ Compiles clean against esp32 core 3.3.7 with the IDE's bundled arduino-cli:
     "/Applications/Arduino IDE.app/Contents/Resources/app/lib/backend/resources/arduino-cli" \
       compile --fqbn esp32:esp32:esp32 --config-file ~/.arduinoIDE/arduino-cli.yaml firmware/EyeMech_PS4
 
-**NOT yet flashed or run on the mechanism.** Unverified: axis directions
-(`INVERT_X`/`INVERT_Y`), and whether the DS4 connects.
+Flashed 2026-09-24 (EraseFlash=none, so the bond is kept). Boot prints "Bluetooth up".
+Controller connection and axis directions (`INVERT_X`/`INVERT_Y`) are still unverified.
+
+**Core 3.x trap:** esp32 core 3.3.7 frees Bluetooth memory at boot unless
+`btInUse()` returns true, and PS4Controller doesn't set it. Without
+`extern "C" bool btInUse() { return true; }` in the sketch, `PS4.begin()` fails.
+Any sketch using this library that is built on core 3.x needs that line.
+
+## The original (John's copy) vs the backup
+
+The backup matches this source: it contains the sketch's `Ready.` string, and it
+was **built on esp32 core 2.0.16 (IDF v4.4.7)**, per the core paths and the
+IDF version string in the dump. This Mac now has core 3.3.7 only. Differences
+from the rebuild:
+- `PS4.begin()` has no argument, which confirms the inference above.
+- **Square** blinks, not Cross.
+- The stick maps straight to the servos (-127..127). X runs 180–440 (the kit uses 220–440),
+  and the upper lid runs 250–400 (the kit uses 280). `servoPos`/`servoPos1` in `notify()` are
+  computed but never used.
+- D-pad up/down steps the lid trim by 25 per 50 ms loop while held, over -50..50, starting at 50.
+- There is no `isConnected()` guard, so on disconnect the eyes hold their last position.
 
 ## Pairing trap
 
