@@ -309,3 +309,11 @@ servo can't reach its target (linkage jammed or past a stop, or gears/pot slippi
 the horn was re-seated, then jams and stalls; (b) supply current limit/brownout under idle's fast
 moves (the bench supply may be current-limited; the dead-servo event earlier fits a supply in protection);
 (c) a damaged servo 1 after the first horn loss.
+**Cause, strong hypothesis (Scott, 2026-09-24): the six servos run off the ESP32 DevKit's 5 V pin**, i.e.
+USB power through the board's diode, with no separate servo supply. SG90s draw ~100–250 mA moving and
+~650+ mA stalled each; idle's fast glances plus 4-lid blinks can ask for well over 1 A at once. That fits
+all three symptoms: the rail sagging makes the servos erratic (runaway); a USB port or the board's fuse tripping
+leaves the ESP32 up but no servo moving until it is unplugged and plugged back in (the "nothing moves" event,
+`pca` still true); and controller driving is gentler, so it didn't show. **Fix:** a separate 5.0 V supply,
+≥2.5 A, into the PCA9685 V+ screw terminal. Take the ESP32 5 V off the header's V+ (or the bench supply
+back-feeds USB), keep GND common. Not yet done or tested.
