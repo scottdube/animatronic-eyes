@@ -374,3 +374,8 @@ adjustment (the horn), so fixing one end moves the other** — back and forth. A
 also too coarse. lidBalance (one scale per eye) cannot fix it either. Proposed: per-servo closed + open trims.
 Per-lid trims live on de940f3 (all 0). idleMode 0 live again for tuning; saved value 1.
 Preset buttons on the page (3229ac7). Closed trims saved before the OTA: botLClosed -14 (Scott), rest 0.
+**Per-preset lid trims (build 1033ac6):** Scott: after closed + wide were trimmed, squint still showed the
+viewer's-left eye wider, so end-trims plus interpolation don't fit the middle (nonlinear linkage). Now 16 trims,
+c/s/n/w × TopL/BotL/TopR/BotR; the page's preset buttons select which preset the four trim sliders edit.
+Between presets the trim blends by lid %. Migrated botLClosed -14 → cBotL -14 and saved (idleMode 1 saved, 0 live).
+Page JS not exercised by me (no browser: my open tab coincided with the dead-slider episode); Scott's first use is the test.
