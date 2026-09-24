@@ -317,3 +317,4 @@ leaves the ESP32 up but no servo moving until it is unplugged and plugged back i
 `pca` still true); and controller driving is gentler, so it didn't show. **Fix:** a separate 5.0 V supply,
 ≥2.5 A, into the PCA9685 V+ screw terminal. Take the ESP32 5 V off the header's V+ (or the bench supply
 back-feeds USB), keep GND common. Not yet done or tested.
+**After the bench-supply rewire (2026-09-24):** `/status` pca false, pcaResets 103 and climbing (one per second): the PCA9685 stopped answering I2C at the rewire. So the logic side (VCC 3.3 V, SDA, SCL or GND on the header) was disturbed, not just V+. The watchdog caught it on its first real outing. Idle stopped again until it answers.
