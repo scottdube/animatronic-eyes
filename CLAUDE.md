@@ -110,6 +110,17 @@ that MAC in the sketch, or rewrite the controller's stored MAC over USB with
 sixaxispairer. Bluepad32 is the fallback if the clone refuses; it pairs DS4
 clones without MAC games but needs its own board package.
 
+## Observed 2026-09-24: lost control after the backup, and a power cycle fixed it
+
+After the esptool read and verify sessions, which each end in a hard reset
+over RTS, Scott switched the controller off, then pressed P4 to turn it back
+on. The eyes no longer responded. A power cycle of the eyes restored control.
+**The flash was not changed:** verify-flash matched the backup byte for byte
+after the read. Cause NOT established. Candidates: (a) the board came back from
+an esptool reset without BT ready; (b) the old firmware does not survive a
+controller off/on without an ESP32 restart, a known PS4-esp32 weakness. Test (b) on the rebuild
+before calling it done: controller off -> on, with no power cycle.
+
 ## Open questions
 
 - A PCA9685 is on the board (`docs/board-pca9685.jpg`, blue board with six
