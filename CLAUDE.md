@@ -347,3 +347,6 @@ Which eye is servos 4+5 was not asked; the slider still reads −/+ not left/rig
 **Horns settle (Scott):** after re-seating, a horn needs to work a little, then realign it, and it lands about
 where it should. So a lid mismatch right after a re-seat is partly horn settling, not only software; run the
 lids a while before trimming lidBalance again.
+**Wide wider (Scott, 2026-09-24):** at lidMin 200 / lowLidMax 480 he wanted more. Those were the old slider
+ends, not a found stop, so the ranges now reach 160 / 520 (build 4880f6d). Stepping live, not saved: 190 / 490 first.
+Caveat: lidBalance +29 scales wide too, so the balanced eye opens only 71% of its travel at wide.
