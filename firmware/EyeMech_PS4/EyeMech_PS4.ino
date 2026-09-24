@@ -10,7 +10,7 @@
 //               stick pushed further wins
 //  Cross        blink (the kit's button on D2)
 //  D-pad up/dn  lid trim (the kit's pot on A2)
-//  No controller: eyes parked (see Y_PARK), lids open.
+//  No controller: eyes parked (see Y_PARK), lids open. Boots with trim at 40 (fully open).
 
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -34,14 +34,14 @@ const bool INVERT_Y = false;
 // Where the eyes rest with the stick centred, below the mechanical centre, in the
 // kit's 0..1023 units (512 = centre). Full stick travel still reaches both ends.
 // Raise it to park lower. On the servo that is ~1/4 of this in pulse counts.
-const int Y_PARK = 120;
+const int Y_PARK = 180;
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 int xval = 512;
 int yval = 512 - Y_PARK;
 int switchval = LOW;
-int trimval = 0;          // -40..40, same as the kit's pot after its map()
+int trimval = 40;         // -40..40, same as the kit's pot after its map(); 40 = lids fully open
 
 int lexpulse, rexpulse;
 int leypulse, reypulse;

@@ -121,7 +121,7 @@ DS4 has no off button, and Scott didn't know this trick until today.
 
 Added the same day at Scott's request: the **right stick drives the eyes too** (per axis,
 whichever stick is pushed further wins; summing them was rejected because it would
-double the throw), and **`Y_PARK`** rests the eyes below mechanical centre, 60 of 1023 at first, then 120 after Scott asked for "a little lower"
+double the throw), and **`Y_PARK`** rests the eyes below mechanical centre, 60 of 1023 at first, then 120, then 180 as Scott asked for lower each time
 to start. Each half of the stick travel is stretched so both ends are still
 reached, which is why the offset isn't simply subtracted, since that would clip the top.
 
