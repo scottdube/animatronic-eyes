@@ -350,3 +350,4 @@ lids a while before trimming lidBalance again.
 **Wide wider (Scott, 2026-09-24):** at lidMin 200 / lowLidMax 480 he wanted more. Those were the old slider
 ends, not a found stop, so the ranges now reach 160 / 520 (build 4880f6d). Stepping live, not saved: 190 / 490 first.
 Caveat: lidBalance +29 scales wide too, so the balanced eye opens only 71% of its travel at wide.
+190/490: no buzz (Scott). Stepped to 180/500.
