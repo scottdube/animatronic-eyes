@@ -63,10 +63,15 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit centre, higher = lower</div></div>
 <div class="row"><label>Pupil centre left / right <span id="v_parkX"></span></label>
 <input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit centre, + = right</div></div>
-<div class="row"><label>Lid opening at power-up <span id="v_bootTrim"></span></label>
-<input type="range" id="bootTrim" min="-40" max="40" step="5"><div class="mut">40 = fully open (applies now, too)</div></div>
+<p class="mut">Lid presets, % open. D-pad up/down steps closed ‹ squint ‹ normal ‹ wide; power-up is normal,
+a blink goes to closed. Moving a slider shows that preset.</p>
+<div class="row"><label>▲ Wide <span id="v_lidWide"></span>%</label><input type="range" id="lidWide" min="0" max="100" step="1"></div>
+<div class="row"><label>● Normal <span id="v_lidNormal"></span>%</label><input type="range" id="lidNormal" min="0" max="100" step="1"></div>
+<div class="row"><label>◒ Squint <span id="v_lidSquint"></span>%</label><input type="range" id="lidSquint" min="0" max="100" step="1"></div>
+<div class="row"><label>▬ Closed <span id="v_lidClosed"></span>%</label><input type="range" id="lidClosed" min="0" max="100" step="1">
+<div class="mut">0 = the positions the horns were seated to</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
-<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
+<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
 <div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
 <input type="range" id="lowLidMax" min="400" max="480" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
@@ -74,8 +79,6 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
-<div class="row"><label>Lid trim per D-pad press <span id="v_trimStep"></span></label>
-<input type="range" id="trimStep" min="1" max="20" step="1"></div>
 <h2>Alive idle</h2>
 <div class="row"><label>Idle</label>
 <select id="idleMode"><option value="0">Off</option><option value="1">Automatic when left alone</option><option value="2">Manual only (Triangle or this page)</option></select></div>
@@ -100,7 +103,7 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','bootTrim','lidMin','lowLidMax','lidFollow','blinkBtn','trimStep','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);

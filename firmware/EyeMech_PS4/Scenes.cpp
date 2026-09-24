@@ -9,11 +9,9 @@ static SceneMode mode = M_REST, shownMode = (SceneMode)-1;
 static uint32_t lastActivity = 0;  // takeover or scene command; 0 = boot
 static uint32_t lastTakeover = 0;
 static bool prevTri = false, prevCir = false, prevShare = false;
-static int lastLiveTrim = 40;
 
 static uint32_t idleUntil = 0;  // 0 = runs until stopped
 static bool playThenIdle = false;
-static int trimBeforePlay = 40;
 
 static bool present = false, emptyPending = false;
 static bool holdRest = false;  // bench went empty with emptyAction=rest: no auto idle until someone is back
@@ -27,6 +25,8 @@ static uint32_t emptySince = 0;
 // most of the time and the pupils disappeared (seen by Scott 2026-09-24).
 static const float IDLE_X_MAX = 400, IDLE_Y_MAX = 200;  // offsets at glanceRange 100%
 static float gx = 0, gy = 0, tx = 0, ty = 0;
+static int idleLid = 75;          // % open; normal, with the odd squint or wide look
+static uint32_t idleLidUntil = 0;
 static uint32_t nextGlance = 0, nextDrift = 0, nextBlink = 0, blinkEnd = 0, secondBlink = 0;
 static uint32_t lastIdleUpdate = 0;
 
@@ -52,6 +52,7 @@ static void idleReset(uint32_t now) {
   nextDrift = now + 400;
   nextBlink = now + nextBlinkDelay();
   blinkEnd = secondBlink = 0;
+  idleLidUntil = 0;
   lastIdleUpdate = now;
 }
 
@@ -63,6 +64,18 @@ static Frame idleFrame(uint32_t now) {
     ty = (frand() * 2 - 1) * r * IDLE_Y_MAX;  // people glance sideways more than up/down
     nextGlance = now + (uint32_t)(settings.glanceTenths * 100 * (0.5f + frand()));
     if (big && frand() < 0.25f) nextBlink = now;  // a big glance often comes with a blink
+    if (now >= idleLidUntil) {  // now and then a wide look (with a big glance) or a squint
+      float r2 = frand();
+      if (big && r2 < 0.25f) {
+        idleLid = settings.lidWide;
+        idleLidUntil = now + 800 + (uint32_t)(frand() * 1200);
+      } else if (r2 < 0.10f) {
+        idleLid = settings.lidSquint;
+        idleLidUntil = now + 1500 + (uint32_t)(frand() * 2500);
+      } else {
+        idleLid = settings.lidNormal;
+      }
+    }
   }
   if (now >= nextDrift) {  // small wander between glances
     tx += (frand() * 2 - 1) * 10;
@@ -88,13 +101,13 @@ static Frame idleFrame(uint32_t now) {
   f.sx = adcToStick(gx, restX());
   f.sy = adcToStick(gy, restY());
   f.blink = now < blinkEnd;
-  f.trim = lastLiveTrim;
+  f.lid = now < idleLidUntil ? idleLid : settings.lidNormal;
   return f;
 }
 
 // ---- recording store: the spare 128 KB "spiffs" data partition, raw ----------
 // [0..255] header (written last), then 4-byte frames at 50 Hz from offset 256.
-static const uint32_t MAGIC = 0x31524559;  // "EYR1"
+static const uint32_t MAGIC = 0x32524559;  // "EYR2": byte 3 is lid % open (EYR1 was trim)
 static const uint32_t FRAME_MS = 20, HDR = 256;
 struct Header {
   uint32_t magic, frames, frameMs;
@@ -141,13 +154,11 @@ static void finishRecording() {
 
 static void stopScene() {
   if (mode == M_RECORD) finishRecording();
-  if (mode == M_PLAY) lastLiveTrim = trimBeforePlay;
   mode = M_REST;
 }
 
 static bool startIdle(uint32_t now, bool timed) {
   if (mode == M_RECORD || settings.idleMode == 0) return false;
-  if (mode == M_PLAY) lastLiveTrim = trimBeforePlay;
   idleReset(now);
   idleUntil = (timed && settings.idleRunMins) ? now + settings.idleRunMins * 60000UL : 0;
   mode = M_IDLE;
@@ -156,7 +167,6 @@ static bool startIdle(uint32_t now, bool timed) {
 
 static bool startPlay(uint32_t now, bool thenIdle) {
   if (!storedFrames || mode == M_RECORD) return false;
-  if (mode != M_PLAY) trimBeforePlay = lastLiveTrim;
   playThenIdle = thenIdle;
   playStart = now;
   rbase = -1;
@@ -166,7 +176,6 @@ static bool startPlay(uint32_t now, bool thenIdle) {
 
 static bool startRecord() {
   if (!part || !PS4.isConnected()) return false;  // a recording is the controller driving
-  if (mode == M_PLAY) lastLiveTrim = trimBeforePlay;
   Serial.println("Scene: erasing recording store");
   esp_partition_erase_range(part, 0, part->size);  // ~1.3 s; the eyes hold still
   storedFrames = 0;
@@ -185,7 +194,7 @@ static void recordSample(const Frame &f, uint32_t now) {
     wbuf[wlen++] = (uint8_t)(int8_t)f.sx;
     wbuf[wlen++] = (uint8_t)(int8_t)f.sy;
     wbuf[wlen++] = f.blink ? 1 : 0;
-    wbuf[wlen++] = (uint8_t)(int8_t)f.trim;
+    wbuf[wlen++] = (uint8_t)f.lid;
     recFrames++;
     if (wlen == sizeof wbuf) {
       esp_partition_write(part, woff, wbuf, sizeof wbuf);
@@ -212,7 +221,7 @@ static bool playFrame(uint32_t now, Frame &f) {
   f.sx = (int8_t)p[0];
   f.sy = (int8_t)p[1];
   f.blink = p[2] & 1;
-  f.trim = constrain((int)(int8_t)p[3], -40, 40);
+  f.lid = constrain((int)p[3], 0, 100);
   return true;
 }
 
@@ -231,7 +240,6 @@ void scenesBegin() {
 }
 
 Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
-  if (mode != M_PLAY) lastLiveTrim = live.trim;
   if (pad.connected && !wasConnected) shownMode = (SceneMode)-1;  // fresh connection: resend the light bar
   wasConnected = pad.connected;
   if (pad.connected && (pad.takeover || pad.triangle || pad.circle || pad.share)) holdRest = false;
@@ -286,14 +294,13 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
       break;
     case M_PLAY:
       if (!playFrame(now, out)) {
-        lastLiveTrim = trimBeforePlay;
         mode = M_REST;
         if (playThenIdle) startIdle(now, true);
         out = mode == M_IDLE ? idleFrame(now) : live;
       }
       break;
     case M_SLEEP:
-      out = {0, 0, true, lastLiveTrim};
+      out = {0, 0, true, settings.lidClosed};
       break;
     case M_RECORD:
       recordSample(live, now);
@@ -301,7 +308,6 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
     default:
       break;
   }
-  if (mode != M_PLAY) out.trim = lastLiveTrim;
 
   if (mode != shownMode) {
     Serial.printf("Scene: %s\n", sceneModeName());

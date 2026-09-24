@@ -9,7 +9,7 @@
 //  Either stick eyes (X and Y, lids follow Y as in the kit); per axis, the
 //               stick pushed further wins
 //  Cross        blink (the kit's button on D2)
-//  D-pad up/dn  lid trim (the kit's pot on A2)
+//  D-pad up/dn  lid preset: closed < squint < normal < wide (replaces the kit's trim pot)
 //  Triangle     alive idle on / off       Circle  play the recording / stop
 //  Share        record / stop
 //  Sticks, blink or D-pad take over from any scene (Scenes.h).
@@ -86,7 +86,7 @@ void pcaCheck() {
 int xval = 512;
 int yval = 512;
 int switchval = LOW;
-int trimval = 40;         // -40..40, same as the kit's pot after its map(); set from settings.bootTrim
+int lidIdx = 2;           // lid preset: 0 closed, 1 squint, 2 normal (power-up), 3 wide
 const int DEADZONE = 16;  // stick movement past this is a takeover
 Frame live;               // what the controller says this loop
 PadState pad;
@@ -113,7 +113,14 @@ void onPacket() { pktCount++; }
 // WebUi hooks
 void applyLiveSetting(const String &key) {
   // Lid opening shows immediately, so the slider can be judged by eye
-  if (key == "bootTrim" || key == "") trimval = settings.bootTrim;
+  // Setting a lid preset shows it: stop any scene and switch to that preset
+  static const char *const PRESETS[] = {"lidClosed", "lidSquint", "lidNormal", "lidWide"};
+  for (int i = 0; i < 4; i++)
+    if (key == PRESETS[i]) {
+      sceneCommand("stop");
+      lidIdx = i;
+    }
+  if (key == "") lidIdx = 2;
   // Setting the pupil centre: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
 }
@@ -122,10 +129,10 @@ String eyeStatusJson() {
   char buf[320];
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
-           "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"trim\":%d,"
+           "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
            "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
-           (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", trimval,
+           (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
            sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
            pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets);
   return buf;
@@ -199,7 +206,7 @@ void setup() {
   PS4.attach(onPacket);
 
   loadSettings();
-  trimval = settings.bootTrim;
+  lidIdx = 2;
   xval = restX();
   yval = restY();
   scenesBegin();
@@ -212,10 +219,19 @@ void setup() {
   Serial.printf("PCA9685: prescale %u (%s)\n", pcaPrescale, pcaOk ? "answering" : "NOT answering");
 }
 
-// Fills `live` and `pad`. No controller = rest, with the trim where it was left.
+int lidPct(int idx) {
+  switch (idx) {
+    case 0: return settings.lidClosed;
+    case 1: return settings.lidSquint;
+    case 3: return settings.lidWide;
+    default: return settings.lidNormal;
+  }
+}
+
+// Fills `live` and `pad`. No controller = rest, lids at the preset where they were left.
 void readController() {
   pad = PadState{};
-  live = Frame{0, 0, false, trimval};
+  live = Frame{0, 0, false, lidPct(lidIdx)};
   if (!PS4.isConnected()) return;
   pad.connected = true;
   live.sx = stronger(PS4.LStickX(), PS4.RStickX());
@@ -225,11 +241,11 @@ void readController() {
              : (PS4.Cross() || PS4.Square());
 
   bool up = PS4.Up(), down = PS4.Down();
-  if (up && !lastUp)     trimval = constrain(trimval + settings.trimStep, -40, 40);
-  if (down && !lastDown) trimval = constrain(trimval - settings.trimStep, -40, 40);
+  if (up && !lastUp)     lidIdx = min(lidIdx + 1, 3);
+  if (down && !lastDown) lidIdx = max(lidIdx - 1, 0);
   lastUp = up;
   lastDown = down;
-  live.trim = trimval;
+  live.lid = lidPct(lidIdx);
 
   bool moved = abs(PS4.LStickX()) > DEADZONE || abs(PS4.LStickY()) > DEADZONE ||
                abs(PS4.RStickX()) > DEADZONE || abs(PS4.RStickY()) > DEADZONE;
@@ -267,7 +283,7 @@ void loop() {
   xval = stickToAdc(f.sx, INVERT_X, restX());
   yval = stickToAdc(f.sy, INVERT_Y, restY());
   switchval = f.blink ? HIGH : LOW;
-  int lidTrim = f.trim;  // a recording plays back its own trim; trimval is untouched
+  int lid = f.blink ? settings.lidClosed : f.lid;  // % open; a blink goes to the closed preset
 
   lexpulse = map(xval, 0, 1023, 220, 440);
   rexpulse = lexpulse;
@@ -275,38 +291,35 @@ void loop() {
   leypulse = map(yval, 0, 1023, 250, 500);
   reypulse = map(yval, 0, 1023, 400, 280);
 
-  // Upper lid: lidMin below the kit's 280 opens the whole lid that much further
-  uplidpulse = followLid(map(yval, 0, 1023, 400, 280), 340);
-  uplidpulse -= (lidTrim - 40);
-  uplidpulse -= (280 - settings.lidMin);
-  uplidpulse = constrain(uplidpulse, settings.lidMin, 400);
-  altuplidpulse = 680 - uplidpulse;
-
-  lolidpulse = followLid(map(yval, 0, 1023, 410, 280), 345);
-  lolidpulse += (lidTrim / 2);
-  lolidpulse += (settings.lowLidMax - 400);  // same idea as lidMin, lower lid opens upward in counts
-  lolidpulse = constrain(lolidpulse, 280, settings.lowLidMax);
-  altlolidpulse = 680 - lolidpulse;
+  // Fully open: the kit's lids at trim 40, following the eyes, pushed out to the
+  // open limits (lidMin below the kit's 280, lowLidMax above its 400).
+  int upOpen = followLid(map(yval, 0, 1023, 400, 280), 340) - (280 - settings.lidMin);
+  upOpen = constrain(upOpen, settings.lidMin, 400);
+  int loOpen = followLid(map(yval, 0, 1023, 410, 280), 345) + 20 + (settings.lowLidMax - 400);
+  loOpen = constrain(loOpen, 280, settings.lowLidMax);
+  // Each servo goes between its own closed pulse (the kit's blink, which the horns
+  // were seated to) and its open pulse. The kit's blink is not an exact mirror, so
+  // servos 4 and 5 get their own closed values rather than 680 - x.
+  // Bottom lids close by sqrt: like real ones they stay mostly open until a lid nearly
+  // shuts, which matches the kit's trim moving them half as far (normal 75% = trim 5).
+  float top = lid / 100.0f, bot = sqrtf(top);
+  uplidpulse = lroundf(400 + (upOpen - 400) * top);
+  altuplidpulse = lroundf(240 + ((680 - upOpen) - 240) * top);
+  lolidpulse = lroundf(240 + (loOpen - 240) * bot);
+  altlolidpulse = lroundf(400 + ((680 - loOpen) - 400) * bot);
 
   pwm.setPWM(0, 0, lexpulse);
   pwm.setPWM(1, 0, leypulse);
 
-  if (switchval == HIGH) {
-    pwm.setPWM(2, 0, 400);
-    pwm.setPWM(3, 0, 240);
-    pwm.setPWM(4, 0, 240);
-    pwm.setPWM(5, 0, 400);
-  } else {
-    pwm.setPWM(2, 0, uplidpulse);
-    pwm.setPWM(3, 0, lolidpulse);
-    pwm.setPWM(4, 0, altuplidpulse);
-    pwm.setPWM(5, 0, altlolidpulse);
-  }
+  pwm.setPWM(2, 0, uplidpulse);
+  pwm.setPWM(3, 0, lolidpulse);
+  pwm.setPWM(4, 0, altuplidpulse);
+  pwm.setPWM(5, 0, altlolidpulse);
 
   if (millis() - lastPrint > 200) {
     lastPrint = millis();
-    Serial.printf("conn=%d mode=%s x=%d y=%d blink=%d trim=%d\n",
-                  PS4.isConnected(), sceneModeName(), xval, yval, switchval, lidTrim);
+    Serial.printf("conn=%d mode=%s x=%d y=%d blink=%d lid=%d\n",
+                  PS4.isConnected(), sceneModeName(), xval, yval, switchval, lid);
   }
 
   delay(5);

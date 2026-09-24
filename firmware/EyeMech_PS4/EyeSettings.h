@@ -10,13 +10,14 @@ struct EyeSettings {
   int parkY;         // eyes rest this far below centre, 0..300
   int parkX;         // eyes rest this far right (+) / left (-), -150..150
   // Lids
-  int bootTrim;      // lid trim at power-up, -40 (most closed) .. 40 (fully open)
+  // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
+  // open limits below. D-pad up/down steps closed < squint < normal < wide; power-up is normal.
+  int lidWide, lidNormal, lidSquint, lidClosed;
   int lidMin;        // upper lid open limit, 280 (kit) .. 200; Scott's original used 250
   int lowLidMax;     // lower lid open limit, 400 (kit) .. 480
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
-  int trimStep;      // D-pad lid trim per press, 1..20
   // Alive idle
   int idleMode;      // 0 off, 1 automatic, 2 manual only
   int autoIdleSecs;  // unattended this long -> automatic idle, 5..600

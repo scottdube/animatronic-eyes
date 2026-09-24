@@ -319,3 +319,7 @@ leaves the ESP32 up but no servo moving until it is unplugged and plugged back i
 back-feeds USB), keep GND common. Not yet done or tested.
 **After the bench-supply rewire (2026-09-24):** `/status` pca false, pcaResets 103 and climbing (one per second): the PCA9685 stopped answering I2C at the rewire. So the logic side (VCC 3.3 V, SDA, SCL or GND on the header) was disturbed, not just V+. The watchdog caught it on its first real outing. Idle stopped again until it answers.
 VCC header wire was loose (Scott). Re-seated: pca true, the watchdog re-initialised the chip on its own (pcaResets stopped at 263). Idle restarted on the bench supply with Scott watching.
+Idle on the bench supply ran clean (Scott). Supply display: usually peaks ~300 mA, high 400s on
+back-to-back blinks. A supply's panel meter averages, so real spikes are higher; that is right at
+the ~500 mA a USB port gives, which is consistent with (not proof of) the USB-power cause.
+Saved 2026-09-24 ~16:40: idleMode 1, bootTrim 5.

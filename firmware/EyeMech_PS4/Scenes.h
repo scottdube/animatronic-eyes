@@ -8,7 +8,7 @@
 struct Frame {
   int sx, sy;   // stick space, -128..127, 0 = rest position
   bool blink;
-  int trim;     // lid trim, -40..40
+  int lid;      // lids % open, 0 = closed .. 100 = wide (EyeSettings lid presets)
 };
 
 struct PadState {
