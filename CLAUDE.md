@@ -279,3 +279,4 @@ live, not saved: 265 first (top lid 325), then toward 250 as long as nothing str
 Stepped live with Scott watching, no buzz at any step: lidMin 265 → 250 → 240 (range widened to
 200 in firmware) → 230 → 220 → 210 → 200. Added `lowLidMax` (400 kit .. 480) and set 480 to match.
 Photo at lidMin 200 / lowLidMax 480: all four lids fully clear of the eye, pupils visible. NOT saved yet.
+Closed check (photo): both eyes seal with no gap; the right eye (as viewed) lower lid rides slightly over the upper.
