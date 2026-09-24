@@ -111,8 +111,13 @@ Flashed 2026-09-24 (EraseFlash=none, so the bond is kept). Boot prints "Bluetoot
 `PS4 connected`, and both stick axes swept the full 4..1023 range. It paired with the
 existing bond, with no re-pairing and no MAC set, so `PS4.begin()` on the ESP32's own MAC is right.
 Scott confirmed on the mechanism the same day that stick direction, Cross blink and
-D-pad trim all work as expected (serial also showed blink=1 at 14:30). Still unverified: controller off/on reconnect
-without a power cycle.
+D-pad trim all work as expected (serial also showed blink=1 at 14:30). **Reconnect without a power cycle: VERIFIED 2026-09-24 14:36.** After two
+back-to-back flashes (RTS resets while the controller was connected), P4 alone did
+not reconnect. Scott **held P4 about 10 s until the light went out, then pressed P4
+once**, and serial showed `PS4 connected` with the light bar solid. The eyes' power was not touched.
+
+**To reconnect: hold P4 about 10 s until the light goes out, then press P4.** A
+DS4 has no off button, and Scott didn't know this trick until today.
 
 Added the same day at Scott's request: the **right stick drives the eyes too** (per axis,
 whichever stick is pushed further wins; summing them was rejected because it would
@@ -156,8 +161,11 @@ on. The eyes no longer responded. A power cycle of the eyes restored control.
 **The flash was not changed:** verify-flash matched the backup byte for byte
 after the read. Cause NOT established. Candidates: (a) the board came back from
 an esptool reset without BT ready; (b) the old firmware does not survive a
-controller off/on without an ESP32 restart, a known PS4-esp32 weakness. Test (b) on the rebuild
-before calling it done: controller off -> on, with no power cycle.
+controller off/on without an ESP32 restart, a known PS4-esp32 weakness;
+(c) **hypothesis, likeliest:** the controller was never actually off. Scott said later that
+day he didn't know how to turn it off, so pressing P4 would not have restarted
+its connection. The same symptom recurred on the rebuild after two quick resets, and the
+hold-P4-10s-then-press sequence cleared it without a power cycle (see above).
 
 ## Open questions
 
