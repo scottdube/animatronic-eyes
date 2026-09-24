@@ -280,3 +280,4 @@ Stepped live with Scott watching, no buzz at any step: lidMin 265 → 250 → 24
 200 in firmware) → 230 → 220 → 210 → 200. Added `lowLidMax` (400 kit .. 480) and set 480 to match.
 Photo at lidMin 200 / lowLidMax 480: all four lids fully clear of the eye, pupils visible. NOT saved yet.
 Closed check (photo): both eyes seal with no gap; the right eye (as viewed) lower lid rides slightly over the upper.
+- **Ruled out 2026-09-24:** 'stuck /set after an OTA restart' as the cause of Scott's dead sliders: he had already reloaded, and it still does nothing (the 3 s timeout fix stays; it is harmless).
