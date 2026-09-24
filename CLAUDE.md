@@ -276,3 +276,6 @@ re-seat is void. Redone with all six servos holding in Sleep at kit centre: serv
 **After the re-seat (photo 2026-09-24):** at full open (trim 40, eyes at kit centre) the top lids still
 cover about half of each eye: the kit opens the top lid only 400 → 340 there. Stepping `lidMin` down
 live, not saved: 265 first (top lid 325), then toward 250 as long as nothing strains.
+Stepped live with Scott watching, no buzz at any step: lidMin 265 → 250 → 240 (range widened to
+200 in firmware) → 230 → 220 → 210 → 200. Added `lowLidMax` (400 kit .. 480) and set 480 to match.
+Photo at lidMin 200 / lowLidMax 480: all four lids fully clear of the eye, pupils visible. NOT saved yet.
