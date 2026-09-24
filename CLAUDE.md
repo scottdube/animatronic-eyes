@@ -111,12 +111,12 @@ Flashed 2026-09-24 (EraseFlash=none, so the bond is kept). Boot prints "Bluetoot
 `PS4 connected`, and both stick axes swept the full 4..1023 range. It paired with the
 existing bond, with no re-pairing and no MAC set, so `PS4.begin()` on the ESP32's own MAC is right.
 Scott confirmed on the mechanism the same day that stick direction, Cross blink and
-D-pad trim all work as expected. Still unverified: controller off/on reconnect
+D-pad trim all work as expected (serial also showed blink=1 at 14:30). Still unverified: controller off/on reconnect
 without a power cycle.
 
 Added the same day at Scott's request: the **right stick drives the eyes too** (per axis,
 whichever stick is pushed further wins; summing them was rejected because it would
-double the throw), and **`Y_PARK`** rests the eyes below mechanical centre, 60 of 1023
+double the throw), and **`Y_PARK`** rests the eyes below mechanical centre, 60 of 1023 at first, then 120 after Scott asked for "a little lower"
 to start. Each half of the stick travel is stretched so both ends are still
 reached, which is why the offset isn't simply subtracted, since that would clip the top.
 

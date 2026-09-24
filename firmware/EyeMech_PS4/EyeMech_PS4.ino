@@ -34,7 +34,7 @@ const bool INVERT_Y = false;
 // Where the eyes rest with the stick centred, below the mechanical centre, in the
 // kit's 0..1023 units (512 = centre). Full stick travel still reaches both ends.
 // Raise it to park lower. On the servo that is ~1/4 of this in pulse counts.
-const int Y_PARK = 60;
+const int Y_PARK = 120;
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
