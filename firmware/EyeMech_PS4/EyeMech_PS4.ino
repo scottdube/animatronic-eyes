@@ -85,6 +85,8 @@ void onPacket() { pktCount++; }
 void applyLiveSetting(const String &key) {
   // Lid opening shows immediately, so the slider can be judged by eye
   if (key == "bootTrim" || key == "") trimval = settings.bootTrim;
+  // Setting the pupil centre: hold the eyes there so it can be judged by eye
+  if (key == "parkX" || key == "parkY") sceneCommand("stop");
 }
 
 String eyeStatusJson() {

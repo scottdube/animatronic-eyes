@@ -57,10 +57,12 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button></div>
 <div class="mut" id="scm">Record needs the controller: it records what you do with it.</div>
 <h2>Eyes and lids</h2>
-<div class="row"><label>Eye rest height <span id="v_parkY"></span></label>
-<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = centre, higher = lower</div></div>
-<div class="row"><label>Eye rest left / right <span id="v_parkX"></span></label>
-<input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = centre, + = right</div></div>
+<p class="mut">Pupil centre: set where the eyes look straight ahead. Moving either slider stops idle and
+holds the eyes there. The sticks and idle glances all work around this point.</p>
+<div class="row"><label>Pupil centre up / down <span id="v_parkY"></span></label>
+<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit centre, higher = lower</div></div>
+<div class="row"><label>Pupil centre left / right <span id="v_parkX"></span></label>
+<input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit centre, + = right</div></div>
 <div class="row"><label>Lid opening at power-up <span id="v_bootTrim"></span></label>
 <input type="range" id="bootTrim" min="-40" max="40" step="5"><div class="mut">40 = fully open (applies now, too)</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
