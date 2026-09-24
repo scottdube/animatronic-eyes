@@ -54,6 +54,35 @@ const bool INVERT_Y = false;
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+// The PCA9685 is set up once at boot. If its logic power blinks (a bumped jumper)
+// it resets into sleep with every output off, and the ESP32 keeps writing positions
+// it ignores: nothing moves, not even a buzz (seen 2026-09-24). Once a second the
+// prescaler is read back; if it isn't ours, the chip is set up again.
+uint8_t pcaPrescale = 0;
+bool pcaOk = false;
+uint32_t pcaResets = 0;
+unsigned long lastPcaCheck = 0;
+
+void pcaSetup() {
+  pwm.begin();
+  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+  delay(10);
+  pcaPrescale = pwm.readPrescale();
+}
+
+void pcaCheck() {
+  uint8_t p = pwm.readPrescale();
+  pcaOk = p == pcaPrescale && p != 0 && p != 0xFF;
+  if (!pcaOk) {
+    pcaResets++;
+    Serial.printf("PCA9685: prescale read %u, expected %u - setting it up again (#%lu)\n",
+                  p, pcaPrescale, (unsigned long)pcaResets);
+    uint8_t want = pcaPrescale;
+    pcaSetup();
+    if (want && want != 0xFF) pcaPrescale = want;
+  }
+}
+
 int xval = 512;
 int yval = 512;
 int switchval = LOW;
@@ -90,14 +119,15 @@ void applyLiveSetting(const String &key) {
 }
 
 String eyeStatusJson() {
-  char buf[256];
+  char buf[320];
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"trim\":%d,"
-           "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d}",
+           "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", trimval,
-           sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval);
+           sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
+           pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets);
   return buf;
 }
 
@@ -177,9 +207,9 @@ void setup() {
   wifiStart();
   webBegin();
 
-  pwm.begin();
-  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
-  delay(10);
+  pcaSetup();
+  pcaOk = pcaPrescale != 0 && pcaPrescale != 0xFF;
+  Serial.printf("PCA9685: prescale %u (%s)\n", pcaPrescale, pcaOk ? "answering" : "NOT answering");
 }
 
 // Fills `live` and `pad`. No controller = rest, with the trim where it was left.
@@ -222,6 +252,10 @@ void loop() {
   if (Serial.available() && Serial.read() == 'w') {
     wifiWanted = !wifiWanted;
     wifiWanted ? wifiStart() : wifiStop();
+  }
+  if (millis() - lastPcaCheck >= 1000) {
+    lastPcaCheck = millis();
+    pcaCheck();
   }
   if (millis() - lastStat >= 1000) {
     lastStat = millis();
