@@ -366,3 +366,4 @@ the original squint fix (+29) shrank the viewer's-LEFT eye, but the too-open eye
 balance was correcting the wrong eye and Scott's horn nudges were compensating for it.
 Scott: "Horns are aligned" — arrived as balance went to 0; which balance he aligned against not yet confirmed.
 Normal photo at lidBalance +15: viewer's-left eye still far wider than the right (top lid well clear of the pupil). Stepped to +30.
++30: still more wanted (Scott). Stepped to +40, the slider end.
