@@ -239,3 +239,16 @@ Page has scene buttons, the mode in words + glyph, and sliders for lids, idle an
 - Deviation from spec: `emptyAction=rest` holds rest until presence/takeover/command.
   Without that, automatic idle restarts at once (already unattended) and "rest" means nothing.
 - Heap after boot with the scenes code: 43.7 KB free. App 1.678 MB = 85% of a slot.
+
+**Idle fix 2026-09-24 (build 6ca51ce).** Scott: pupils never visible while idling, too high.
+Cause: glances were even in stick units, and with parkY 270 the stick's upper half spans
+781 units vs 242 below, so idle looked up ~3x further than down. Now picked in 0..1023
+units around rest. Measured after the fix over /status (80 samples, 0.3 s apart): y 209–352,
+mean 260, around rest 242; x 320–568, mean 481, around 512. The park sliders are now
+labelled **Pupil centre**, and dragging one stops idle so the centre can be set by eye.
+
+**The up/down servo horn fell off (2026-09-24).** The eyes are held at kit centre (x 512,
+y 512 = servo 1 pulse 375) with idleMode 0, parkY 0, parkX 0 set live and NOT saved (NVS
+still has parkY 270 and idleMode 1) so Scott can re-seat it. **Hypothesis, untested:** a slipping horn
+could be why "park lower" was asked for three times and why the pupils read high. Re-set
+the pupil centre after the horn is back on, before trusting parkY 270.
