@@ -252,3 +252,8 @@ y 512 = servo 1 pulse 375) with idleMode 0, parkY 0, parkX 0 set live and NOT sa
 still has parkY 270 and idleMode 1) so Scott can re-seat it. **Hypothesis, untested:** a slipping horn
 could be why "park lower" was asked for three times and why the pupils read high. Re-set
 the pupil centre after the horn is back on, before trusting parkY 270.
+
+**Lid horns re-seated 2026-09-24.** After the up/down horn was refitted, the right eye's lids read
+"180 out" and each of the four lids sat differently. Held all lids at the kit's closed command
+(Sleep: servo 2=400, 3=240, 4=240, 5=400), and Scott re-seated all four horns so each lid is just
+closed there. That is now the mechanical reference for the lids. Open position not yet checked.
