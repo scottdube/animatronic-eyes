@@ -288,3 +288,7 @@ lidMin 200, lowLidMax 480, idleMode 1. The old parkY 270 is gone: it was compens
 from curl and a fresh page in my browser moved the eyes. It worked once my page was closed, but it had
 started failing before mine was opened, and parkX 15 from his page had arrived earlier. Suspect the sync
 WebServer (one client at a time) and several open pages polling /status every 2 s. Untested.
+- **OTA can fail with `curl: (56) Connection reset by peer`** mid-upload: 2 of the last 7 uploads
+  (2026-09-24). The old build keeps running (nothing is half-written), and an immediate retry
+  succeeded both times. Cause not established; free heap was ~34–40 KB both times vs ~43 KB on
+  clean boots. `./build.sh ota` does not retry. Check `build` in `/status` after every OTA.
