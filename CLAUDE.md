@@ -272,3 +272,7 @@ off) is NOT established. **Consequence:** the servos were limp during the lid-ho
 re-seat is void. Redone with all six servos holding in Sleep at kit centre: servo 0 = 330
 (x 512), servo 1 = 375 (y 512), lids closed 2=400, 3=240, 4=240, 5=400.
 **Lesson: before re-seating a horn, check the servo is holding (push the arm and feel it resist).**
+
+**After the re-seat (photo 2026-09-24):** at full open (trim 40, eyes at kit centre) the top lids still
+cover about half of each eye: the kit opens the top lid only 400 → 340 there. Stepping `lidMin` down
+live, not saved: 265 first (top lid 325), then toward 250 as long as nothing strains.
