@@ -105,7 +105,10 @@ const K=['parkY','parkX','bootTrim','lidMin','lowLidMax','lidFollow','blinkBtn',
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
 function show(v){K.forEach(k=>{$(k).value=v[k];const o=$('v_'+k);if(o)o.textContent=v[k]});dirty=v.dirty}
-async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(r.status);return r.json()}
+// A request lost to a restart (OTA) can hang forever, and send() waits on each
+// one: give up after 3 s so later slider moves still go out.
+async function j(u,o){const c=new AbortController(),t=setTimeout(()=>c.abort(),3000);
+ try{const r=await fetch(u,{...o,signal:c.signal});if(!r.ok)throw new Error(r.status);return r.json()}finally{clearTimeout(t)}}
 async function send(){if(busy||!pend)return;busy=true;const q=pend;pend=null;
  try{const v=await j('/set?'+q,{method:'POST'});dirty=v.dirty}catch(e){}busy=false;send()}
 K.forEach(k=>$(k).addEventListener('input',e=>{const o=$('v_'+k);if(o)o.textContent=e.target.value;
