@@ -76,7 +76,7 @@ $('defaults').onclick=async()=>{show(await j('/defaults',{method:'POST'}));poll(
 async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved');
- $('bi').textContent='build '+s.build+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
+ $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
 j('/values').then(show).then(poll);setInterval(poll,2000);
 </script></body></html>)HTML";
 

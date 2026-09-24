@@ -17,6 +17,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <PS4Controller.h>
 #include <esp_mac.h>
+#include <esp_ota_ops.h>
 #include <WiFi.h>
 #include "secrets.h"   // WIFI_SSID / WIFI_PASS, git-ignored; see secrets.h.template
 #include "EyeSettings.h"
@@ -83,10 +84,11 @@ void applyLiveSetting(const String &key) {
 }
 
 String eyeStatusJson() {
-  char buf[160];
-  snprintf(buf, sizeof buf, "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"trim\":%d}",
+  char buf[192];
+  const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
+  snprintf(buf, sizeof buf, "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"trim\":%d}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
-           (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, trimval);
+           (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", trimval);
   return buf;
 }
 
