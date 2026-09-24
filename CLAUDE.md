@@ -373,3 +373,4 @@ re-seated horns to seal and named the real problem: **each lid has two ends to f
 adjustment (the horn), so fixing one end moves the other** — back and forth. A spline step (~17° on an SG90) is
 also too coarse. lidBalance (one scale per eye) cannot fix it either. Proposed: per-servo closed + open trims.
 Per-lid trims live on de940f3 (all 0). idleMode 0 live again for tuning; saved value 1.
+Preset buttons on the page (3229ac7). Closed trims saved before the OTA: botLClosed -14 (Scott), rest 0.
