@@ -11,7 +11,7 @@ struct EyeSettings {
   int parkX;         // eyes rest this far right (+) / left (-), -150..150
   // Lids
   int bootTrim;      // lid trim at power-up, -40 (most closed) .. 40 (fully open)
-  int lidMin;        // upper lid open limit, 280 (kit) .. 250 (Scott's original)
+  int lidMin;        // upper lid open limit, 280 (kit) .. 200; Scott's original used 250
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either

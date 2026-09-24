@@ -66,7 +66,7 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <div class="row"><label>Lid opening at power-up <span id="v_bootTrim"></span></label>
 <input type="range" id="bootTrim" min="-40" max="40" step="5"><div class="mut">40 = fully open (applies now, too)</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
-<input type="range" id="lidMin" min="250" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch. Lower opens the top lids further: watch for a straining servo</div></div>
+<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch. Lower opens the top lids further: watch for a straining servo</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
 <h2>Controller</h2>
