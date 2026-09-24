@@ -342,3 +342,8 @@ so the closed seal is kept. Started at +29 (7.5/10.5 = 71%). Which physical eye 
 **Saved before the OTA** (an OTA restart drops live values): lidNormal 60, lowLidCurve 100 — and idleMode **0**
 (tuning). Set idleMode 1 and Save again when tuning ends. Rejected equalising the four servos' pulse travel:
 at wide it would push servo 5 to ~160, past the range checked for buzz.
+**Balanced (Scott, 2026-09-24):** lidBalance +29 plus a small nudge of one horn: "they're good now". Saved.
+Which eye is servos 4+5 was not asked; the slider still reads −/+ not left/right.
+**Horns settle (Scott):** after re-seating, a horn needs to work a little, then realign it, and it lands about
+where it should. So a lid mismatch right after a re-seat is partly horn settling, not only software; run the
+lids a while before trimming lidBalance again.
