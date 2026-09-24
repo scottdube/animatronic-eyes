@@ -6,6 +6,9 @@ May 2024. License is **CC BY-NC-SA 4.0** (`reference/License.html`), so the
 kit files may be shared with attribution, non-commercially, under the same
 license. Keep that in mind before this repo gets a public remote.
 
+**Remote: `scottdube/animatronic-eyes`, PRIVATE (created 2026-09-24). Keep it private:
+the flash backup holds the controller link key, and the kit is NC-SA.**
+
 ## State: the controller version was lost, then RECOVERED 2026-09-24
 
 Scott had edited the sketch to drive the eyes from a **game controller**. That
