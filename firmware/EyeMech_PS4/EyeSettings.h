@@ -13,6 +13,7 @@ struct EyeSettings {
   // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
   // open limits below. D-pad up/down steps closed < squint < normal < wide; power-up is normal.
   int lidWide, lidNormal, lidSquint, lidClosed;
+  int lowLidCurve;   // bottom lid % open = top ^ (this/100): 50 gentle (kit-like), 100 = same as top, 200 ahead
   int lidMin;        // upper lid open limit, 280 (kit) .. 200; Scott's original used 250
   int lowLidMax;     // lower lid open limit, 400 (kit) .. 480
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)

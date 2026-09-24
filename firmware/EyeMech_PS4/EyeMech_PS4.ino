@@ -120,6 +120,7 @@ void applyLiveSetting(const String &key) {
       sceneCommand("stop");
       lidIdx = i;
     }
+  if (key == "lowLidCurve") sceneCommand("stop");  // hold still so the bottoms can be judged
   if (key == "") lidIdx = 2;
   // Setting the pupil centre: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
@@ -300,9 +301,10 @@ void loop() {
   // Each servo goes between its own closed pulse (the kit's blink, which the horns
   // were seated to) and its open pulse. The kit's blink is not an exact mirror, so
   // servos 4 and 5 get their own closed values rather than 680 - x.
-  // Bottom lids close by sqrt: like real ones they stay mostly open until a lid nearly
-  // shuts, which matches the kit's trim moving them half as far (normal 75% = trim 5).
-  float top = lid / 100.0f, bot = sqrtf(top);
+  // Bottom lids follow the top on a curve (lowLidCurve): 50 = sqrt, mostly open until
+  // nearly shut like the kit's trim; 100 = same % as the top. 0% and 100% always
+  // stay closed and open, so blink and wide are unchanged.
+  float top = lid / 100.0f, bot = powf(top, settings.lowLidCurve / 100.0f);
   uplidpulse = lroundf(400 + (upOpen - 400) * top);
   altuplidpulse = lroundf(240 + ((680 - upOpen) - 240) * top);
   lolidpulse = lroundf(240 + (loOpen - 240) * bot);

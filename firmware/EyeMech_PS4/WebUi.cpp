@@ -70,6 +70,8 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <div class="row"><label>◒ Squint <span id="v_lidSquint"></span>%</label><input type="range" id="lidSquint" min="0" max="100" step="1"></div>
 <div class="row"><label>▬ Closed <span id="v_lidClosed"></span>%</label><input type="range" id="lidClosed" min="0" max="100" step="1">
 <div class="mut">0 = the positions the horns were seated to</div></div>
+<div class="row"><label>Bottom lids come up <span id="v_lowLidCurve"></span></label>
+<input type="range" id="lowLidCurve" min="25" max="300" step="5"><div class="mut">50 = gently, 100 = same as the top, higher = further up. Closed and wide don't change</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
 <input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
 <div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
@@ -103,7 +105,7 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
