@@ -78,6 +78,8 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <input type="range" id="lowLidMax" min="400" max="480" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
+<div class="row"><label>Lid balance <span id="v_lidBalance"></span></label>
+<input type="range" id="lidBalance" min="-40" max="40" step="1"><div class="mut">0 = both eyes the same. − opens one eye less, + the other. Closed doesn't change</div></div>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
@@ -105,7 +107,7 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','lidBalance','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);

@@ -336,3 +336,9 @@ mirrors (2=400/4=240, 3=240/5=400), and the open side mirrors with 680-x, so pul
 per servo (2: 400→200 = 200, 4: 240→480 = 240; 3: 240→480 = 240, 5: 400→200 = 200). That predicts ONE lid
 per eye more open, not both lids of one eye, so it does not explain the photo alone. Linkage/horn spline
 offsets are the other candidate.
+**Measured (Scott, calipers, squint 35):** one eye 10.5 mm open, the other 7.5 mm. Added `lidBalance` -40..40
+(build 36c52da-dirty = this commit): scales one eye's lid travel from closed (− = servos 2+3, + = servos 4+5),
+so the closed seal is kept. Started at +29 (7.5/10.5 = 71%). Which physical eye is servos 4+5: pending Scott.
+**Saved before the OTA** (an OTA restart drops live values): lidNormal 60, lowLidCurve 100 — and idleMode **0**
+(tuning). Set idleMode 1 and Save again when tuning ends. Rejected equalising the four servos' pulse travel:
+at wide it would push servo 5 to ~160, past the range checked for buzz.

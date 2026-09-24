@@ -17,6 +17,7 @@ struct EyeSettings {
   int lidMin;        // upper lid open limit, 280 (kit) .. 200; Scott's original used 250
   int lowLidMax;     // lower lid open limit, 400 (kit) .. 480
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
+  int lidBalance;    // -40..40: - opens the servo 2+3 eye less, + the servo 4+5 eye (% of its travel)
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
   // Alive idle
