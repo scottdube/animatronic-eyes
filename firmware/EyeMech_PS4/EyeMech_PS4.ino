@@ -10,7 +10,8 @@
 //               stick pushed further wins
 //  Cross        blink (the kit's button on D2)
 //  D-pad up/dn  lid trim (the kit's pot on A2)
-//  No controller: eyes parked (see Y_PARK), lids open. Boots with trim at 40 (fully open).
+//  No controller: eyes at their rest position, lids at the power-up opening.
+//  Rest position, power-up lids, blink button and trim step: web page (WebUi.h).
 
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -18,6 +19,16 @@
 #include <esp_mac.h>
 #include <WiFi.h>
 #include "secrets.h"   // WIFI_SSID / WIFI_PASS, git-ignored; see secrets.h.template
+#include "EyeSettings.h"
+#include "WebUi.h"
+#if __has_include("build_id.h")
+#include "build_id.h"
+#endif
+#ifdef BUILD_ID
+#define BUILD_ID_STR BUILD_ID
+#else
+#define BUILD_ID_STR "unknown"
+#endif
 
 // esp32 core 3.x frees the Bluetooth controller's memory at boot unless a BT
 // library registers itself, and PS4Controller predates that and doesn't. Without
@@ -33,17 +44,18 @@ const char* PS4_HOST_MAC = "";
 const bool INVERT_X = false;
 const bool INVERT_Y = false;
 
-// Where the eyes rest with the stick centred, below the mechanical centre, in the
-// kit's 0..1023 units (512 = centre). Full stick travel still reaches both ends.
-// Raise it to park lower. On the servo that is ~1/4 of this in pulse counts.
-const int Y_PARK = 180;
+// Where the eyes rest with the stick centred (settings.parkY / parkX, set from the
+// web page) is an offset from mechanical centre in the kit's 0..1023 units.
+// Full stick travel still reaches both ends.
+int restX() { return 512 + settings.parkX; }
+int restY() { return 512 - settings.parkY; }
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 int xval = 512;
-int yval = 512 - Y_PARK;
+int yval = 512;
 int switchval = LOW;
-int trimval = 40;         // -40..40, same as the kit's pot after its map(); 40 = lids fully open
+int trimval = 40;         // -40..40, same as the kit's pot after its map(); set from settings.bootTrim
 
 int lexpulse, rexpulse;
 int leypulse, reypulse;
@@ -63,6 +75,20 @@ unsigned long lastStat = 0;
 bool wifiWanted = true;
 
 void onPacket() { pktCount++; }
+
+// WebUi hooks
+void applyLiveSetting(const String &key) {
+  // Lid opening shows immediately, so the slider can be judged by eye
+  if (key == "bootTrim" || key == "") trimval = settings.bootTrim;
+}
+
+String eyeStatusJson() {
+  char buf[160];
+  snprintf(buf, sizeof buf, "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"trim\":%d}",
+           PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
+           (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, trimval);
+  return buf;
+}
 
 void wifiStart() {
   WiFi.mode(WIFI_STA);
@@ -131,7 +157,13 @@ void setup() {
   PS4.attachOnDisconnect(onDisconnect);
   PS4.attach(onPacket);
 
+  loadSettings();
+  trimval = settings.bootTrim;
+  xval = restX();
+  yval = restY();
+
   wifiStart();
+  webBegin();
 
   pwm.begin();
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
@@ -140,24 +172,28 @@ void setup() {
 
 void readController() {
   if (!PS4.isConnected()) {
-    xval = 512;
-    yval = 512 - Y_PARK;
+    xval = restX();
+    yval = restY();
     switchval = LOW;
     return;
   }
-  xval = stickToAdc(stronger(PS4.LStickX(), PS4.RStickX()), INVERT_X, 512);
-  yval = stickToAdc(stronger(PS4.LStickY(), PS4.RStickY()), INVERT_Y, 512 - Y_PARK);
-  switchval = PS4.Cross() ? HIGH : LOW;
+  xval = stickToAdc(stronger(PS4.LStickX(), PS4.RStickX()), INVERT_X, restX());
+  yval = stickToAdc(stronger(PS4.LStickY(), PS4.RStickY()), INVERT_Y, restY());
+  bool blink = settings.blinkBtn == 0 ? PS4.Cross()
+             : settings.blinkBtn == 1 ? PS4.Square()
+             : (PS4.Cross() || PS4.Square());
+  switchval = blink ? HIGH : LOW;
 
   bool up = PS4.Up(), down = PS4.Down();
-  if (up && !lastUp)     trimval = constrain(trimval + 5, -40, 40);
-  if (down && !lastDown) trimval = constrain(trimval - 5, -40, 40);
+  if (up && !lastUp)     trimval = constrain(trimval + settings.trimStep, -40, 40);
+  if (down && !lastDown) trimval = constrain(trimval - settings.trimStep, -40, 40);
   lastUp = up;
   lastDown = down;
 }
 
 void loop() {
   loopCount++;
+  webHandle();
   if (Serial.available() && Serial.read() == 'w') {
     wifiWanted = !wifiWanted;
     wifiWanted ? wifiStart() : wifiStop();

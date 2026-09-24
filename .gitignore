@@ -1,1 +1,3 @@
 firmware/EyeMech_PS4/secrets.h
+firmware/EyeMech_PS4/build_id.h
+build/
