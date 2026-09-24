@@ -173,7 +173,7 @@ hold-P4-10s-then-press sequence cleared it without a power cycle (see above).
   servo leads and a 6-wire jumper to the ESP32). Whether the jumpers land on
   SDA 21 / SCL 22 is still unread, so that remains an assumption.
 
-## Requested 2026-09-24 (not built yet)
+## Web settings + OTA (requested and built 2026-09-24)
 
 Scott asked for Wi-Fi OTA plus a web settings page "just like the Info Orbs"
 (`~/code/hot-info-orbs/firmware/src/core/ota`, `.../settings`). Scope he chose:
@@ -201,3 +201,21 @@ against 60 Hz servo PWM. Both states dip for a second, so the minimums aren't Wi
 step 2: the sync WebServer and Update, with no LittleFS picture as the Orbs have. App is 1.605 MB, 81% of a slot.
 Wi-Fi comes from `firmware/EyeMech_PS4/secrets.h` (git-ignored, copied from
 the Orb's secrets.h fallback: SSID IoT). DNS name: hostname `eyemech`.
+
+**Step 2 BUILT and tested 2026-09-24 (build da3d545).**
+- Settings page: **http://192.168.30.211/**. Sliders apply live, and **Save** writes NVS
+  namespace `eyes` (`EyeSettings.cpp`). The page also has Revert and Defaults.
+  Status line: ● / ○ controller, ✎ unsaved / ✓ saved, then build, slot, IP and heap.
+- OTA: `./build.sh ota` (curl to `/update`), or the `/update` page in a browser.
+  Measured: the upload takes ~20 s and the eyes are back ~4 s later. Both directions were verified,
+  app0→app1 (19b5791) and app1→app0 (da3d545), by the `slot` field on `/status`.
+  **Any flash restarts the board and drops the controller: hold P4 ~10 s, then press P4.**
+- `./build.sh usb` is the USB fallback, with EraseFlash=none.
+- Rollback: `verifyRollbackLater()` returns true, and the app is marked valid once Wi-Fi joins,
+  as on the Orbs. Whether this core's bootloader really rolls back is **unverified**.
+- **No OTA_PASSWORD** (same as the Orbs). Anyone on the IoT network can change settings or
+  flash. Define `OTA_PASSWORD` in `secrets.h` to require login as `admin`.
+- Heap with Wi-Fi + BT + server: ~44.7 KB free, 43.6 KB during a request.
+  App 1.667 MB = 84% of a slot.
+- `eyemech.internal` did NOT resolve at first boot (curl 000); use the IP. The IP is a
+  DHCP lease, so a UniFi fixed IP would stop it moving.
