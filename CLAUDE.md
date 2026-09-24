@@ -351,3 +351,5 @@ lids a while before trimming lidBalance again.
 ends, not a found stop, so the ranges now reach 160 / 520 (build 4880f6d). Stepping live, not saved: 190 / 490 first.
 Caveat: lidBalance +29 scales wide too, so the balanced eye opens only 71% of its travel at wide.
 190/490: no buzz (Scott). Stepped to 180/500.
+**Presets done and SAVED 2026-09-24:** wide at lidMin 180 / lowLidMax 500 (no buzz, "that's good"), normal 60,
+squint 35, closed 0, bottoms curve 100, lidBalance +29, idleMode back to 1 (automatic).
