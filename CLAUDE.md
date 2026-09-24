@@ -220,5 +220,22 @@ the Orb's secrets.h fallback: SSID IoT). DNS name: hostname `eyemech`.
   flash. Define `OTA_PASSWORD` in `secrets.h` to require login as `admin`.
 - Heap with Wi-Fi + BT + server: ~44.7 KB free, 43.6 KB during a request.
   App 1.667 MB = 84% of a slot.
-- `eyemech.internal` did NOT resolve at first boot (curl 000); use the IP. The IP is a
-  DHCP lease, so a UniFi fixed IP would stop it moving.
+- `eyemech.internal` did NOT resolve at first boot (curl 000); use the IP.
+  **192.168.30.211 is now a UniFi fixed IP** (Scott, 2026-09-24).
+
+**Step 3, scenes: BUILT 2026-09-24 (build 9d59dd5, app1).** Spec:
+`docs/superpowers/specs/2026-09-24-eyemech-scenes-design.md`. `Scenes.cpp` decides who
+drives; every source emits the controller's Frame, and the kit math is the only path to
+the servos. Triangle = idle, Circle = play, Share = record; sticks/blink/D-pad take over.
+Page has scene buttons, the mode in words + glyph, and sliders for lids, idle and radar.
+`POST /scene?cmd=idle|play|record|stop|sleep|wake`, `POST /presence?state=on|off`.
+- Settings Scott had saved survived the new table layout (parkY 270, trimStep 10).
+- **Verified over HTTP, no controller:** auto idle started ~20 s after boot; sleep, wake,
+  idle and stop all switch mode; play and record refuse (409) with no recording / no controller;
+  presence=on right after a page command is skipped by design (operator active).
+- **Not yet verified:** how idle LOOKS (Scott), the lid sliders on the mechanism (watch for
+  a straining servo below 280), record/replay with the controller, the light bar colours,
+  and the radar (HA package not written yet).
+- Deviation from spec: `emptyAction=rest` holds rest until presence/takeover/command.
+  Without that, automatic idle restarts at once (already unattended) and "rest" means nothing.
+- Heap after boot with the scenes code: 43.7 KB free. App 1.678 MB = 85% of a slot.
