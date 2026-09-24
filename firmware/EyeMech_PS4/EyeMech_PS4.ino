@@ -14,6 +14,7 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <PS4Controller.h>
+#include <esp_mac.h>
 
 // The controller only connects to the Bluetooth MAC it has stored. Leave this
 // empty to use the ESP32's own MAC (printed at boot); otherwise set it to the
@@ -56,6 +57,12 @@ void onDisconnect() {
 void setup() {
   Serial.begin(115200);
   Serial.println("EyeMech PS4");
+
+  uint8_t m[6];
+  esp_read_mac(m, ESP_MAC_BT);
+  Serial.printf("ESP32 Bluetooth MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+                m[0], m[1], m[2], m[3], m[4], m[5]);
+  if (strlen(PS4_HOST_MAC)) Serial.printf("Using PS4_HOST_MAC: %s\n", PS4_HOST_MAC);
 
   bool ok = strlen(PS4_HOST_MAC) ? PS4.begin(PS4_HOST_MAC) : PS4.begin();
   Serial.println(ok ? "Bluetooth up" : "Bluetooth FAILED to start");
