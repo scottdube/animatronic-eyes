@@ -281,3 +281,10 @@ Stepped live with Scott watching, no buzz at any step: lidMin 265 → 250 → 24
 Photo at lidMin 200 / lowLidMax 480: all four lids fully clear of the eye, pupils visible. NOT saved yet.
 Closed check (photo): both eyes seal with no gap; the right eye (as viewed) lower lid rides slightly over the upper.
 - **Ruled out 2026-09-24:** 'stuck /set after an OTA restart' as the cause of Scott's dead sliders: he had already reloaded, and it still does nothing (the 3 s timeout fix stays; it is harmless).
+
+**Saved 2026-09-24 16:21 after re-seating every horn:** pupil centre parkY 0, parkX -75 (Scott, by eye),
+lidMin 200, lowLidMax 480, idleMode 1. The old parkY 270 is gone: it was compensating for a slipping horn.
+**Dead sliders, cause NOT established.** Scott's page (reloaded) did nothing for a while, while `/set`
+from curl and a fresh page in my browser moved the eyes. It worked once my page was closed, but it had
+started failing before mine was opened, and parkX 15 from his page had arrived earlier. Suspect the sync
+WebServer (one client at a time) and several open pages polling /status every 2 s. Untested.
