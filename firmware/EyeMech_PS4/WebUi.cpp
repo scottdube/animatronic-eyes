@@ -66,7 +66,9 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <div class="row"><label>Lid opening at power-up <span id="v_bootTrim"></span></label>
 <input type="range" id="bootTrim" min="-40" max="40" step="5"><div class="mut">40 = fully open (applies now, too)</div></div>
 <div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
-<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch. Lower opens the top lids further: watch for a straining servo</div></div>
+<input type="range" id="lidMin" min="200" max="280" step="2"><div class="mut">280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
+<div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
+<input type="range" id="lowLidMax" min="400" max="480" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
 <h2>Controller</h2>
@@ -98,7 +100,7 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','bootTrim','lidMin','lidFollow','blinkBtn','trimStep','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','bootTrim','lidMin','lowLidMax','lidFollow','blinkBtn','trimStep','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);

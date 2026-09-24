@@ -284,7 +284,8 @@ void loop() {
 
   lolidpulse = followLid(map(yval, 0, 1023, 410, 280), 345);
   lolidpulse += (lidTrim / 2);
-  lolidpulse = constrain(lolidpulse, 280, 400);
+  lolidpulse += (settings.lowLidMax - 400);  // same idea as lidMin, lower lid opens upward in counts
+  lolidpulse = constrain(lolidpulse, 280, settings.lowLidMax);
   altlolidpulse = 680 - lolidpulse;
 
   pwm.setPWM(0, 0, lexpulse);

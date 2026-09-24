@@ -12,6 +12,7 @@ struct EyeSettings {
   // Lids
   int bootTrim;      // lid trim at power-up, -40 (most closed) .. 40 (fully open)
   int lidMin;        // upper lid open limit, 280 (kit) .. 200; Scott's original used 250
+  int lowLidMax;     // lower lid open limit, 400 (kit) .. 480
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
