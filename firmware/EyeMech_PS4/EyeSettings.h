@@ -31,6 +31,10 @@ struct EyeSettings {
 
 extern EyeSettings settings;
 
+// Where the eyes rest with the stick centred, in the kit's 0..1023 units.
+inline int restX() { return 512 + settings.parkX; }
+inline int restY() { return 512 - settings.parkY; }
+
 void resetSettings(EyeSettings &s);  // every field to its default
 void loadSettings();                 // NVS -> settings (defaults where absent)
 bool saveSettings();                 // settings -> NVS

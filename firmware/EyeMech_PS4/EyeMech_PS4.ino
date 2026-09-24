@@ -49,11 +49,8 @@ const char* PS4_HOST_MAC = "";
 const bool INVERT_X = false;
 const bool INVERT_Y = false;
 
-// Where the eyes rest with the stick centred (settings.parkY / parkX, set from the
-// web page) is an offset from mechanical centre in the kit's 0..1023 units.
-// Full stick travel still reaches both ends.
-int restX() { return 512 + settings.parkX; }
-int restY() { return 512 - settings.parkY; }
+// Rest position: restX()/restY() in EyeSettings.h. Full stick travel still
+// reaches both ends.
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
@@ -95,10 +92,10 @@ String eyeStatusJson() {
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"trim\":%d,"
-           "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu}",
+           "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", trimval,
-           sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs());
+           sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval);
   return buf;
 }
 

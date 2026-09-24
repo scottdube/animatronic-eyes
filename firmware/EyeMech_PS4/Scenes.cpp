@@ -21,6 +21,11 @@ static bool wasConnected = false;
 static uint32_t emptySince = 0;
 
 // ---- alive idle generator --------------------------------------------------
+// Gaze is picked in the kit's 0..1023 units as an offset from the rest
+// position, NOT in stick units: with the eyes parked low the stick's upper half
+// covers ~3x the travel of its lower half, so even stick targets looked up
+// most of the time and the pupils disappeared (seen by Scott 2026-09-24).
+static const float IDLE_X_MAX = 400, IDLE_Y_MAX = 200;  // offsets at glanceRange 100%
 static float gx = 0, gy = 0, tx = 0, ty = 0;
 static uint32_t nextGlance = 0, nextDrift = 0, nextBlink = 0, blinkEnd = 0, secondBlink = 0;
 static uint32_t lastIdleUpdate = 0;
@@ -32,6 +37,13 @@ static uint32_t nextBlinkDelay() {
   float mean = 60000.0f / settings.blinkRate;
   float d = -logf(1.0f - frand() * 0.999f) * mean;  // exponential: Poisson blinks
   return (uint32_t)max(800.0f, d);
+}
+
+// Inverse of the sketch's stickToAdc (INVERT_X/Y false): an offset from `centre`
+// in 0..1023 units to the stick value that lands there.
+static int adcToStick(float off, int centre) {
+  float v = off >= 0 ? off * 127.0f / max(1, 1023 - centre) : off * 128.0f / max(1, centre);
+  return constrain((int)lroundf(v), -128, 127);
 }
 
 static void idleReset(uint32_t now) {
@@ -46,15 +58,15 @@ static void idleReset(uint32_t now) {
 static Frame idleFrame(uint32_t now) {
   if (now >= nextGlance) {
     bool big = frand() < 0.30f;
-    float r = settings.glanceRange / 100.0f * 127.0f * (big ? 1.0f : 0.3f);
-    tx = (frand() * 2 - 1) * r;
-    ty = (frand() * 2 - 1) * r * 0.7f;  // people glance sideways more than up/down
+    float r = settings.glanceRange / 100.0f * (big ? 1.0f : 0.3f);
+    tx = (frand() * 2 - 1) * r * IDLE_X_MAX;
+    ty = (frand() * 2 - 1) * r * IDLE_Y_MAX;  // people glance sideways more than up/down
     nextGlance = now + (uint32_t)(settings.glanceTenths * 100 * (0.5f + frand()));
     if (big && frand() < 0.25f) nextBlink = now;  // a big glance often comes with a blink
   }
   if (now >= nextDrift) {  // small wander between glances
-    tx += (frand() * 2 - 1) * 3;
-    ty += (frand() * 2 - 1) * 3;
+    tx += (frand() * 2 - 1) * 10;
+    ty += (frand() * 2 - 1) * 10;
     nextDrift = now + 300 + (uint32_t)(frand() * 400);
   }
   float dt = (float)(now - lastIdleUpdate);
@@ -73,8 +85,8 @@ static Frame idleFrame(uint32_t now) {
     secondBlink = 0;
   }
   Frame f;
-  f.sx = constrain((int)lroundf(gx), -128, 127);
-  f.sy = constrain((int)lroundf(gy), -128, 127);
+  f.sx = adcToStick(gx, restX());
+  f.sy = adcToStick(gy, restY());
   f.blink = now < blinkEnd;
   f.trim = lastLiveTrim;
   return f;
