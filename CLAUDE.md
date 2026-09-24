@@ -361,3 +361,4 @@ then check normal and wide.
 **Eye mapping, from the normal photo with lidBalance +29:** the eye on the VIEWER'S RIGHT (Scott's right facing
 the eyes) was the tighter one, so servos 4+5 = viewer's-right eye, servos 2+3 = viewer's-left eye. Balance then
 set to 0 live (reversible; saved value is still +29) to see normal with no scaling.
+Scott: "Horns are aligned" — arrived as balance went to 0; which balance he aligned against not yet confirmed.
