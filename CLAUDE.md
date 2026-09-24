@@ -69,6 +69,10 @@ at 0x9000). To restore it:
     ~/Library/Arduino15/packages/esp32/tools/esptool_py/5.1.0/esptool \
       --port /dev/cu.usbserial-0001 -b 115200 write-flash 0 backup/board-flash-2026-09-24.bin
 
+**Second copy on Google Drive:** `My Drive/#3D prints/basic_eyemech_download_package/Board flash backup/`
+(bin plus SHA256SUMS). The Drive API showed it server-side on 2026-09-24 at
+4194304 bytes.
+
 **Baud trap:** this board's CP2102 corrupts reads at 921600 and 460800. Use
 115200 (a 4 MB read takes about 6.5 min).
 
