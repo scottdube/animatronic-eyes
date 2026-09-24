@@ -78,8 +78,16 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
-<div class="row"><label>Lid balance <span id="v_lidBalance"></span></label>
-<input type="range" id="lidBalance" min="-40" max="40" step="1"><div class="mut">0 = both eyes the same. − opens one eye less, + the other. Closed doesn't change</div></div>
+<div class="mut"><b>Left eye (as you face it)</b>: − more closed, + more open. Closed trims show closed, open trims show wide</div>
+<div class="row"><label>Top lid, closed <span id="v_topLClosed"></span></label><input type="range" id="topLClosed" min="-60" max="60" step="1"></div>
+<div class="row"><label>Top lid, wide <span id="v_topLOpen"></span></label><input type="range" id="topLOpen" min="-60" max="60" step="1"></div>
+<div class="row"><label>Bottom lid, closed <span id="v_botLClosed"></span></label><input type="range" id="botLClosed" min="-60" max="60" step="1"></div>
+<div class="row"><label>Bottom lid, wide <span id="v_botLOpen"></span></label><input type="range" id="botLOpen" min="-60" max="60" step="1"></div>
+<div class="mut"><b>Right eye (as you face it)</b>: − more closed, + more open. Closed trims show closed, open trims show wide</div>
+<div class="row"><label>Top lid, closed <span id="v_topRClosed"></span></label><input type="range" id="topRClosed" min="-60" max="60" step="1"></div>
+<div class="row"><label>Top lid, wide <span id="v_topROpen"></span></label><input type="range" id="topROpen" min="-60" max="60" step="1"></div>
+<div class="row"><label>Bottom lid, closed <span id="v_botRClosed"></span></label><input type="range" id="botRClosed" min="-60" max="60" step="1"></div>
+<div class="row"><label>Bottom lid, wide <span id="v_botROpen"></span></label><input type="range" id="botROpen" min="-60" max="60" step="1"></div>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
@@ -107,7 +115,7 @@ a blink goes to closed. Moving a slider shows that preset.</p>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','lidBalance','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','topLClosed','topLOpen','botLClosed','botLOpen','topRClosed','topROpen','botRClosed','botROpen','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);

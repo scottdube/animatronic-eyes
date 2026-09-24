@@ -120,7 +120,10 @@ void applyLiveSetting(const String &key) {
       sceneCommand("stop");
       lidIdx = i;
     }
-  if (key == "lowLidCurve" || key == "lidBalance") sceneCommand("stop");  // hold still so the bottoms can be judged
+  if (key == "lowLidCurve") sceneCommand("stop");  // hold still so the bottoms can be judged
+  // A lid trim shows the end it trims: closed trims on the closed preset, open trims on wide
+  if (key.endsWith("Closed") && key != "lidClosed") { sceneCommand("stop"); lidIdx = 0; }
+  if (key.endsWith("Open")) { sceneCommand("stop"); lidIdx = 3; }
   if (key == "") lidIdx = 2;
   // Setting the pupil centre: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
@@ -263,6 +266,13 @@ int followLid(int kit, int centre) {
   return centre + (kit - centre) * settings.lidFollow / 100;
 }
 
+// One lid servo between its trimmed closed and open pulses; frac 0 = closed .. 1 = open.
+// Clamped to the SG90's safe range (~0.6-2.4 ms at 60 Hz) whatever the trims say.
+int lidPulse(int closed, int open, int dir, int closedTrim, int openTrim, float frac) {
+  float c = closed + dir * closedTrim, o = open + dir * openTrim;
+  return constrain((int)lroundf(c + (o - c) * frac), 150, 600);
+}
+
 void loop() {
   loopCount++;
   webHandle();
@@ -305,14 +315,12 @@ void loop() {
   // nearly shut like the kit's trim; 100 = same % as the top. 0% and 100% always
   // stay closed and open, so blink and wide are unchanged.
   float top = lid / 100.0f, bot = powf(top, settings.lowLidCurve / 100.0f);
-  // lidBalance trims one eye's opening to match the other (measured 7.5 vs 10.5 mm
-  // at squint): it scales that eye's travel from closed, so the closed seal is kept.
-  float eyeA = 1.0f - max(0, -settings.lidBalance) / 100.0f;  // servos 2+3
-  float eyeB = 1.0f - max(0, settings.lidBalance) / 100.0f;   // servos 4+5
-  uplidpulse = lroundf(400 + (upOpen - 400) * top * eyeA);
-  lolidpulse = lroundf(240 + (loOpen - 240) * bot * eyeA);
-  altuplidpulse = lroundf(240 + ((680 - upOpen) - 240) * top * eyeB);
-  altlolidpulse = lroundf(400 + ((680 - loOpen) - 400) * bot * eyeB);
+  // Each lid's ends get their own trim (EyeSettings): + = more open, so dir is the
+  // way that servo opens (-1: pulse falls as the lid opens).
+  uplidpulse = lidPulse(400, upOpen, -1, settings.topRClosed, settings.topROpen, top);
+  lolidpulse = lidPulse(240, loOpen, +1, settings.botRClosed, settings.botROpen, bot);
+  altuplidpulse = lidPulse(240, 680 - upOpen, +1, settings.topLClosed, settings.topLOpen, top);
+  altlolidpulse = lidPulse(400, 680 - loOpen, -1, settings.botLClosed, settings.botLOpen, bot);
 
   pwm.setPWM(0, 0, lexpulse);
   pwm.setPWM(1, 0, leypulse);

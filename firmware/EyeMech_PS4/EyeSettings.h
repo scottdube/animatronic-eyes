@@ -17,7 +17,11 @@ struct EyeSettings {
   int lidMin;        // upper lid open limit, 280 (kit) .. 160; Scott's original used 250
   int lowLidMax;     // lower lid open limit, 400 (kit) .. 520
   int lidFollow;     // % the lids follow the eyes up/down, 0..100 (100 = kit)
-  int lidBalance;    // -40..40: - opens the servo 2+3 eye less, + the servo 4+5 eye (% of its travel)
+  // Per-lid trims at each end, pulse counts, + = more open whichever way the servo turns.
+  // A horn has one adjustment (and ~17° spline steps) but a lid has two ends to fit.
+  // L/R = as seen facing the eyes: L = servos 4 (top) + 5 (bottom), R = servos 2 + 3.
+  int topLClosed, topLOpen, botLClosed, botLOpen;
+  int topRClosed, topROpen, botRClosed, botROpen;
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
   // Alive idle
