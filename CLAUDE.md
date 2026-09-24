@@ -368,3 +368,7 @@ Scott: "Horns are aligned" — arrived as balance went to 0; which balance he al
 Normal photo at lidBalance +15: viewer's-left eye still far wider than the right (top lid well clear of the pupil). Stepped to +30.
 +30: still more wanted (Scott). Stepped to +40, the slider end.
 +40 (range end): still more wanted. A >40% scale points at a horn seated open, not travel. Showing closed to check whether the viewer's-left eye seals.
+**Closed photo at balance +40:** viewer's-right eye sealed; viewer's-LEFT eye open a slit, pupil visible. Scott
+re-seated horns to seal and named the real problem: **each lid has two ends to fit (closed, wide) and only one
+adjustment (the horn), so fixing one end moves the other** — back and forth. A spline step (~17° on an SG90) is
+also too coarse. lidBalance (one scale per eye) cannot fix it either. Proposed: per-servo closed + open trims.
