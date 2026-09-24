@@ -16,6 +16,8 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <PS4Controller.h>
 #include <esp_mac.h>
+#include <WiFi.h>
+#include "secrets.h"   // WIFI_SSID / WIFI_PASS, git-ignored; see secrets.h.template
 
 // esp32 core 3.x frees the Bluetooth controller's memory at boot unless a BT
 // library registers itself, and PS4Controller predates that and doesn't. Without
@@ -49,6 +51,47 @@ int uplidpulse, lolidpulse, altuplidpulse, altlolidpulse;
 
 bool lastUp = false, lastDown = false;
 unsigned long lastPrint = 0;
+
+// Wi-Fi + Bluetooth coexistence check (step 1 of OTA/settings). Wi-Fi and the
+// controller's Bluetooth share one radio on this ESP32. Once a second, print the
+// controller's packet rate and the loop rate. Send 'w' on serial to switch Wi-Fi off
+// and on, so both can be compared without a restart (a restart drops the controller).
+const char* HOSTNAME = "eyemech";
+volatile uint32_t pktCount = 0;
+uint32_t loopCount = 0;
+unsigned long lastStat = 0;
+bool wifiWanted = true;
+
+void onPacket() { pktCount++; }
+
+void wifiStart() {
+  WiFi.mode(WIFI_STA);
+  WiFi.setHostname(HOSTNAME);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  Serial.println("WiFi: connecting");
+}
+
+void wifiStop() {
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  Serial.println("WiFi: off");
+}
+
+void printStat() {
+  uint32_t pkts = pktCount;
+  pktCount = 0;
+  if (WiFi.status() == WL_CONNECTED)
+    Serial.printf("stat pkts/s=%lu loop/s=%lu wifi=%s rssi=%d heap=%lu\n",
+                  (unsigned long)pkts, (unsigned long)loopCount,
+                  WiFi.localIP().toString().c_str(), WiFi.RSSI(),
+                  (unsigned long)ESP.getFreeHeap());
+  else
+    Serial.printf("stat pkts/s=%lu loop/s=%lu wifi=%s heap=%lu\n",
+                  (unsigned long)pkts, (unsigned long)loopCount,
+                  wifiWanted ? "down" : "off", (unsigned long)ESP.getFreeHeap());
+  loopCount = 0;
+}
 
 // Stick -128..127 to 0..1023, with the stick's centre landing on `centre`, so
 // each half of the travel is stretched to keep reaching its end.
@@ -86,6 +129,9 @@ void setup() {
   Serial.println(ok ? "Bluetooth up" : "Bluetooth FAILED to start");
   PS4.attachOnConnect(onConnect);
   PS4.attachOnDisconnect(onDisconnect);
+  PS4.attach(onPacket);
+
+  wifiStart();
 
   pwm.begin();
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
@@ -111,6 +157,16 @@ void readController() {
 }
 
 void loop() {
+  loopCount++;
+  if (Serial.available() && Serial.read() == 'w') {
+    wifiWanted = !wifiWanted;
+    wifiWanted ? wifiStart() : wifiStop();
+  }
+  if (millis() - lastStat >= 1000) {
+    lastStat = millis();
+    printStat();
+  }
+
   readController();
 
   lexpulse = map(xval, 0, 1023, 220, 440);

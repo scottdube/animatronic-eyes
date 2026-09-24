@@ -187,3 +187,17 @@ keeps NVS at 0x9000/0x5000, the same as `default`, so the bond survives the one 
 that changes the layout. Unlike the Orbs, settings must **apply live, with no restart**,
 because a restart drops the controller. **The open risk is Wi-Fi + Classic BT on one
 radio.** Spike it first: Wi-Fi on only, then check stick feel and reconnect.
+
+**Step 1 MEASURED 2026-09-24 14:47–14:52** (serial, 'w' toggled Wi-Fi every 30 s
+while connected, 5 min, Scott driving). Built with PartitionScheme=min_spiffs, and the
+first USB flash of the new layout kept the bond: P4 reconnected with no re-pairing.
+| | controller pkts/s mean (min) | loop/s |
+|---|---|---|
+| Wi-Fi on (192.168.30.211, RSSI -43) | 98.9 (44) | 112 |
+| Wi-Fi off | 110.6 (57) | 112 |
+There were 0 disconnects. Wi-Fi costs about 11% of controller packets, which still leaves about 100/s
+against 60 Hz servo PWM. Both states dip for a second, so the minimums aren't Wi-Fi's.
+**Free heap with Wi-Fi + BT up is only ~50.9 KB**, and that is the budget for
+step 2: the sync WebServer and Update, with no LittleFS picture as the Orbs have. App is 1.605 MB, 81% of a slot.
+Wi-Fi comes from `firmware/EyeMech_PS4/secrets.h` (git-ignored, copied from
+the Orb's secrets.h fallback: SSID IoT). DNS name: hostname `eyemech`.
