@@ -107,7 +107,11 @@ Compiles clean against esp32 core 3.3.7 with the IDE's bundled arduino-cli:
       compile --fqbn esp32:esp32:esp32 --config-file ~/.arduinoIDE/arduino-cli.yaml firmware/EyeMech_PS4
 
 Flashed 2026-09-24 (EraseFlash=none, so the bond is kept). Boot prints "Bluetooth up".
-Controller connection and axis directions (`INVERT_X`/`INVERT_Y`) are still unverified.
+**Controller connects: VERIFIED 2026-09-24 14:21.** Scott pressed P4, serial printed
+`PS4 connected`, and both stick axes swept the full 4..1023 range. It paired with the
+existing bond, with no re-pairing and no MAC set, so `PS4.begin()` on the ESP32's own MAC is right.
+Still unverified: axis directions on the mechanism (`INVERT_X`/`INVERT_Y`), Cross
+blink, D-pad trim, and a controller off/on reconnect without a power cycle.
 
 **Core 3.x trap:** esp32 core 3.3.7 frees Bluetooth memory at boot unless
 `btInUse()` returns true, and PS4Controller doesn't set it. Without
