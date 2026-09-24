@@ -323,3 +323,10 @@ Idle on the bench supply ran clean (Scott). Supply display: usually peaks ~300 m
 back-to-back blinks. A supply's panel meter averages, so real spikes are higher; that is right at
 the ~500 mA a USB port gives, which is consistent with (not proof of) the USB-power cause.
 Saved 2026-09-24 ~16:40: idleMode 1, bootTrim 5.
+
+## Lid presets tuned live with Scott (2026-09-24, NOT saved yet)
+Four presets (Wide/Normal/Squint/Closed, % open); the D-pad and idle pick between them. Scott approved:
+**lidNormal 60** (75 = the old trim 5 read too wide; he saw 75, then 60) and **lowLidCurve 100** (bottoms
+at the same % as the tops; 50 left the bottoms too open at 60). Squint shown at the default 35 (photo): pupils
+about half covered, reads as squint; awaiting his call. Wide not yet reviewed. idleMode is 0 live while
+tuning: set it back to 1 BEFORE Save, or Save stores idle off.
