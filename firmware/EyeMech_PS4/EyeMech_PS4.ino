@@ -6,10 +6,11 @@
 //  version was lost. The servo math below is the kit's, unchanged. Only the
 //  inputs are new, converted to the 0..1023 range the kit's analogRead gave.
 //
-//  Left stick   eyes (X and Y, lids follow Y as in the kit)
+//  Either stick eyes (X and Y, lids follow Y as in the kit); per axis, the
+//               stick pushed further wins
 //  Cross        blink (the kit's button on D2)
 //  D-pad up/dn  lid trim (the kit's pot on A2)
-//  No controller: eyes centred, lids open.
+//  No controller: eyes parked (see Y_PARK), lids open.
 
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -30,10 +31,15 @@ const char* PS4_HOST_MAC = "";
 const bool INVERT_X = false;
 const bool INVERT_Y = false;
 
+// Where the eyes rest with the stick centred, below the mechanical centre, in the
+// kit's 0..1023 units (512 = centre). Full stick travel still reaches both ends.
+// Raise it to park lower. On the servo that is ~1/4 of this in pulse counts.
+const int Y_PARK = 60;
+
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 int xval = 512;
-int yval = 512;
+int yval = 512 - Y_PARK;
 int switchval = LOW;
 int trimval = 0;          // -40..40, same as the kit's pot after its map()
 
@@ -44,9 +50,16 @@ int uplidpulse, lolidpulse, altuplidpulse, altlolidpulse;
 bool lastUp = false, lastDown = false;
 unsigned long lastPrint = 0;
 
-int stickToAdc(int8_t v, bool invert) {
-  int a = map(v, -128, 127, 0, 1023);
-  return invert ? 1023 - a : a;
+// Stick -128..127 to 0..1023, with the stick's centre landing on `centre`, so
+// each half of the travel is stretched to keep reaching its end.
+int stickToAdc(int v, bool invert, int centre) {
+  if (invert) v = -v;
+  return v < 0 ? map(v, -128, 0, 0, centre) : map(v, 0, 127, centre, 1023);
+}
+
+// Per axis, the stick pushed further from centre wins, so either stick drives.
+int stronger(int a, int b) {
+  return abs(a) >= abs(b) ? a : b;
 }
 
 void onConnect() {
@@ -82,12 +95,12 @@ void setup() {
 void readController() {
   if (!PS4.isConnected()) {
     xval = 512;
-    yval = 512;
+    yval = 512 - Y_PARK;
     switchval = LOW;
     return;
   }
-  xval = stickToAdc(PS4.LStickX(), INVERT_X);
-  yval = stickToAdc(PS4.LStickY(), INVERT_Y);
+  xval = stickToAdc(stronger(PS4.LStickX(), PS4.RStickX()), INVERT_X, 512);
+  yval = stickToAdc(stronger(PS4.LStickY(), PS4.RStickY()), INVERT_Y, 512 - Y_PARK);
   switchval = PS4.Cross() ? HIGH : LOW;
 
   bool up = PS4.Up(), down = PS4.Down();

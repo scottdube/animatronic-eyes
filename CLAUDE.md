@@ -110,8 +110,15 @@ Flashed 2026-09-24 (EraseFlash=none, so the bond is kept). Boot prints "Bluetoot
 **Controller connects: VERIFIED 2026-09-24 14:21.** Scott pressed P4, serial printed
 `PS4 connected`, and both stick axes swept the full 4..1023 range. It paired with the
 existing bond, with no re-pairing and no MAC set, so `PS4.begin()` on the ESP32's own MAC is right.
-Still unverified: axis directions on the mechanism (`INVERT_X`/`INVERT_Y`), Cross
-blink, D-pad trim, and a controller off/on reconnect without a power cycle.
+Scott confirmed on the mechanism the same day that stick direction, Cross blink and
+D-pad trim all work as expected. Still unverified: controller off/on reconnect
+without a power cycle.
+
+Added the same day at Scott's request: the **right stick drives the eyes too** (per axis,
+whichever stick is pushed further wins; summing them was rejected because it would
+double the throw), and **`Y_PARK`** rests the eyes below mechanical centre, 60 of 1023
+to start. Each half of the stick travel is stretched so both ends are still
+reached, which is why the offset isn't simply subtracted, since that would clip the top.
 
 **Core 3.x trap:** esp32 core 3.3.7 frees Bluetooth memory at boot unless
 `btInUse()` returns true, and PS4Controller doesn't set it. Without
