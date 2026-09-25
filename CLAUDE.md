@@ -394,3 +394,4 @@ Everyday: walk into the lab → wait **30 s** (setting) → wake and do its thin
 sleep. **Not running constantly while he's in the lab: the cheap servos are loud and get annoying.** Sometimes
 he wants a longer run, as an option — maybe a Home Assistant voice command for "extended play".
 This replaces "automatic idle whenever unattended", which ran 24/7 and got the eyes powered off.
+Re-trigger (Scott): BOTH coming back after the lab has been empty a while AND a periodic show while he's there.
