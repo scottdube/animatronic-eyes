@@ -424,3 +424,8 @@ his right → center); winks, random eye, every 25–60 s. Trims renamed to his 
 cRBot -21, not the -14 read earlier: Scott re-trimmed closed in between. **This OTA went out WITHOUT a dirty
 check**, so whether anything unsaved was lost is unknown; `./build.sh ota` now refuses while /values is dirty.
 Not yet seen by Scott: the three set pieces, and the relabeled page.
+**Center calibration (build 5ebecee, 2026-09-25):** parkX -75 migrated to `xCenter` -16 (pulse counts, applied at
+servo 0), parkX now 0 = true center; verified by /values and /status x 512 at rest. Travel is now ±110 pulses
+about center (was +126 his left / −94 his right), so his right end reaches pulse 204, 16 past the kit's 220:
+**not yet checked for a stop.** Page has look-test buttons (full his left / right / up / down / center, held
+until anything else happens). Also fixed: d87a7ef's trim rename broke the trim sliders' preset switching.
