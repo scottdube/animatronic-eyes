@@ -451,3 +451,9 @@ link but the DS4 clone doesn't notice promptly and has no off button; this libra
 the controller must call it, and a DS4 only does that on power-up. Holding P4 ~10 s forces it off; the next
 press is a fresh power-up that calls the stored host. **Hypothesis, untested:** waiting until the light bar goes
 dark by itself (a DS4 gives up after a while) and then one press would work too.
+**Rail monitor (build affbc83, 2026-09-25):** /status `rail`, `railMin`, `railMax`, `railDips` (<4.6 V), `reset`
+(last restart reason); page line under the mode. Needs a 10k/10k divider, ESP32 5 V pin → GPIO34 → GND: NOT
+wired yet (reads 284 mV floating; the page says "not wired"). Heap after boot 37.7 KB (the task stack is 3 KB).
+**Supply evidence so far:** the bench PSU panel never showed near 1 A (Scott; peaks high 400s mA). A panel meter
+averages over ~0.25–0.5 s, so it can't see ms spikes. The 2–4 A spike figure I gave is an ESTIMATE, not measured;
+the PPK2 (Scott has one, and a scope) on ONE servo can measure a real SG90 peak/stall within its 1 A limit.
