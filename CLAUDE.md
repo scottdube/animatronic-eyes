@@ -574,3 +574,8 @@ Mini over USB: that carries the link key for 8c:41:f2:a1:49:dc AND the current s
 so the settings JSON becomes the fallback. Read it from the DevKit on the day, not from the 09-24 backup
 (that one has old settings). Retire the DevKit: two hosts on one BT MAC would fight. Fallbacks in order:
 MAC alone without the NVS copy (the common tutorial path), sixaxispairer over USB, Bluepad32.
+**Buck input supply (2026-09-25):** Scott linked a 12 V 3 A 5.5×2.1 adapter (Amazon B0DKT5DH2K; specs read from
+the listing URL only, page not opened). 12 V 3 A = 36 W against ~12 W needed: fine. Already in stock, no purchase
+needed: **Power Adapter 12V 3A, model 1230** @ SLN/Assembly & Test (http://192.168.50.10:8001/web/stock/item/683/;
+it sits beside the ZVS cooling-loop pump, so check it isn't that loop's supply; plug size not recorded), and
+**5.5×2.1 female barrel pigtails, 12** @ SLN B0-R1C3 (http://192.168.50.10:8001/web/stock/item/802/) for the buck's IN+/IN−.
