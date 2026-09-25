@@ -27,10 +27,12 @@ static const Field SETTINGS[] = {
     F(wTopL, -60, 60, 0), F(wBotL, -60, 60, 0), F(wTopR, -60, 60, 0), F(wBotR, -60, 60, 0),
     F(blinkBtn, 0, 2, 0),
     F(idleMode, 0, 2, 1),
-    F(autoIdleSecs, 5, 600, 20),  F(idleRunMins, 0, 120, 5),
+    F(arriveDelay, 0, 300, 30),   F(showSecs, 30, 900, 150),
+    F(showEvery, 0, 240, 60),     F(extendMins, 1, 120, 20),
+    F(handsOffSecs, 5, 600, 20),  F(sleepQuiet, 0, 1, 1),
     F(glanceTenths, 5, 50, 20),   F(glanceRange, 10, 100, 60),
     F(blinkRate, 0, 30, 12),      F(arriveAction, 0, 2, 1),
-    F(emptyAction, 0, 2, 2),      F(emptyMins, 1, 60, 5),
+    F(emptyMins, 1, 60, 5),
 };
 #undef F
 static_assert(offsetof(EyeSettings, wBotR) - offsetof(EyeSettings, cTopL) == 15 * sizeof(int),

@@ -137,10 +137,10 @@ String eyeStatusJson() {
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
-           "\"mode\":\"%s\",\"held\":%s,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
+           "\"mode\":\"%s\",\"nextShow\":%d,\"showLeft\":%d,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
-           sceneModeName(), sceneHeld() ? "true" : "false", scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
+           sceneModeName(), sceneNextShowSecs(), sceneShowLeftSecs(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
            pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets);
   return buf;
 }
@@ -217,6 +217,7 @@ void setup() {
   xval = restX();
   yval = restY();
   scenesBegin();
+  scenesBoot();
 
   wifiStart();
   webBegin();
@@ -339,13 +340,18 @@ void loop() {
   altuplidpulse = lidPulse(240 + ((680 - upOpen) - 240) * top, +1, trimAt(0, lid)); // top L
   altlolidpulse = lidPulse(400 + ((680 - loOpen) - 400) * bot, -1, trimAt(1, lid)); // bottom L
 
-  pwm.setPWM(0, 0, lexpulse);
-  pwm.setPWM(1, 0, leypulse);
+  if (f.limp) {
+    // Quiet sleep: no pulses at all (the PCA9685's full-off bit), so nothing hums
+    for (int ch = 0; ch <= 5; ch++) pwm.setPWM(ch, 0, 4096);
+  } else {
+    pwm.setPWM(0, 0, lexpulse);
+    pwm.setPWM(1, 0, leypulse);
 
-  pwm.setPWM(2, 0, uplidpulse);
-  pwm.setPWM(3, 0, lolidpulse);
-  pwm.setPWM(4, 0, altuplidpulse);
-  pwm.setPWM(5, 0, altlolidpulse);
+    pwm.setPWM(2, 0, uplidpulse);
+    pwm.setPWM(3, 0, lolidpulse);
+    pwm.setPWM(4, 0, altuplidpulse);
+    pwm.setPWM(5, 0, altlolidpulse);
+  }
 
   if (millis() - lastPrint > 200) {
     lastPrint = millis();

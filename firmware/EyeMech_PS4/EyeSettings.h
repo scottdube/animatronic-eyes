@@ -28,17 +28,20 @@ struct EyeSettings {
   int wTopL, wBotL, wTopR, wBotR;
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
-  // Alive idle
-  int idleMode;      // 0 off, 1 automatic, 2 manual only
-  int autoIdleSecs;  // unattended this long -> automatic idle, 5..600
-  int idleRunMins;   // a manual start runs this long, 0 = until stopped, 0..120
+  // Alive idle and shows. A show is a spell of alive idle that ends in sleep.
+  int idleMode;      // 0 off (eyes rest open), 1 automatic (arrival, power-up, every showEvery), 2 on demand only
+  int arriveDelay;   // seconds from arrival (or power-up) to the show, 0..300
+  int showSecs;      // a show lasts this long, 30..900
+  int showEvery;     // minutes between shows while someone is there, 0 = none, 0..240
+  int extendMins;    // extended play lasts this long, 1..120
+  int handsOffSecs;  // controller let go this long -> back to sleep, 5..600
+  int sleepQuiet;    // 1 = stop the servo pulses once the lids are closed (silent), 0 = hold
   int glanceTenths;  // mean time between glances, tenths of a second, 5..50
   int glanceRange;   // how far glances go, % of full travel, 10..100
   int blinkRate;     // idle blinks per minute, 0..30
   // Radar (Home Assistant calls /presence)
-  int arriveAction;  // 0 nothing, 1 idle, 2 play recording then idle
-  int emptyAction;   // 0 keep going, 1 rest, 2 sleep (lids closed)
-  int emptyMins;     // bench empty this long -> emptyAction, 1..60
+  int arriveAction;  // what a show is: 0 nothing, 1 alive idle, 2 play the recording then idle
+  int emptyMins;     // lab empty this long before a return counts as a new arrival, 1..60
 };
 
 extern EyeSettings settings;

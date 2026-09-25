@@ -395,3 +395,6 @@ sleep. **Not running constantly while he's in the lab: the cheap servos are loud
 he wants a longer run, as an option — maybe a Home Assistant voice command for "extended play".
 This replaces "automatic idle whenever unattended", which ran 24/7 and got the eyes powered off.
 Re-trigger (Scott): BOTH coming back after the lab has been empty a while AND a periodic show while he's there.
+**Show cycle built 2026-09-25** (spec revision in docs/superpowers/specs/2026-09-24-eyemech-scenes-design.md).
+Supersedes faa5248's Stop/hold fixes (holdRest removed: nothing automatic runs unprompted now). NOT deployed:
+eyes are off. On deploy, check: power-up → show at +30 s → sleep; quiet sleep lids don't sag; /presence on/off.

@@ -5,21 +5,25 @@
 #include <math.h>
 
 // ---- state ----------------------------------------------------------------
-static SceneMode mode = M_REST, shownMode = (SceneMode)-1;
-static uint32_t lastActivity = 0;  // takeover or scene command; 0 = boot
+// Everyday use (Scott, 2026-09-25): walk in, 30 s later the eyes wake and do a short
+// show, then sleep; the servos are loud, so they must NOT run the whole time he is in
+// the lab. Another show comes on a return after the lab was empty a while, and every
+// showEvery minutes while he is there. Extended play is on demand (HA voice or page).
+static SceneMode mode = M_REST, shownMode = (SceneMode)-1, prevMode = M_REST;
 static uint32_t lastTakeover = 0;
 static bool prevTri = false, prevCir = false, prevShare = false;
 
-static uint32_t idleUntil = 0;  // 0 = runs until stopped
+static uint32_t idleUntil = 0;  // end of the current show
 static bool playThenIdle = false;
 
-static bool present = false, emptyPending = false;
-// No auto idle until someone is back (controller, arrival, or a page command). Set by a Stop
-// (page or Triangle), a timed idle run ending, and the bench going empty with emptyAction=rest.
-// Without it a Stop lasted only autoIdleSecs, and a timed run restarted the moment it ended.
-static bool holdRest = false;
-static bool wasConnected = false;
+static bool present = false, everPresent = false;
 static uint32_t emptySince = 0;
+static bool showPending = false;  // an arrival show waiting out arriveDelay
+static uint32_t showAt = 0;
+static uint32_t nextPeriodic = 0;  // 0 = none (nobody present, or showEvery 0)
+static bool sleepAfterHands = false;  // the controller was let go: sleep after handsOffSecs
+static uint32_t sleepSince = 0;
+static bool wasConnected = false;
 
 // ---- alive idle generator --------------------------------------------------
 // Gaze is picked in the kit's 0..1023 units as an offset from the rest
@@ -160,11 +164,20 @@ static void stopScene() {
   mode = M_REST;
 }
 
-static bool startIdle(uint32_t now, bool timed) {
+// Where the eyes go when a show, a playback or the controller is done: asleep, unless
+// shows are off altogether (then they rest open as before).
+static void endScene() {
+  stopScene();
+  if (settings.idleMode != 0) mode = M_SLEEP;
+}
+
+static bool startShow(uint32_t now, uint32_t secs) {
   if (mode == M_RECORD || settings.idleMode == 0) return false;
   idleReset(now);
-  idleUntil = (timed && settings.idleRunMins) ? now + settings.idleRunMins * 60000UL : 0;
+  idleUntil = now + secs * 1000UL;
   mode = M_IDLE;
+  showPending = false;
+  sleepAfterHands = false;
   return true;
 }
 
@@ -172,6 +185,8 @@ static bool startPlay(uint32_t now, bool thenIdle) {
   if (!storedFrames || mode == M_RECORD) return false;
   playThenIdle = thenIdle;
   playStart = now;
+  showPending = false;
+  sleepAfterHands = false;
   rbase = -1;
   mode = M_PLAY;
   return true;
@@ -242,33 +257,34 @@ void scenesBegin() {
                 storedFrames * FRAME_MS / 1000.0f);
 }
 
+// An arrival (or power-up) show: what arriveAction says
+static void arrivalShow(uint32_t now) {
+  if (settings.arriveAction == 1) startShow(now, settings.showSecs);
+  else if (settings.arriveAction == 2 && !startPlay(now, true)) startShow(now, settings.showSecs);
+}
+
 Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   if (pad.connected && !wasConnected) shownMode = (SceneMode)-1;  // fresh connection: resend the light bar
   wasConnected = pad.connected;
 
   // Controller: takeover stops any scene; Triangle / Circle / Share are commands
   if (pad.connected && pad.takeover) {
-    lastActivity = lastTakeover = now;
+    lastTakeover = now;
+    showPending = false;  // driving during the arrival wait: no show on top of it
     if (mode == M_IDLE || mode == M_PLAY || mode == M_SLEEP) stopScene();
     if (mode != M_RECORD) mode = M_LIVE;
   }
   bool tri = pad.connected && pad.triangle, cir = pad.connected && pad.circle,
        sh = pad.connected && pad.share;
-  // Edges, not held buttons: a held Triangle must not undo the hold its own press set
-  if ((pad.connected && pad.takeover) || (tri && !prevTri) || (cir && !prevCir) || (sh && !prevShare))
-    holdRest = false;
   if (tri && !prevTri) {
-    lastActivity = now;
-    if (mode == M_IDLE) { stopScene(); holdRest = true; }
-    else if (settings.idleMode != 0) startIdle(now, true);
+    if (mode == M_IDLE) endScene();
+    else startShow(now, settings.showSecs);
   }
   if (cir && !prevCir) {
-    lastActivity = now;
-    if (mode == M_PLAY) stopScene();
+    if (mode == M_PLAY) endScene();
     else startPlay(now, false);
   }
   if (sh && !prevShare) {
-    lastActivity = now;
     if (mode == M_RECORD) finishRecording();
     else startRecord();
   }
@@ -277,21 +293,29 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   prevShare = sh;
   if (mode == M_RECORD && !pad.connected) finishRecording();
 
-  bool unattended = now - lastActivity >= settings.autoIdleSecs * 1000UL;
-
   // Timers
-  if (mode == M_IDLE && settings.idleMode == 0) mode = M_REST;
-  if (mode == M_IDLE && idleUntil && (int32_t)(now - idleUntil) >= 0) { mode = M_REST; holdRest = true; }
-  if (mode == M_LIVE && now - lastTakeover > 3000) mode = M_REST;
-  if (settings.idleMode == 1 && mode == M_REST && unattended && !holdRest) startIdle(now, false);
-  if (emptyPending && now - emptySince >= settings.emptyMins * 60000UL) {
-    emptyPending = false;
-    if (unattended && mode != M_RECORD && settings.emptyAction != 0) {
-      stopScene();
-      if (settings.emptyAction == 2) mode = M_SLEEP;
-      else holdRest = true;
-    }
+  if (mode == M_IDLE && (settings.idleMode == 0 || (int32_t)(now - idleUntil) >= 0)) endScene();
+  if (mode == M_LIVE && now - lastTakeover > 3000) {
+    mode = M_REST;
+    sleepAfterHands = settings.idleMode != 0;
   }
+  if (sleepAfterHands && mode == M_REST && now - lastTakeover >= settings.handsOffSecs * 1000UL) {
+    sleepAfterHands = false;
+    mode = M_SLEEP;
+  }
+  bool waiting = mode == M_REST || mode == M_SLEEP;
+  if (showPending && (int32_t)(now - showAt) >= 0) {
+    showPending = false;
+    if (waiting) arrivalShow(now);
+  }
+  if (nextPeriodic && (int32_t)(now - nextPeriodic) >= 0) {
+    nextPeriodic = (present && settings.showEvery) ? now + settings.showEvery * 60000UL : 0;
+    if (settings.idleMode == 1 && present && settings.showEvery && waiting && !showPending)
+      startShow(now, settings.showSecs);
+  }
+
+  if (mode != prevMode && mode == M_SLEEP) sleepSince = now;
+  prevMode = mode;
 
   Frame out = live;
   switch (mode) {
@@ -300,13 +324,16 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
       break;
     case M_PLAY:
       if (!playFrame(now, out)) {
-        mode = M_REST;
-        if (playThenIdle) startIdle(now, true);
+        if (playThenIdle) startShow(now, settings.showSecs);
+        else endScene();
         out = mode == M_IDLE ? idleFrame(now) : live;
       }
       break;
     case M_SLEEP:
       out = {0, 0, true, settings.lidClosed};
+      // Quiet sleep: once the lids have had time to close, stop the pulses so the
+      // cheap servos can't hum or buzz holding position.
+      out.limp = settings.sleepQuiet && now - sleepSince > 1000;
       break;
     case M_RECORD:
       recordSample(live, now);
@@ -338,36 +365,66 @@ const char *sceneModeName() {
 
 bool sceneCommand(const String &cmd) {
   uint32_t now = millis();
-  holdRest = false;
-  if (cmd == "idle") return startIdle(now, true);
+  if (cmd == "idle" || cmd == "show") return startShow(now, settings.showSecs);
+  else if (cmd == "extended") return startShow(now, settings.extendMins * 60UL);
   else if (cmd == "play") return startPlay(now, false);
   else if (cmd == "record") return startRecord();
-  else if (cmd == "stop") { stopScene(); holdRest = true; }
+  else if (cmd == "stop") stopScene();  // rest, eyes open, until something else happens
   else if (cmd == "sleep") { stopScene(); mode = M_SLEEP; }
   else if (cmd == "wake") { if (mode == M_SLEEP) mode = M_REST; }
   else return false;
-  lastActivity = now;  // a page command counts as someone being there
+  showPending = false;
+  sleepAfterHands = false;
   return true;
+}
+
+void scenesBoot() {
+  // Power-up counts as an arrival, so the cycle works before the radar reports anything
+  if (settings.idleMode == 1) {
+    showPending = true;
+    showAt = millis() + settings.arriveDelay * 1000UL;
+  }
 }
 
 void scenePresence(bool on) {
   uint32_t now = millis();
+  if (on == present) return;  // Home Assistant may repeat itself
   present = on;
   if (!on) {
-    emptyPending = true;
     emptySince = now;
+    showPending = false;  // left during the wait: no show to an empty room
+    nextPeriodic = 0;
     return;
   }
-  emptyPending = false;
-  holdRest = false;
-  if (mode == M_SLEEP) mode = M_REST;
-  bool recentlyDriven = now - lastActivity < settings.autoIdleSecs * 1000UL;
-  if (recentlyDriven || mode == M_RECORD || mode == M_PLAY || mode == M_IDLE) return;
-  if (settings.arriveAction == 1) startIdle(now, true);
-  else if (settings.arriveAction == 2 && !startPlay(now, true)) startIdle(now, true);
+  if (mode == M_SLEEP && settings.idleMode == 0) mode = M_REST;
+  nextPeriodic = settings.showEvery ? now + settings.showEvery * 60000UL : 0;
+  // A new arrival only after the lab was empty emptyMins: a quick step out doesn't count
+  bool arrival = !everPresent || now - emptySince >= settings.emptyMins * 60000UL;
+  everPresent = true;
+  if (!arrival || settings.idleMode != 1) return;
+  if (mode == M_RECORD || mode == M_PLAY || mode == M_IDLE || mode == M_LIVE) return;
+  showPending = true;
+  showAt = now + settings.arriveDelay * 1000UL;
 }
 
 bool scenePresent() { return present; }
-bool sceneHeld() { return holdRest; }
+
+// Seconds to the next show the eyes will start on their own, -1 = none scheduled
+int sceneNextShowSecs() {
+  uint32_t now = millis();
+  int32_t best = -1;
+  if (showPending) best = max<int32_t>(0, (int32_t)(showAt - now));
+  if (nextPeriodic && settings.idleMode == 1) {
+    int32_t d = max<int32_t>(0, (int32_t)(nextPeriodic - now));
+    if (best < 0 || d < best) best = d;
+  }
+  return best < 0 ? -1 : (int)(best / 1000);
+}
+
+// Seconds left in the running show, -1 = no show running
+int sceneShowLeftSecs() {
+  if (mode != M_IDLE) return -1;
+  return max<int32_t>(0, (int32_t)(idleUntil - millis())) / 1000;
+}
 
 uint32_t recordingMs() { return storedFrames * FRAME_MS; }

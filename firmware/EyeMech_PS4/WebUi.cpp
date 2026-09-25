@@ -21,7 +21,7 @@ extern "C" bool verifyRollbackLater() { return true; }
 static WebServer server(80);
 static bool started = false, markedValid = false;
 
-static bool authorised() {
+static bool authorized() {
 #ifdef OTA_PASSWORD
   if (!server.authenticate("admin", OTA_PASSWORD)) {
     server.requestAuthentication();
@@ -53,7 +53,7 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <div class="mut" id="bi"></div>
 <div id="st">…</div>
 <div id="mode">…</div>
-<div class="sc"><button data-c="idle">∿ Idle</button><button data-c="play">▶ Play</button><button data-c="record">⏺ Record</button>
+<div class="sc"><button data-c="show">∿ Show</button><button data-c="extended">∿∿ Extended</button><button data-c="play">▶ Play</button><button data-c="record">⏺ Record</button>
 <button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button></div>
 <div class="mut" id="scm">Record needs the controller: it records what you do with it.</div>
 <h2>Eyes and lids</h2>
@@ -87,13 +87,26 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
+<h2>Shows</h2>
+<p class="mut">A show is a spell of alive idle that ends with the eyes asleep. Everyday: you arrive, the eyes
+wait, do one show, then sleep while you're in the lab, with another show now and then.</p>
+<div class="row"><label>Shows</label>
+<select id="idleMode"><option value="0">Off (eyes rest open)</option><option value="1">Automatic: on arrival and now and then</option><option value="2">On demand only (Triangle, this page, voice)</option></select></div>
+<div class="row"><label>Show starts <span id="v_arriveDelay"></span> s after you arrive</label>
+<input type="range" id="arriveDelay" min="0" max="300" step="5"><div class="mut">Power-up counts as an arrival</div></div>
+<div class="row"><label>A show lasts <span id="v_showSecs"></span> s</label>
+<input type="range" id="showSecs" min="30" max="900" step="10"></div>
+<div class="row"><label>Another show every <span id="v_showEvery"></span> min while you're here</label>
+<input type="range" id="showEvery" min="0" max="240" step="5"><div class="mut">0 = only on arrival. Needs the radar</div></div>
+<div class="row"><label>Extended play lasts <span id="v_extendMins"></span> min</label>
+<input type="range" id="extendMins" min="1" max="120" step="1"></div>
+<div class="row"><label>Back to sleep <span id="v_handsOffSecs"></span> s after the controller</label>
+<input type="range" id="handsOffSecs" min="5" max="600" step="5"></div>
+<div class="row"><label>While asleep</label>
+<select id="sleepQuiet"><option value="1">Silent (servos let go once the lids close)</option><option value="0">Hold (servos powered)</option></select></div>
+<div class="row"><label>What a show is</label>
+<select id="arriveAction"><option value="0">Nothing</option><option value="1">Alive idle</option><option value="2">Play the recording, then idle</option></select></div>
 <h2>Alive idle</h2>
-<div class="row"><label>Idle</label>
-<select id="idleMode"><option value="0">Off</option><option value="1">Automatic when left alone</option><option value="2">Manual only (Triangle or this page)</option></select></div>
-<div class="row"><label>Automatic after <span id="v_autoIdleSecs"></span> s alone</label>
-<input type="range" id="autoIdleSecs" min="5" max="600" step="5"></div>
-<div class="row"><label>Manual start runs <span id="v_idleRunMins"></span> min</label>
-<input type="range" id="idleRunMins" min="0" max="120" step="1"><div class="mut">0 = until stopped</div></div>
 <div class="row"><label>Time between glances <span id="v_glanceTenths"></span> ×0.1 s</label>
 <input type="range" id="glanceTenths" min="5" max="50" step="1"></div>
 <div class="row"><label>How far glances go <span id="v_glanceRange"></span>%</label>
@@ -101,20 +114,17 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <div class="row"><label>Blinks per minute <span id="v_blinkRate"></span></label>
 <input type="range" id="blinkRate" min="0" max="30" step="1"></div>
 <h2>Bench radar (Home Assistant)</h2>
-<div class="row"><label>When someone arrives</label>
-<select id="arriveAction"><option value="0">Nothing (still wakes from sleep)</option><option value="1">Alive idle</option><option value="2">Play the recording, then idle</option></select></div>
-<div class="row"><label>When the bench is empty</label>
-<select id="emptyAction"><option value="0">Keep going</option><option value="1">Rest</option><option value="2">Sleep (lids closed)</option></select></div>
-<div class="row"><label>… after <span id="v_emptyMins"></span> min empty</label>
-<input type="range" id="emptyMins" min="1" max="60" step="1"></div>
+<div class="row"><label>A return counts as a new arrival after <span id="v_emptyMins"></span> min empty</label>
+<input type="range" id="emptyMins" min="1" max="60" step="1"><div class="mut">So a quick step out doesn't start a show</div></div>
 <div class="btns"><button class="pri" id="save">Save</button><button id="revert">Revert</button><button id="defaults">Defaults</button></div>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','autoIdleSecs','idleRunMins',
- 'glanceTenths','glanceRange','blinkRate','arriveAction','emptyAction','emptyMins'];
-const M={live:'● Live: controller driving',idle:'∿ Alive idle',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
+const K=['parkY','parkX','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
+ 'glanceTenths','glanceRange','blinkRate','arriveAction','emptyMins'];
+const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
+const fm=t=>t<90?t+' s':Math.round(t/60)+' min';
 // Trims: one set of four sliders edits the selected preset's (prefix c/s/n/w)
 const T=['TopL','BotL','TopR','BotR'],P={lidClosed:['c','▬ Closed'],lidSquint:['s','◒ Squint'],lidNormal:['n','● Normal'],lidWide:['w','▲ Wide']};
 let V={},tp='n';
@@ -142,7 +152,7 @@ document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
 async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
- $('mode').textContent=(M[s.mode]||s.mode)+(s.held&&s.mode=='rest'?' (held: idle waits for you)':'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
+ $('mode').textContent=(M[s.mode]||s.mode)+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
  $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
 j('/values').then(show).then(poll);setInterval(poll,2000);
 </script></body></html>)HTML";
@@ -162,19 +172,19 @@ static void sendJson(const String &s) { server.send(200, "application/json", s);
 
 void webBegin() {
   server.on("/", HTTP_GET, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     server.send_P(200, "text/html", PAGE);
   });
   server.on("/values", HTTP_GET, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     sendJson(settingsJson());
   });
   server.on("/status", HTTP_GET, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     sendJson(eyeStatusJson());
   });
   server.on("/set", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     for (int i = 0; i < server.args(); i++) {
       String k = server.argName(i);
       if (k == "plain") continue;  // WebServer's name for the body
@@ -187,7 +197,7 @@ void webBegin() {
     sendJson(settingsJson());
   });
   server.on("/save", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     if (!saveSettings()) {
       server.send(500, "text/plain", "NVS write failed\n");
       return;
@@ -195,13 +205,13 @@ void webBegin() {
     sendJson(settingsJson());
   });
   server.on("/revert", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     loadSettings();
     applyLiveSetting("");  // "" = everything may have changed
     sendJson(settingsJson());
   });
   server.on("/defaults", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     resetSettings(settings);
     applyLiveSetting("");
     sendJson(settingsJson());  // not saved until Save
@@ -209,7 +219,7 @@ void webBegin() {
 
   // idle | play | record | stop | sleep | wake
   server.on("/scene", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     String c = server.arg("cmd");
     if (!sceneCommand(c)) {
       server.send(409, "text/plain", "can't " + c + " now (idle off? no recording? no controller?)\n");
@@ -219,7 +229,7 @@ void webBegin() {
   });
   // Home Assistant, from the bench radar
   server.on("/presence", HTTP_POST, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     String st = server.arg("state");
     if (st != "on" && st != "off") {
       server.send(400, "text/plain", "state=on|off\n");
@@ -230,7 +240,7 @@ void webBegin() {
   });
 
   server.on("/update", HTTP_GET, [] {
-    if (!authorised()) return;
+    if (!authorized()) return;
     String page = FPSTR(UPDATE_PAGE);
     page.replace("%BUILD%", BUILD_ID);
     server.send(200, "text/html", page);
@@ -238,7 +248,7 @@ void webBegin() {
   server.on(
       "/update", HTTP_POST,
       [] {
-        if (!authorised()) return;
+        if (!authorized()) return;
         bool ok = !Update.hasError() && Update.isFinished();  // isFinished: a file actually arrived
         server.send(ok ? 200 : 500, "text/plain",
                     ok ? "Update OK, restarting.\n" : "Update FAILED, old firmware kept.\n");
@@ -246,7 +256,7 @@ void webBegin() {
         if (ok) ESP.restart();
       },
       [] {
-        // The upload handler can't send a challenge mid-stream, so an unauthorised
+        // The upload handler can't send a challenge mid-stream, so an unauthorized
         // upload is simply not written; the final handler then sends the challenge.
         // Update.end(true) switches the boot slot, so this check must be here too.
         static bool allowed = false;
