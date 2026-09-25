@@ -383,3 +383,8 @@ Page JS not exercised by me (no browser: my open tab coincided with the dead-sli
 OTA could not reach them: laptop on 192.168.1.203, gateway 192.168.1.1 answered "Destination Host
 Unreachable" for 192.168.30.211 (eyes powered off, or off Wi-Fi; not established). Eyes still run 1033ac6.
 Deploy with `./build.sh ota` from the shop, then check `build` in /status.
+**Why the eyes were off 2026-09-25 (Scott):** he powered them down because they "were running consistently",
+idling nonstop. How idle got back on after idleMode 0 was set live is not established (a power cycle would do
+it: saved idleMode is 1). Design gap either way: automatic idle has no end without the radar. Only a bench-empty
+report ends it (emptyAction sleep), and the HA package that sends presence is not written. So on a plain
+power-up it idles 24/7.
