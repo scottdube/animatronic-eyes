@@ -1,6 +1,7 @@
 #include "WebUi.h"
 #include "EyeSettings.h"
 #include "Scenes.h"
+#include "Rail.h"
 #include "secrets.h"
 #include <Update.h>
 #include <WebServer.h>
@@ -54,6 +55,7 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <div class="mut" id="bi"></div>
 <div id="st">…</div>
 <div id="mode">…</div>
+<div id="pw" class="mut">…</div>
 <div class="sc"><button data-c="show">∿ Show</button><button data-c="extended">∿∿ Extended</button><button data-c="play">▶ Play</button><button data-c="record">⏺ Record</button>
 <button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button>
 <button data-c="service">🔧 Service</button></div>
@@ -173,6 +175,11 @@ async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
  $('mode').textContent=(M[s.mode]||s.mode)+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
+ const v=x=>(x/1000).toFixed(2)+' V',low=s.railMin<4600||s.railDips>0;
+ $('pw').innerHTML=s.rail<1000?'⚡ 5 V rail: not wired (10k/10k divider to GPIO34) · last restart: '+s.reset:
+  (low?'⚠':'✓')+' ⚡ 5 V rail '+v(s.rail)+' · min '+v(s.railMin)+' · max '+v(s.railMax)+' · dips under 4.6 V: '+s.railDips+
+  ' · last restart: '+(s.reset=='brownout'?'<b>⚠ BROWNOUT</b>':s.reset)+' <button id="rr" style="flex:none;padding:2px 8px;font-size:.85em">reset min</button>';
+ const rr=$('rr');if(rr)rr.onclick=async()=>{await fetch('/railreset',{method:'POST'});poll()};
  $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
 j('/values').then(show).then(poll);setInterval(poll,2000);
 </script></body></html>)HTML";
@@ -246,6 +253,11 @@ void webBegin() {
       return;
     }
     sendJson(eyeStatusJson());
+  });
+  server.on("/railreset", HTTP_POST, [] {  // start the rail's min/max/dips afresh
+    if (!authorized()) return;
+    railReset();
+    server.send(200, "text/plain", "ok\n");
   });
   // Home Assistant, from the bench radar
   server.on("/presence", HTTP_POST, [] {

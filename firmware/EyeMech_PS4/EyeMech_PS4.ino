@@ -26,6 +26,7 @@
 #include "EyeSettings.h"
 #include "WebUi.h"
 #include "Scenes.h"
+#include "Rail.h"
 #if __has_include("build_id.h")
 #include "build_id.h"
 #endif
@@ -136,15 +137,17 @@ void applyLiveSetting(const String &key) {
 }
 
 String eyeStatusJson() {
-  char buf[384];
+  char buf[512];
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
-           "\"mode\":\"%s\",\"nextShow\":%d,\"showLeft\":%d,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
+           "\"mode\":\"%s\",\"nextShow\":%d,\"showLeft\":%d,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu,"
+           "\"rail\":%d,\"railMin\":%d,\"railMax\":%d,\"railDips\":%lu,\"reset\":\"%s\"}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
            sceneModeName(), sceneNextShowSecs(), sceneShowLeftSecs(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
-           pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets);
+           pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets,
+           railNowMv(), railMinMv(), railMaxMv(), (unsigned long)railDips(), resetReasonName());
   return buf;
 }
 
@@ -202,6 +205,8 @@ void onDisconnect() {
 void setup() {
   Serial.begin(115200);
   Serial.println("EyeMech PS4");
+  Serial.printf("Last restart: %s\n", resetReasonName());
+  railBegin();
 
   uint8_t m[6];
   esp_read_mac(m, ESP_MAC_BT);
