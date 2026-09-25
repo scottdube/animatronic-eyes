@@ -61,9 +61,9 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <p class="mut">Pupil center: set where the eyes look straight ahead. Moving either slider stops idle and
 holds the eyes there. The sticks and idle glances all work around this point.</p>
 <div class="row"><label>Pupil center up / down <span id="v_parkY"></span></label>
-<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit center, higher = lower</div></div>
+<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = true center (set under Calibration), higher = lower</div></div>
 <div class="row"><label>Pupil center left / right <span id="v_parkX"></span></label>
-<input type="range" id="parkX" min="-150" max="150" step="5" style="direction:rtl"><div class="mut" style="display:flex;justify-content:space-between"><span>◂ his left</span><span>0 = kit center</span><span>his right ▸</span></div></div>
+<input type="range" id="parkX" min="-150" max="150" step="5" style="direction:rtl"><div class="mut" style="display:flex;justify-content:space-between"><span>◂ his left</span><span>0 = true center</span><span>his right ▸</span></div></div>
 <p class="mut">Lid presets, % open. D-pad up/down steps closed ‹ squint ‹ normal ‹ wide; power-up is normal,
 a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <div class="sc pr"><button data-k="lidWide">▲ Wide</button><button data-k="lidNormal">● Normal</button><button data-k="lidSquint">◒ Squint</button><button data-k="lidClosed">▬ Closed</button></div>
@@ -74,17 +74,8 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <div class="mut">0 = the positions the horns were seated to</div></div>
 <div class="row"><label>Bottom lids come up <span id="v_lowLidCurve"></span></label>
 <input type="range" id="lowLidCurve" min="25" max="300" step="5"><div class="mut">50 = gently, 100 = same as the top, higher = further up. Closed and wide don't change</div></div>
-<div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
-<input type="range" id="lidMin" min="160" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
-<div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
-<input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
-<div class="row"><b>Lid trims for: <span id="trp">● Normal</span></b><div class="mut">Pick a preset with the buttons above, then match the eyes. − more closed, + more open. Left/right are HIS left and right, like up and down: his left eye is the one on your right as you face him</div></div>
-<div class="row"><label>His left eye, top lid <span id="v_tLTop"></span></label><input type="range" id="tLTop" min="-60" max="60" step="1"></div>
-<div class="row"><label>His left eye, bottom lid <span id="v_tLBot"></span></label><input type="range" id="tLBot" min="-60" max="60" step="1"></div>
-<div class="row"><label>His right eye, top lid <span id="v_tRTop"></span></label><input type="range" id="tRTop" min="-60" max="60" step="1"></div>
-<div class="row"><label>His right eye, bottom lid <span id="v_tRBot"></span></label><input type="range" id="tRBot" min="-60" max="60" step="1"></div>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
@@ -120,7 +111,7 @@ side; now and then he winks, either eye.</p>
 <div class="row"><label>A return counts as a new arrival after <span id="v_emptyMins"></span> min empty</label>
 <input type="range" id="emptyMins" min="1" max="60" step="1"><div class="mut">So a quick step out doesn't start a show</div></div>
 <h2>Calibration</h2>
-<p class="mut">Set once, after a horn is moved. Everyday adjustments are the sliders above.</p>
+<p class="mut">Set once, after a horn is moved: servo centers, travel limits, lid max open and lid trims. Everyday adjustments are the sliders above.</p>
 <div class="row"><label>Left/right servo center <span id="v_xCenter"></span></label>
 <input type="range" id="xCenter" min="-40" max="40" step="1" style="direction:rtl"><div class="mut" style="display:flex;justify-content:space-between"><span>◂ his left</span><span>pulse counts; set with pupil center at 0</span><span>his right ▸</span></div></div>
 <div class="row"><label>Up/down servo center <span id="v_yCenter"></span></label>
@@ -130,6 +121,16 @@ side; now and then he winks, either eye.</p>
 <div class="row"><b>Look test</b><div class="mut">Holds the eyes at full travel to check for a stop or strain. Stop, a preset or a show ends it.</div>
 <div class="sc lk"><button data-c="lookL">◂ His left</button><button data-c="lookU">▴ Up</button><button data-c="lookR">His right ▸</button>
 <button data-c="lookC">● Center</button><button data-c="lookD">▾ Down</button><button data-c="stop">■ Stop</button></div></div>
+<div class="row"><label>Top lid max open <span id="v_lidMin"></span></label>
+<input type="range" id="lidMin" min="160" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens the top lids further: watch for a straining servo</div></div>
+<div class="row"><label>Bottom lid max open <span id="v_lowLidMax"></span></label>
+<input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
+<div class="row"><b>Lid trims for: <span id="trp">● Normal</span></b><div class="mut">Pick a preset, then match the eyes. − more closed, + more open. Left/right are HIS left and right, like up and down: his left eye is the one on your right as you face him</div></div>
+<div class="sc pr"><button data-k="lidWide">▲ Wide</button><button data-k="lidNormal">● Normal</button><button data-k="lidSquint">◒ Squint</button><button data-k="lidClosed">▬ Closed</button></div>
+<div class="row"><label>His left eye, top lid <span id="v_tLTop"></span></label><input type="range" id="tLTop" min="-60" max="60" step="1"></div>
+<div class="row"><label>His left eye, bottom lid <span id="v_tLBot"></span></label><input type="range" id="tLBot" min="-60" max="60" step="1"></div>
+<div class="row"><label>His right eye, top lid <span id="v_tRTop"></span></label><input type="range" id="tRTop" min="-60" max="60" step="1"></div>
+<div class="row"><label>His right eye, bottom lid <span id="v_tRBot"></span></label><input type="range" id="tRBot" min="-60" max="60" step="1"></div>
 <div class="btns"><button class="pri" id="save">Save</button><button id="revert">Revert</button><button id="defaults">Defaults</button></div>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
