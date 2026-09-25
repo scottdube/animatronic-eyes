@@ -18,6 +18,12 @@ printf '#define BUILD_ID "%s"\n' "$(git describe --always --dirty)" > "$SKETCH/b
 case "${1:-}" in
   ota)
     host="${2:-192.168.30.211}"
+    # A flash restarts the board and drops live values: refuse while the page has unsaved
+    # changes (FORCE=1 to flash anyway). Added 2026-09-25 after a flash went out unchecked.
+    if curl -s --max-time 5 "http://$host/values" | grep -q '"dirty":true' && [ "${FORCE:-}" != 1 ]; then
+      echo "Unsaved changes on the eyes: Save (or Revert) on the page first, or FORCE=1 $0 ota" >&2
+      exit 3
+    fi
     curl -sS --max-time 180 -F "firmware=@$BIN" "http://$host/update"
     ;;
   usb)

@@ -417,3 +417,10 @@ wide TopL 23 BotL 33 BotR 33; all others 0. Save button now answers on the butto
 asked "his left or his right?", answered "left"). So higher xval / servo 0 pulse = his left.
 **Perspective rule (Scott, 2026-09-25): left/right always means the ANIMATRON'S left/right**, like up/down,
 so it survives mounting him in a robot. His left eye = servos 2+3 (viewer's right); his right eye = servos 4+5.
+**Show set pieces + his-perspective labels (build d87a7ef, 2026-09-25):** wake look (wide, far to his left, 2.5 s)
+on a show that starts from sleep; slow squint about once a minute (wide → squint over 3 s, one 6 s sweep his left →
+his right → center); winks, random eye, every 25–60 s. Trims renamed to his own left/right (cLTop.. ; L = servos
+2+3) and migrated from NVS on first boot, verified by /values: old cTopL→cRTop etc. Closed read cLBot 43 /
+cRBot -21, not the -14 read earlier: Scott re-trimmed closed in between. **This OTA went out WITHOUT a dirty
+check**, so whether anything unsaved was lost is unknown; `./build.sh ota` now refuses while /values is dirty.
+Not yet seen by Scott: the three set pieces, and the relabeled page.
