@@ -480,3 +480,9 @@ the run was `brownout` (Scott was rewiring). Firmware ran the show (mode idle) 0
 4.45–4.48 V, min 4.34 V, 0 dips: no sign of servo load at all. At ~145 s the board restarted (`power-on`),
 min 3.73 V. A lookL right after gave a 0.42 V dip (1 count) within 2 s. Cause of "no show" NOT established:
 hypotheses are servos unpowered during the show (the flat rail fits) or the show running in a still phase.
+**USB-only show, after Scott reset the ESP (2026-09-25) — measured, servos on the ESP32 5 V pin:** show ran
+150 s with no restart. Rail level sagged from 4.47 V to ~4.40–4.41 V while moving (one 2 s read at 3.94 V);
+1 ms averages bottomed at **3.61 V**; **95 sags of >0.4 V** in 150 s. Bench-PSU baseline for comparison:
+min 4.20 V, 0 sags in 100 s. So sharing the USB path does sag the rail by ~0.85 V in ms bursts; it did not
+brown the ESP out this run. What it means for margin (the LDO's dropout off a 3.6 V input, instantaneous
+dips deeper than a 1 ms average) is not measured — the scope on the 5 V pin is the instrument for that.
