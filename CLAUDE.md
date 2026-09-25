@@ -545,3 +545,9 @@ from a 5 V supply on short thick leads with bulk capacitance at V+, not through 
 the board in the eyes is the same one is assumed, not checked. Arithmetic: 1000 µF supplying ~1.5 A for 12 ms
 would fall ΔV = I·t/C ≈ 18 V, so no practical cap rides through a sag that long — it's the source/path, not
 missing capacitance. Retracts my earlier "add ≥1000 µF at V+": the fix is a direct, stiff 5 V feed to V+.
+**Plan (Scott, 2026-09-25): LM2596 buck module → PCA9685 V+ AND ESP32 5 V pin** (same single-supply topology
+advised earlier). Wire as a star from the buck's output terminals (separate leads to V+ and to the 5 V pin),
+not daisy-chained through the PCA, so servo current doesn't drop across the ESP's feed. Set 5.0–5.1 V at the
+buck before connecting. Standing trap still applies: USB unplugged while it's powered, flash by OTA. Verify
+with the same scope setup: CH1 on the ESP 5 V pin, CH2 on 3V3, neg pulse >100 µs, level ~0.3 V under the
+new rail. Module rating: chip 3 A; typical blue module ~2 A continuous without a heatsink.
