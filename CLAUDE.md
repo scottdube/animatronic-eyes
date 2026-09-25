@@ -475,3 +475,8 @@ counting. Scope on the pin is the tie-breaker for anything under ~0.3 V.
 ## Eyeball CAD (2026-09-25)
 The eyeball STL is rebuilt as a native Fusion solid ("Eye Ball native" in the "Eye model"
 document); decoded dimensions and the check against the mesh are in `docs/eyeball-cad.md`.
+**First USB-only run (servos on the ESP32 5 V pin, 2026-09-25): Scott saw NO show.** Measured: last reset before
+the run was `brownout` (Scott was rewiring). Firmware ran the show (mode idle) 0–140 s with the rail flat at
+4.45–4.48 V, min 4.34 V, 0 dips: no sign of servo load at all. At ~145 s the board restarted (`power-on`),
+min 3.73 V. A lookL right after gave a 0.42 V dip (1 count) within 2 s. Cause of "no show" NOT established:
+hypotheses are servos unpowered during the show (the flat rail fits) or the show running in a still phase.
