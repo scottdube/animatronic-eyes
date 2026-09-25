@@ -486,3 +486,5 @@ hypotheses are servos unpowered during the show (the flat rail fits) or the show
 min 4.20 V, 0 sags in 100 s. So sharing the USB path does sag the rail by ~0.85 V in ms bursts; it did not
 brown the ESP out this run. What it means for margin (the LDO's dropout off a 3.6 V input, instantaneous
 dips deeper than a 1 ms average) is not measured — the scope on the 5 V pin is the instrument for that.
+Scott (2026-09-25): the eyes twitch and jump all the time on EITHER supply — it's how this build moves — so
+visible motion can't tell the supplies apart. Next instrument: scope, CH1 ESP32 5 V pin, CH2 ESP32 3V3 pin.
