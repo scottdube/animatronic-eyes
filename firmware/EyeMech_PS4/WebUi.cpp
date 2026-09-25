@@ -44,6 +44,7 @@ h1{font-size:1.3em;margin:0 0 4px}.mut{color:var(--mut);font-size:.9em}
 input[type=range]{width:100%;height:32px}select{font-size:1em;padding:6px;width:100%}
 .btns{display:flex;gap:8px;margin-top:20px}button{flex:1;font-size:1em;padding:12px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
 button.pri{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button:active{transform:scale(.95);filter:brightness(.8)}button:disabled{opacity:.6}
 a{color:var(--acc)}
 h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--line)}
 #mode{font-size:1.15em;font-weight:600}.sc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
@@ -140,9 +141,13 @@ async function send(){if(busy||!pend)return;busy=true;const q=pend;pend=null;
  try{const v=await j('/set?'+q,{method:'POST'});dirty=v.dirty}catch(e){}busy=false;send()}
 K.forEach(k=>$(k).addEventListener('input',e=>{const o=$('v_'+k);if(o)o.textContent=e.target.value;
  pend=k+'='+e.target.value;send()}));
-$('save').onclick=async()=>{show(await j('/save',{method:'POST'}));poll()};
-$('revert').onclick=async()=>{show(await j('/revert',{method:'POST'}));poll()};
-$('defaults').onclick=async()=>{show(await j('/defaults',{method:'POST'}));poll()};
+// Save / Revert / Defaults answer on the button itself: working, then done or failed
+async function act(b,u,ok){const t=b.textContent;b.disabled=true;b.textContent='…';let m;
+ try{show(await j(u,{method:'POST'}));m='✓ '+ok}catch(e){m='⚠ Failed'}
+ b.textContent=m;poll();setTimeout(()=>{b.textContent=t;b.disabled=false},2000)}
+$('save').onclick=e=>act(e.target,'/save','Saved');
+$('revert').onclick=e=>act(e.target,'/revert','Reverted');
+$('defaults').onclick=e=>act(e.target,'/defaults','Defaults');
 // Preset buttons show a preset: re-sending its current value switches the eyes to it
 document.querySelectorAll('.pr button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;tp=P[k][0];$('trp').textContent=P[k][1];showT();
  pend=k+'='+$(k).value;send()});
