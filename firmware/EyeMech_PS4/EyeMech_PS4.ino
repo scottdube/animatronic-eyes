@@ -131,7 +131,7 @@ void applyLiveSetting(const String &key) {
   // Setting the pupil center: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
   // Calibrating the center: stop a show, but keep a held look so an end stop can be checked
-  if ((key == "xCenter" || key == "yCenter") && sceneMode() != M_REST) sceneCommand("stop");
+  if ((key == "xCenter" || key == "yCenter" || key == "upMax") && sceneMode() != M_REST) sceneCommand("stop");
 }
 
 String eyeStatusJson() {
@@ -323,7 +323,9 @@ void loop() {
   lexpulse = constrain(map(xval, 0, 1023, 220, 440) + settings.xCenter, 150, 600);  // + xCenter: calibration
   rexpulse = lexpulse;
 
-  leypulse = constrain(map(yval, 0, 1023, 250, 500) + settings.yCenter, 150, 600);  // + yCenter: calibration
+  // The kit's map(yval, 0..1023, 250..500), with the upper half ending at upMax
+  int ey = yval <= 512 ? map(yval, 0, 512, 250, 375) : map(yval, 512, 1023, 375, settings.upMax);
+  leypulse = constrain(ey + settings.yCenter, 150, 600);  // + yCenter: calibration
   reypulse = map(yval, 0, 1023, 400, 280);
 
   // Fully open: the kit's lids at trim 40, following the eyes, pushed out to the

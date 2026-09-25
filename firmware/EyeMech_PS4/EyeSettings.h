@@ -14,6 +14,8 @@ struct EyeSettings {
   int xCenter;       // + = toward his left, -40..40
   int yCenter;       // up/down servo, + = up, -40..40. Servo 1 only: the lids keep following
                      // the commanded gaze, so their trims stay valid
+  int upMax;         // up/down servo pulse at full up, before yCenter: 500 = kit .. 420. Scales the
+                     // upper half of the travel (no dead zone); full up strained a little (2026-09-25)
   // Lids
   // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
   // open limits below. D-pad up/down steps closed < squint < normal < wide; power-up is normal.
