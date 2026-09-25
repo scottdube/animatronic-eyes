@@ -6,8 +6,8 @@
 #include <Arduino.h>
 
 struct EyeSettings {
-  // Rest position, offsets from mechanical centre in the kit's 0..1023 units
-  int parkY;         // eyes rest this far below centre, 0..300
+  // Rest position, offsets from mechanical center in the kit's 0..1023 units
+  int parkY;         // eyes rest this far below center, 0..300
   int parkX;         // eyes rest this far right (+) / left (-), -150..150
   // Lids
   // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
@@ -46,7 +46,7 @@ extern EyeSettings settings;
 // Trim for preset p (0 closed, 1 squint, 2 normal, 3 wide) and lid l (0 topL, 1 botL, 2 topR, 3 botR)
 inline int lidTrim(int p, int l) { return (&settings.cTopL)[p * 4 + l]; }
 
-// Where the eyes rest with the stick centred, in the kit's 0..1023 units.
+// Where the eyes rest with the stick centerd, in the kit's 0..1023 units.
 inline int restX() { return 512 + settings.parkX; }
 inline int restY() { return 512 - settings.parkY; }
 

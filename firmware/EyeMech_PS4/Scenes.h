@@ -29,4 +29,5 @@ const char *sceneModeName();   // "live", "idle", ... for /status
 bool sceneCommand(const String &cmd);
 void scenePresence(bool present);  // from Home Assistant via /presence
 bool scenePresent();
+bool sceneHeld();                  // resting and auto idle is waiting for someone
 uint32_t recordingMs();            // length of the stored recording, 0 = none

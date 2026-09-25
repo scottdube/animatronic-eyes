@@ -14,7 +14,10 @@ static uint32_t idleUntil = 0;  // 0 = runs until stopped
 static bool playThenIdle = false;
 
 static bool present = false, emptyPending = false;
-static bool holdRest = false;  // bench went empty with emptyAction=rest: no auto idle until someone is back
+// No auto idle until someone is back (controller, arrival, or a page command). Set by a Stop
+// (page or Triangle), a timed idle run ending, and the bench going empty with emptyAction=rest.
+// Without it a Stop lasted only autoIdleSecs, and a timed run restarted the moment it ended.
+static bool holdRest = false;
 static bool wasConnected = false;
 static uint32_t emptySince = 0;
 
@@ -39,10 +42,10 @@ static uint32_t nextBlinkDelay() {
   return (uint32_t)max(800.0f, d);
 }
 
-// Inverse of the sketch's stickToAdc (INVERT_X/Y false): an offset from `centre`
+// Inverse of the sketch's stickToAdc (INVERT_X/Y false): an offset from `center`
 // in 0..1023 units to the stick value that lands there.
-static int adcToStick(float off, int centre) {
-  float v = off >= 0 ? off * 127.0f / max(1, 1023 - centre) : off * 128.0f / max(1, centre);
+static int adcToStick(float off, int center) {
+  float v = off >= 0 ? off * 127.0f / max(1, 1023 - center) : off * 128.0f / max(1, center);
   return constrain((int)lroundf(v), -128, 127);
 }
 
@@ -129,7 +132,7 @@ static void setLightBar(SceneMode m) {
   switch (m) {
     case M_IDLE: g = 255; break;
     case M_PLAY: r = 255; b = 255; break;
-    case M_RECORD: r = 255; on = off = 25; break;  // flashing, not colour alone
+    case M_RECORD: r = 255; on = off = 25; break;  // flashing, not color alone
     case M_SLEEP: b = 16; break;
     default: b = 255; break;
   }
@@ -242,7 +245,6 @@ void scenesBegin() {
 Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   if (pad.connected && !wasConnected) shownMode = (SceneMode)-1;  // fresh connection: resend the light bar
   wasConnected = pad.connected;
-  if (pad.connected && (pad.takeover || pad.triangle || pad.circle || pad.share)) holdRest = false;
 
   // Controller: takeover stops any scene; Triangle / Circle / Share are commands
   if (pad.connected && pad.takeover) {
@@ -252,9 +254,12 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   }
   bool tri = pad.connected && pad.triangle, cir = pad.connected && pad.circle,
        sh = pad.connected && pad.share;
+  // Edges, not held buttons: a held Triangle must not undo the hold its own press set
+  if ((pad.connected && pad.takeover) || (tri && !prevTri) || (cir && !prevCir) || (sh && !prevShare))
+    holdRest = false;
   if (tri && !prevTri) {
     lastActivity = now;
-    if (mode == M_IDLE) stopScene();
+    if (mode == M_IDLE) { stopScene(); holdRest = true; }
     else if (settings.idleMode != 0) startIdle(now, true);
   }
   if (cir && !prevCir) {
@@ -275,7 +280,8 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   bool unattended = now - lastActivity >= settings.autoIdleSecs * 1000UL;
 
   // Timers
-  if (mode == M_IDLE && (settings.idleMode == 0 || (idleUntil && (int32_t)(now - idleUntil) >= 0))) mode = M_REST;
+  if (mode == M_IDLE && settings.idleMode == 0) mode = M_REST;
+  if (mode == M_IDLE && idleUntil && (int32_t)(now - idleUntil) >= 0) { mode = M_REST; holdRest = true; }
   if (mode == M_LIVE && now - lastTakeover > 3000) mode = M_REST;
   if (settings.idleMode == 1 && mode == M_REST && unattended && !holdRest) startIdle(now, false);
   if (emptyPending && now - emptySince >= settings.emptyMins * 60000UL) {
@@ -336,7 +342,7 @@ bool sceneCommand(const String &cmd) {
   if (cmd == "idle") return startIdle(now, true);
   else if (cmd == "play") return startPlay(now, false);
   else if (cmd == "record") return startRecord();
-  else if (cmd == "stop") stopScene();
+  else if (cmd == "stop") { stopScene(); holdRest = true; }
   else if (cmd == "sleep") { stopScene(); mode = M_SLEEP; }
   else if (cmd == "wake") { if (mode == M_SLEEP) mode = M_REST; }
   else return false;
@@ -362,5 +368,6 @@ void scenePresence(bool on) {
 }
 
 bool scenePresent() { return present; }
+bool sceneHeld() { return holdRest; }
 
 uint32_t recordingMs() { return storedFrames * FRAME_MS; }

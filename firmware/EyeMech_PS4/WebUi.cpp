@@ -57,12 +57,12 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button></div>
 <div class="mut" id="scm">Record needs the controller: it records what you do with it.</div>
 <h2>Eyes and lids</h2>
-<p class="mut">Pupil centre: set where the eyes look straight ahead. Moving either slider stops idle and
+<p class="mut">Pupil center: set where the eyes look straight ahead. Moving either slider stops idle and
 holds the eyes there. The sticks and idle glances all work around this point.</p>
-<div class="row"><label>Pupil centre up / down <span id="v_parkY"></span></label>
-<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit centre, higher = lower</div></div>
-<div class="row"><label>Pupil centre left / right <span id="v_parkX"></span></label>
-<input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit centre, + = right</div></div>
+<div class="row"><label>Pupil center up / down <span id="v_parkY"></span></label>
+<input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit center, higher = lower</div></div>
+<div class="row"><label>Pupil center left / right <span id="v_parkX"></span></label>
+<input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit center, + = right</div></div>
 <p class="mut">Lid presets, % open. D-pad up/down steps closed ‹ squint ‹ normal ‹ wide; power-up is normal,
 a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <div class="sc pr"><button data-k="lidWide">▲ Wide</button><button data-k="lidNormal">● Normal</button><button data-k="lidSquint">◒ Squint</button><button data-k="lidClosed">▬ Closed</button></div>
@@ -142,7 +142,7 @@ document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
 async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
- $('mode').textContent=(M[s.mode]||s.mode)+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
+ $('mode').textContent=(M[s.mode]||s.mode)+(s.held&&s.mode=='rest'?' (held: idle waits for you)':'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
  $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}
 j('/values').then(show).then(poll);setInterval(poll,2000);
 </script></body></html>)HTML";

@@ -128,19 +128,19 @@ void applyLiveSetting(const String &key) {
     lidIdx = strchr("csnw", key[0]) - "csnw";
   }
   if (key == "") lidIdx = 2;
-  // Setting the pupil centre: hold the eyes there so it can be judged by eye
+  // Setting the pupil center: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
 }
 
 String eyeStatusJson() {
-  char buf[320];
+  char buf[384];
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
-           "\"mode\":\"%s\",\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
+           "\"mode\":\"%s\",\"held\":%s,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
-           sceneModeName(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
+           sceneModeName(), sceneHeld() ? "true" : "false", scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
            pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets);
   return buf;
 }
@@ -174,14 +174,14 @@ void printStat() {
   loopCount = 0;
 }
 
-// Stick -128..127 to 0..1023, with the stick's centre landing on `centre`, so
+// Stick -128..127 to 0..1023, with the stick's center landing on `center`, so
 // each half of the travel is stretched to keep reaching its end.
-int stickToAdc(int v, bool invert, int centre) {
+int stickToAdc(int v, bool invert, int center) {
   if (invert) v = -v;
-  return v < 0 ? map(v, -128, 0, 0, centre) : map(v, 0, 127, centre, 1023);
+  return v < 0 ? map(v, -128, 0, 0, center) : map(v, 0, 127, center, 1023);
 }
 
-// Per axis, the stick pushed further from centre wins, so either stick drives.
+// Per axis, the stick pushed further from center wins, so either stick drives.
 int stronger(int a, int b) {
   return abs(a) >= abs(b) ? a : b;
 }
@@ -263,10 +263,10 @@ void readController() {
 }
 
 // The kit's lid pulse with the two lid settings applied. `kit` is the kit's
-// map() of Y, `centre` the same map() at mechanical centre (512): lidFollow
+// map() of Y, `center` the same map() at mechanical center (512): lidFollow
 // scales how far the lid moves away from that with the eyes.
-int followLid(int kit, int centre) {
-  return centre + (kit - centre) * settings.lidFollow / 100;
+int followLid(int kit, int center) {
+  return center + (kit - center) * settings.lidFollow / 100;
 }
 
 // Trim for lid l at `pct` % open: each preset's trim sits at that preset's own %, and
