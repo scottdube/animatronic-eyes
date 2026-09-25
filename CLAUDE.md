@@ -379,3 +379,7 @@ viewer's-left eye wider, so end-trims plus interpolation don't fit the middle (n
 c/s/n/w × TopL/BotL/TopR/BotR; the page's preset buttons select which preset the four trim sliders edit.
 Between presets the trim blends by lid %. Migrated botLClosed -14 → cBotL -14 and saved (idleMode 1 saved, 0 live).
 Page JS not exercised by me (no browser: my open tab coincided with the dead-slider episode); Scott's first use is the test.
+**faa5248 (Stop holds, timed run ends, `held` in /status) is committed but NOT on the eyes.** 2026-09-25 the
+OTA could not reach them: laptop on 192.168.1.203, gateway 192.168.1.1 answered "Destination Host
+Unreachable" for 192.168.30.211 (eyes powered off, or off Wi-Fi; not established). Eyes still run 1033ac6.
+Deploy with `./build.sh ota` from the shop, then check `build` in /status.
