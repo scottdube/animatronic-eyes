@@ -541,3 +541,7 @@ regulator in dropout, below the ESP32's 3.0 V spec. Readings off photos: ±0.05 
 2 A wall wart, and a runaway on laptop USB. The bench PSU on V+ showed no sag (ADC 0 dips). Cause of the
 runaway itself (servo electronics below their ~4.8 V rating?) remains hypothesis. Direction: feed V+ directly
 from a 5 V supply on short thick leads with bulk capacitance at V+, not through the ESP32's USB path.
+**PCA9685 bulk cap (Scott read a stock board, SLN A3-R8C1, 2026-09-25):** already 1000 µF 10 V at V+. Whether
+the board in the eyes is the same one is assumed, not checked. Arithmetic: 1000 µF supplying ~1.5 A for 12 ms
+would fall ΔV = I·t/C ≈ 18 V, so no practical cap rides through a sag that long — it's the source/path, not
+missing capacitance. Retracts my earlier "add ≥1000 µF at V+": the fix is a direct, stiff 5 V feed to V+.
