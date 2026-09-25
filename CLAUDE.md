@@ -499,3 +499,4 @@ shown. Meanwhile the ADC logged min **3.37 V** and 41 sags in the first 60 s of 
 a 16-sample average that low needs a dip wider than one needle — either wide dips exist that this capture
 missed (an edge trigger at 3.97 V fires on needles, so the screen shows the last needle), or the ADC itself is
 disturbed. The burst length ("~1 ms" above) was NEVER timed — likely shorter. Next: pulse-width trigger.
+That scope-show run finished: 150 s, 90 sags, ADC min 3.37 V, no restart (reset still `power-on`).
