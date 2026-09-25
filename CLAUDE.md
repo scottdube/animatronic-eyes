@@ -438,3 +438,16 @@ yCenter 0 (either level already or not moved; not asked). His left (407), up and
 pulse at full up, kit 500, scales the upper half). Set 490 live and held lookU; by the next read upMax was back to
 500 with nothing unsaved (Revert?), so 490 went untested. **Scott settled on upMax "495": no strain, saved; NVS reads 494 (the slider steps by 2 from 420).** Page 882589a: all calibration in one section.
 xCenter stays -33 by design: it is the servo's offset; parkX is the everyday knob that reads 0.
+**Service + set pieces (build 97339ba, 2026-09-25).** 🔧 Service verified over HTTP: mode service, lid 0 (closed
+preset), a show refused with 409, look test still holds (x 1023), nextShow -1, 🔧 again → rest. **Not tested:**
+the NVS flag surviving a power cycle. Set pieces now rotate every 30–50 s (slow squint, eye roll 1.3 s eased,
+circle at 95% of travel 2.4 s); not yet watched by Scott. First upload of 97339ba failed with curl (55) broken
+pipe; the retry took (same intermittent failure as before).
+**Horn refit method (advised 2026-09-25):** 🔧 Service, paint-pen line horn→case, refit on the tooth that lines
+up under the same command, then check Closed + Wide. Screws snug with servos holding; no threadlocker (cracks
+plastic). A replacement servo needs its own recalibration.
+**Why the controller needs hold-P4-10 s after a flash (Scott asked 2026-09-25):** the ESP32 restart kills the
+link but the DS4 clone doesn't notice promptly and has no off button; this library can't call the controller,
+the controller must call it, and a DS4 only does that on power-up. Holding P4 ~10 s forces it off; the next
+press is a fresh power-up that calls the stored host. **Hypothesis, untested:** waiting until the light bar goes
+dark by itself (a DS4 gives up after a while) and then one press would work too.
