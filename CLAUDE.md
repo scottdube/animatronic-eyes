@@ -579,3 +579,27 @@ I had read "3 A" from the search keywords in the URL, which was WRONG). 24 W aga
 needed: **Power Adapter 12V 3A, model 1230** @ SLN/Assembly & Test (http://192.168.50.10:8001/web/stock/item/683/;
 it sits beside the ZVS cooling-loop pump, so check it isn't that loop's supply; plug size not recorded), and
 **5.5×2.1 female barrel pigtails, 12** @ SLN B0-R1C3 (http://192.168.50.10:8001/web/stock/item/802/) for the buck's IN+/IN−.
+**Carrier PCB (Scott, 2026-09-25): one milled board carrying the D1 Mini, PCA9685 and LM2596, on standoffs into
+the rack.** Outline from Scott's Fusion DXF, now `hardware/carrier/outline.dxf` (mm, AC1014): a 117.9 × 72.3 mm
+plate, symmetric about x=0, with a 31.6 mm wide slot cut 39 mm down from the top edge (x −15.8..15.8, y −3.9..35.3),
+so the usable area is two wings ~43 × 39 mm beside the slot and a full-width band ~33 mm tall along the bottom
+(x ±40.6 at the bottom edge, ±56 higher up). Four 3.2 mm holes at (±49.5, 27.7) and (±28.5, −15.3) — M3, lands on
+the 3.175 bit. The carrier IS the star wiring: buck OUT+ runs as separate traces to PCA V+ and to the D1 Mini VCC
+pin, the 10k/10k rail divider and the bulk cap go on it. Rules from the pcb-design skill / fabrication guide:
+single-sided B.Cu, 0.4/0.5 mm rules, 1.78 mm pads on header rows, NPTH under the ESP32 flash pins, 6.5 mm keepout
+at each standoff hole, MountingHole symbols in the schematic.
+**Inventory (2026-09-25):** project already exists — part #837 "Animatronic Eyes", build **BO-0010** — so the carrier's
+parts go on that build, no twin. **Both D1 Minis at RB-12 (stock 340) are ALLOCATED to BO-0009 "Rat GDO - Florida
+pair"**: 2 in stock, 0 available. The "2 in stock" note above was true and useless. Scott decides: release one
+from BO-0009 or buy. The **12 V 3 A adapter (stock 683) is the shrink-fit kit's** (its notes say BO-0002), not free
+either; the Amazon 12 V 2 A (B0DKT5DH2K) or another supply is needed. Free and allocatable: LM2596 (part #28, 14 @
+A3-R7C2; the 15th at RB-25 has an unknown trimpot setting — check output before trusting any of them), barrel
+pigtail (#1200, 12 @ B0-R1C3), 10k 1/4 W THT (#634, 28 in the EAONE kit), 100 nF (#645), 220 µF 10 V (#687, 15-value kit).
+**Footprint sources:** `~/code/my-rat-ratgdo/kicad_files/D1 Mini - ESP32/` has an ESP32_mini footprint (40 pads, 4 rows
+of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annulus after snapping: passes the 0.25 gate but
+redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
+VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
+pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Firmware for the swap:** PS4Controller applies a host MAC via esp_base_mac_addr_set (BT − 2, IDF's own rule), but
+the sketch starts Wi-Fi before PS4.begin, so done that way only BT would take the DevKit's identity. Setting the
+base MAC at the top of setup() makes Wi-Fi inherit it too, so the 192.168.30.211 reservation carries over.
