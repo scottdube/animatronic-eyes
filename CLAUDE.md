@@ -566,3 +566,11 @@ dirty false, no secrets in it). Note xCenter now -21 and yCenter 12 (were -33 / 
 refit, presumably by Scott; saved. The D1 Mini starts from defaults: restore from this file.
 **Swap checklist:** USB-flash the D1 Mini (same FQBN/partition); new MAC → new DHCP IP, so move the
 192.168.30.211 reservation (HA package and build.sh use it); restore settings; re-pair the controller.
+**Controller onto the D1 Mini — plan (2026-09-25), not yet done:** make the new board BE the old host.
+(1) Set `PS4_HOST_MAC` to the DevKit's BT MAC. Derived, not read: base d4:8a:fc:9e:7a:cc + 2 =
+**d4:8a:fc:9e:7a:ce** (ESP32 BT = base+2) — confirm from the DevKit's boot line "ESP32 Bluetooth MAC" before
+relying on it. (2) Copy the DevKit's NVS partition (0x9000, 0x5000 bytes on this partition scheme) to the D1
+Mini over USB: that carries the link key for 8c:41:f2:a1:49:dc AND the current settings and service flag,
+so the settings JSON becomes the fallback. Read it from the DevKit on the day, not from the 09-24 backup
+(that one has old settings). Retire the DevKit: two hosts on one BT MAC would fight. Fallbacks in order:
+MAC alone without the NVS copy (the common tutorial path), sixaxispairer over USB, Bluepad32.
