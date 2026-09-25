@@ -429,3 +429,6 @@ servo 0), parkX now 0 = true center; verified by /values and /status x 512 at re
 about center (was +126 his left / −94 his right), so his right end reaches pulse 204, 16 past the kit's 220:
 **not yet checked for a stop.** Page has look-test buttons (full his left / right / up / down / center, held
 until anything else happens). Also fixed: d87a7ef's trim rename broke the trim sliders' preset switching.
+**xCenter -33 saved (Scott, by eye, 2026-09-25)**, not the migrated -16: the old parkX -75 was not true center.
+So his right end now reaches pulse 220+110-33 = 297-110 = 187 and his left 407: re-check both with the look test.
+**yCenter added (build 9bcf632):** servo 1 only (+ = up); lids follow commanded gaze, so lid trims stay valid. 0 until Scott sets it.
