@@ -405,3 +405,8 @@ the board's diode. Consistent with USB power as the cause, not proof. Suggested:
 PCA9685 V+ terminal, feeding the ESP32 5 V pin from that same rail (a single plug, no bench PSU). The trap:
 don't have USB plugged in as well, or two supplies back-feed; flash by OTA.
 HA package sln-ha-config f71964f pulled to the NUC 2026-09-25; `ha core check` passes (login shell needed). Not loaded: needs an HA restart, waiting on Scott's OK. Voice + presence unverified.
+**Deployed 2026-09-25:** firmware 7a72ac6 on the eyes (emptyMins 5 saved); the power-up show was scheduled
+(nextShow 16 s). HA restarted with Scott's OK. **Measured over /status right after:** present true (the HA
+presence automation reaches the eyes), show running with showLeft counting down, nextShow ~3595 s (periodic,
+showEvery 60). Show ended into mode sleep on time (showLeft -1, pca true, no resets). Whether quiet-sleep
+lids sag: ask Scott. Voice sentences load at HA start; not yet spoken to.
