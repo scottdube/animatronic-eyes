@@ -559,3 +559,10 @@ firmware carries over (SDA 21/SCL 22, rail ADC GPIO34 — pin exposure on this c
 A new board has a new BT MAC and no link key: re-pair the controller, or set PS4_HOST_MAC and copy NVS.
 Bigger space win, not started: drop the PCA9685 and drive the 6 servos from the ESP32's LEDC PWM (16 channels);
 trims are in PCA counts and would convert. LM2596 module ~43×21 mm; 14 in stock at A3-R7C2.
+**Decision (Scott, 2026-09-25): keep the PCA9685, move to the D1 Mini ESP32** — just enough room under the
+rack; servo wires routed back to it. Rejected dropping the PCA for simplicity.
+**Settings snapshot before the board swap:** docs/settings/2026-09-25-devkit-values.json (from /values,
+dirty false, no secrets in it). Note xCenter now -21 and yCenter 12 (were -33 / 0) — changed after the horn
+refit, presumably by Scott; saved. The D1 Mini starts from defaults: restore from this file.
+**Swap checklist:** USB-flash the D1 Mini (same FQBN/partition); new MAC → new DHCP IP, so move the
+192.168.30.211 reservation (HA package and build.sh use it); restore settings; re-pair the controller.
