@@ -404,3 +404,4 @@ the high 400s mA (a panel meter averages, so real spikes are higher) against a U
 the board's diode. Consistent with USB power as the cause, not proof. Suggested: one 5 V ≥3 A adapter into the
 PCA9685 V+ terminal, feeding the ESP32 5 V pin from that same rail (a single plug, no bench PSU). The trap:
 don't have USB plugged in as well, or two supplies back-feed; flash by OTA.
+HA package sln-ha-config f71964f pulled to the NUC 2026-09-25; `ha core check` passes (login shell needed). Not loaded: needs an HA restart, waiting on Scott's OK. Voice + presence unverified.
