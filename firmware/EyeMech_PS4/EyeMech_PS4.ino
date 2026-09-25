@@ -122,7 +122,7 @@ void applyLiveSetting(const String &key) {
     }
   if (key == "lowLidCurve") sceneCommand("stop");  // hold still so the bottoms can be judged
   // A lid trim shows the end it trims: closed trims on the closed preset, open trims on wide
-  // A lid trim shows the preset it trims (cTopL = closed, sTopL = squint, ...)
+  // A lid trim shows the preset it trims (cLTop = closed, sLTop = squint, ...)
   if (key.length() == 5 && strchr("csnw", key[0]) && (key.endsWith("L") || key.endsWith("R"))) {
     sceneCommand("stop");
     lidIdx = strchr("csnw", key[0]) - "csnw";
@@ -315,6 +315,8 @@ void loop() {
   yval = stickToAdc(f.sy, INVERT_Y, restY());
   switchval = f.blink ? HIGH : LOW;
   int lid = f.blink ? settings.lidClosed : f.lid;  // % open; a blink goes to the closed preset
+  // Per eye, his own left/right: a wink shuts one of them
+  int lidL = f.wink == 1 ? settings.lidClosed : lid, lidR = f.wink == 2 ? settings.lidClosed : lid;
 
   lexpulse = map(xval, 0, 1023, 220, 440);
   rexpulse = lexpulse;
@@ -334,11 +336,13 @@ void loop() {
   // Bottom lids follow the top on a curve (lowLidCurve): 50 = sqrt, mostly open until
   // nearly shut like the kit's trim; 100 = same % as the top. 0% and 100% always
   // stay closed and open, so blink and wide are unchanged.
-  float top = lid / 100.0f, bot = powf(top, settings.lowLidCurve / 100.0f);
-  uplidpulse = lidPulse(400 + (upOpen - 400) * top, -1, trimAt(2, lid));           // top R
-  lolidpulse = lidPulse(240 + (loOpen - 240) * bot, +1, trimAt(3, lid));           // bottom R
-  altuplidpulse = lidPulse(240 + ((680 - upOpen) - 240) * top, +1, trimAt(0, lid)); // top L
-  altlolidpulse = lidPulse(400 + ((680 - loOpen) - 400) * bot, -1, trimAt(1, lid)); // bottom L
+  // Servos 2+3 are HIS left eye, 4+5 his right (the eye on your left as you face him).
+  float topL = lidL / 100.0f, botL = powf(topL, settings.lowLidCurve / 100.0f);
+  float topR = lidR / 100.0f, botR = powf(topR, settings.lowLidCurve / 100.0f);
+  uplidpulse = lidPulse(400 + (upOpen - 400) * topL, -1, trimAt(0, lidL));            // his left, top
+  lolidpulse = lidPulse(240 + (loOpen - 240) * botL, +1, trimAt(1, lidL));            // his left, bottom
+  altuplidpulse = lidPulse(240 + ((680 - upOpen) - 240) * topR, +1, trimAt(2, lidR)); // his right, top
+  altlolidpulse = lidPulse(400 + ((680 - loOpen) - 400) * botR, -1, trimAt(3, lidR)); // his right, bottom
 
   if (f.limp) {
     // Quiet sleep: no pulses at all (the PCA9685's full-off bit), so nothing hums

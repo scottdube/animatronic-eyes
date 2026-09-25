@@ -63,7 +63,7 @@ holds the eyes there. The sticks and idle glances all work around this point.</p
 <div class="row"><label>Pupil center up / down <span id="v_parkY"></span></label>
 <input type="range" id="parkY" min="0" max="300" step="5"><div class="mut">0 = kit center, higher = lower</div></div>
 <div class="row"><label>Pupil center left / right <span id="v_parkX"></span></label>
-<input type="range" id="parkX" min="-150" max="150" step="5"><div class="mut">0 = kit center, + = right</div></div>
+<input type="range" id="parkX" min="-150" max="150" step="5" style="direction:rtl"><div class="mut" style="display:flex;justify-content:space-between"><span>◂ his left</span><span>0 = kit center</span><span>his right ▸</span></div></div>
 <p class="mut">Lid presets, % open. D-pad up/down steps closed ‹ squint ‹ normal ‹ wide; power-up is normal,
 a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <div class="sc pr"><button data-k="lidWide">▲ Wide</button><button data-k="lidNormal">● Normal</button><button data-k="lidSquint">◒ Squint</button><button data-k="lidClosed">▬ Closed</button></div>
@@ -80,17 +80,19 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <input type="range" id="lowLidMax" min="400" max="520" step="2"><div class="mut">400 = kit. Higher opens the bottom lids further</div></div>
 <div class="row"><label>Lids follow eyes <span id="v_lidFollow"></span>%</label>
 <input type="range" id="lidFollow" min="0" max="100" step="5"><div class="mut">100 = kit, 0 = lids stay put when the eyes look up or down</div></div>
-<div class="row"><b>Lid trims for: <span id="trp">● Normal</span></b><div class="mut">Pick a preset with the buttons above, then match the eyes. − more closed, + more open. Left/right as you face the eyes</div></div>
-<div class="row"><label>Left eye, top lid <span id="v_tTopL"></span></label><input type="range" id="tTopL" min="-60" max="60" step="1"></div>
-<div class="row"><label>Left eye, bottom lid <span id="v_tBotL"></span></label><input type="range" id="tBotL" min="-60" max="60" step="1"></div>
-<div class="row"><label>Right eye, top lid <span id="v_tTopR"></span></label><input type="range" id="tTopR" min="-60" max="60" step="1"></div>
-<div class="row"><label>Right eye, bottom lid <span id="v_tBotR"></span></label><input type="range" id="tBotR" min="-60" max="60" step="1"></div>
+<div class="row"><b>Lid trims for: <span id="trp">● Normal</span></b><div class="mut">Pick a preset with the buttons above, then match the eyes. − more closed, + more open. Left/right are HIS left and right, like up and down: his left eye is the one on your right as you face him</div></div>
+<div class="row"><label>His left eye, top lid <span id="v_tLTop"></span></label><input type="range" id="tLTop" min="-60" max="60" step="1"></div>
+<div class="row"><label>His left eye, bottom lid <span id="v_tLBot"></span></label><input type="range" id="tLBot" min="-60" max="60" step="1"></div>
+<div class="row"><label>His right eye, top lid <span id="v_tRTop"></span></label><input type="range" id="tRTop" min="-60" max="60" step="1"></div>
+<div class="row"><label>His right eye, bottom lid <span id="v_tRBot"></span></label><input type="range" id="tRBot" min="-60" max="60" step="1"></div>
 <h2>Controller</h2>
 <div class="row"><label>Blink button</label>
 <select id="blinkBtn"><option value="0">✕ Cross</option><option value="1">□ Square</option><option value="2">Either</option></select></div>
 <h2>Shows</h2>
 <p class="mut">A show is a spell of alive idle that ends with the eyes asleep. Everyday: you arrive, the eyes
-wait, do one show, then sleep while you're in the lab, with another show now and then.</p>
+wait, do one show, then sleep while you're in the lab, with another show now and then. A show that starts
+from sleep opens wide and looks far to his left first; about once a minute he squints slowly and looks side to
+side; now and then he winks, either eye.</p>
 <div class="row"><label>Shows</label>
 <select id="idleMode"><option value="0">Off (eyes rest open)</option><option value="1">Automatic: on arrival and now and then</option><option value="2">On demand only (Triangle, this page, voice)</option></select></div>
 <div class="row"><label>Show starts <span id="v_arriveDelay"></span> s after you arrive</label>
@@ -127,7 +129,7 @@ const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'
 const $=id=>document.getElementById(id);
 const fm=t=>t<90?t+' s':Math.round(t/60)+' min';
 // Trims: one set of four sliders edits the selected preset's (prefix c/s/n/w)
-const T=['TopL','BotL','TopR','BotR'],P={lidClosed:['c','▬ Closed'],lidSquint:['s','◒ Squint'],lidNormal:['n','● Normal'],lidWide:['w','▲ Wide']};
+const T=['LTop','LBot','RTop','RBot'],P={lidClosed:['c','▬ Closed'],lidSquint:['s','◒ Squint'],lidNormal:['n','● Normal'],lidWide:['w','▲ Wide']};
 let V={},tp='n';
 function showT(){T.forEach(t=>{const v=V[tp+t];if(v===undefined)return;$('t'+t).value=v;$('v_t'+t).textContent=v})}
 function show(v){V=v;K.forEach(k=>{$(k).value=v[k];const o=$('v_'+k);if(o)o.textContent=v[k]});showT();dirty=v.dirty}

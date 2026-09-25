@@ -36,6 +36,17 @@ static int idleLid = 75;          // % open; normal, with the odd squint or wide
 static uint32_t idleLidUntil = 0;
 static uint32_t nextGlance = 0, nextDrift = 0, nextBlink = 0, blinkEnd = 0, secondBlink = 0;
 static uint32_t lastIdleUpdate = 0;
+// Set pieces inside a show (Scott, 2026-09-25). Times in ms.
+// Wake: a show that starts from sleep opens wide and looks far to his left first.
+static const uint32_t WAKE_MS = 2500;
+static uint32_t wakeUntil = 0;
+// Slow squint: wide, close slowly to squint, then a slow look side to side, then carry on.
+static const uint32_t SQ_OPEN = 600, SQ_CLOSE = 3000, SQ_PAN = 6000, SQ_BACK = 600;
+static uint32_t squintAt = 0;   // start of the next (or running) slow squint
+// Winks: now and then one eye closes, either eye.
+static const uint32_t WINK_MS = 400;
+static uint32_t nextWink = 0, winkEnd = 0;
+static int winkEye = 0;
 
 static float frand() { return (float)esp_random() / 4294967295.0f; }  // 0..1
 
@@ -53,8 +64,14 @@ static int adcToStick(float off, int center) {
   return constrain((int)lroundf(v), -128, 127);
 }
 
-static void idleReset(uint32_t now) {
+static uint32_t randMs(uint32_t lo, uint32_t hi) { return lo + (uint32_t)(frand() * (hi - lo)); }
+
+static void idleReset(uint32_t now, bool fromSleep) {
   tx = ty = 0;
+  wakeUntil = fromSleep ? now + WAKE_MS : now;
+  squintAt = wakeUntil + randMs(20000, 40000);
+  nextWink = wakeUntil + randMs(15000, 45000);
+  winkEnd = 0;
   nextGlance = now + 300;
   nextDrift = now + 400;
   nextBlink = now + nextBlinkDelay();
@@ -63,7 +80,54 @@ static void idleReset(uint32_t now) {
   lastIdleUpdate = now;
 }
 
+// Far to his left: + x is his left (measured 2026-09-25), kept a little off the end stop
+static float farLeft() { return 1023 - 40 - restX(); }
+
+// The set pieces; true = this frame is theirs and ordinary idle waits
+static bool setPiece(uint32_t now, Frame &f) {
+  float dt = (float)(now - lastIdleUpdate);
+  if (now < wakeUntil) {  // wake: wide, eyes swing far left and hold
+    tx = farLeft();
+    ty = 0;
+    gx += (tx - gx) * (1.0f - expf(-dt / 150.0f));
+    gy += (ty - gy) * (1.0f - expf(-dt / 150.0f));
+    f.lid = settings.lidWide;
+    return true;
+  }
+  if (now < squintAt) return false;
+  uint32_t t = now - squintAt;
+  float R = settings.glanceRange / 100.0f * IDLE_X_MAX;
+  if (t < SQ_OPEN) {  // wide, eyes back to center
+    gx += (0 - gx) * (1.0f - expf(-dt / 150.0f));
+    gy += (0 - gy) * (1.0f - expf(-dt / 150.0f));
+    f.lid = settings.lidWide;
+  } else if ((t -= SQ_OPEN) < SQ_CLOSE) {  // slowly down to squint
+    f.lid = settings.lidWide + (settings.lidSquint - settings.lidWide) * (float)t / SQ_CLOSE;
+  } else if ((t -= SQ_CLOSE) < SQ_PAN) {  // one slow sweep: his left, across to his right, back
+    gx = R * sinf(2 * (float)M_PI * t / SQ_PAN);
+    f.lid = settings.lidSquint;
+  } else if ((t -= SQ_PAN) < SQ_BACK) {
+    gx = 0;
+    f.lid = settings.lidNormal;
+  } else {  // done: the next one in about a minute
+    tx = ty = gx = 0;
+    squintAt = now + randMs(45000, 75000);
+    nextGlance = nextBlink = now + 300;
+    return false;
+  }
+  return true;
+}
+
 static Frame idleFrame(uint32_t now) {
+  Frame f;
+  if (setPiece(now, f)) {
+    lastIdleUpdate = now;
+    blinkEnd = secondBlink = winkEnd = 0;
+    f.sx = adcToStick(gx, restX());
+    f.sy = adcToStick(gy, restY());
+    f.blink = false;
+    return f;
+  }
   if (now >= nextGlance) {
     bool big = frand() < 0.30f;
     float r = settings.glanceRange / 100.0f * (big ? 1.0f : 0.3f);
@@ -104,10 +168,15 @@ static Frame idleFrame(uint32_t now) {
     blinkEnd = now + 150;
     secondBlink = 0;
   }
-  Frame f;
+  if (now >= nextWink && now >= blinkEnd) {  // a wink, either eye, a few per show
+    winkEye = frand() < 0.5f ? 1 : 2;
+    winkEnd = now + WINK_MS;
+    nextWink = now + randMs(25000, 60000);
+  }
   f.sx = adcToStick(gx, restX());
   f.sy = adcToStick(gy, restY());
   f.blink = now < blinkEnd;
+  f.wink = now < winkEnd ? winkEye : 0;
   f.lid = now < idleLidUntil ? idleLid : settings.lidNormal;
   return f;
 }
@@ -173,7 +242,7 @@ static void endScene() {
 
 static bool startShow(uint32_t now, uint32_t secs) {
   if (mode == M_RECORD || settings.idleMode == 0) return false;
-  idleReset(now);
+  idleReset(now, mode == M_SLEEP);
   idleUntil = now + secs * 1000UL;
   mode = M_IDLE;
   showPending = false;
@@ -211,7 +280,7 @@ static void recordSample(const Frame &f, uint32_t now) {
     recNext += FRAME_MS;
     wbuf[wlen++] = (uint8_t)(int8_t)f.sx;
     wbuf[wlen++] = (uint8_t)(int8_t)f.sy;
-    wbuf[wlen++] = f.blink ? 1 : 0;
+    wbuf[wlen++] = (f.blink ? 1 : 0) | (f.wink & 3) << 1;  // bits 1-2: wink (old recordings: 0)
     wbuf[wlen++] = (uint8_t)f.lid;
     recFrames++;
     if (wlen == sizeof wbuf) {
@@ -239,6 +308,7 @@ static bool playFrame(uint32_t now, Frame &f) {
   f.sx = (int8_t)p[0];
   f.sy = (int8_t)p[1];
   f.blink = p[2] & 1;
+  f.wink = p[2] >> 1 & 3;
   f.lid = constrain((int)p[3], 0, 100);
   return true;
 }

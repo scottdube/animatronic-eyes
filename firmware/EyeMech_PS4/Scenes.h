@@ -10,6 +10,7 @@ struct Frame {
   bool blink;
   int lid;      // lids % open, 0 = closed .. 100 = wide (EyeSettings lid presets)
   bool limp = false;  // stop the servo pulses (quiet sleep)
+  int wink = 0;       // one eye closed: 0 none, 1 his left, 2 his right (his own left/right)
 };
 
 struct PadState {

@@ -21,10 +21,10 @@ static const Field SETTINGS[] = {
     F(lowLidCurve, 25, 300, 50),
     F(lidMin, 160, 280, 280),
     F(lowLidMax, 400, 520, 400),  F(lidFollow, 0, 100, 100),
-    F(cTopL, -60, 60, 0), F(cBotL, -60, 60, 0), F(cTopR, -60, 60, 0), F(cBotR, -60, 60, 0),
-    F(sTopL, -60, 60, 0), F(sBotL, -60, 60, 0), F(sTopR, -60, 60, 0), F(sBotR, -60, 60, 0),
-    F(nTopL, -60, 60, 0), F(nBotL, -60, 60, 0), F(nTopR, -60, 60, 0), F(nBotR, -60, 60, 0),
-    F(wTopL, -60, 60, 0), F(wBotL, -60, 60, 0), F(wTopR, -60, 60, 0), F(wBotR, -60, 60, 0),
+    F(cLTop, -60, 60, 0), F(cLBot, -60, 60, 0), F(cRTop, -60, 60, 0), F(cRBot, -60, 60, 0),
+    F(sLTop, -60, 60, 0), F(sLBot, -60, 60, 0), F(sRTop, -60, 60, 0), F(sRBot, -60, 60, 0),
+    F(nLTop, -60, 60, 0), F(nLBot, -60, 60, 0), F(nRTop, -60, 60, 0), F(nRBot, -60, 60, 0),
+    F(wLTop, -60, 60, 0), F(wLBot, -60, 60, 0), F(wRTop, -60, 60, 0), F(wRBot, -60, 60, 0),
     F(blinkBtn, 0, 2, 0),
     F(idleMode, 0, 2, 1),
     F(arriveDelay, 0, 300, 30),   F(showSecs, 30, 900, 150),
@@ -35,7 +35,7 @@ static const Field SETTINGS[] = {
     F(emptyMins, 1, 60, 5),
 };
 #undef F
-static_assert(offsetof(EyeSettings, wBotR) - offsetof(EyeSettings, cTopL) == 15 * sizeof(int),
+static_assert(offsetof(EyeSettings, wRBot) - offsetof(EyeSettings, cLTop) == 15 * sizeof(int),
               "lidTrim() indexes the 16 trims as one array");
 static const size_t N = sizeof SETTINGS / sizeof SETTINGS[0];
 
@@ -49,15 +49,32 @@ void loadSettings() {
   EyeSettings d;
   resetSettings(d);
   Preferences p;
+  bool migrate = false;
   if (p.begin(NS, true)) {  // fails when the namespace doesn't exist yet: defaults stand
     for (size_t i = 0; i < N; i++) {
       const Field &f = SETTINGS[i];
       ref(d, f) = constrain(p.getInt(f.key, f.def), f.lo, f.hi);
     }
+    // Until 2026-09-25 the trims were named as seen FACING him (cTopL = the eye on your
+    // left = his right). Carry them over to his own left/right once, then drop the old keys.
+    migrate = !p.isKey("cLTop") && p.isKey("cTopL");
+    if (migrate)
+      for (int k = 0; k < 16; k++) {
+        const char *pre = "cccc" "ssss" "nnnn" "wwww";
+        static const char *oldLid[4] = {"TopR", "BotR", "TopL", "BotL"};  // his LTop, LBot, RTop, RBot
+        String key = String(pre[k]) + oldLid[k % 4];
+        (&d.cLTop)[k] = constrain(p.getInt(key.c_str(), 0), -60, 60);
+      }
     p.end();
   }
   settings = d;
   saved = d;
+  if (migrate && saveSettings() && p.begin(NS, false)) {
+    for (const char *pre : {"c", "s", "n", "w"})
+      for (const char *lid : {"TopL", "BotL", "TopR", "BotR"}) p.remove((String(pre) + lid).c_str());
+    p.end();
+    Serial.println("Settings: lid trims moved to his own left/right");
+  }
 }
 
 bool saveSettings() {

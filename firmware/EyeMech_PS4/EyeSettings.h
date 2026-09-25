@@ -8,7 +8,7 @@
 struct EyeSettings {
   // Rest position, offsets from mechanical center in the kit's 0..1023 units
   int parkY;         // eyes rest this far below center, 0..300
-  int parkX;         // eyes rest this far right (+) / left (-), -150..150
+  int parkX;         // eyes rest this far to HIS left (+) / his right (-), -150..150 (measured 2026-09-25)
   // Lids
   // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
   // open limits below. D-pad up/down steps closed < squint < normal < wide; power-up is normal.
@@ -20,12 +20,13 @@ struct EyeSettings {
   // Per-preset, per-lid trims, pulse counts, + = more open whichever way the servo turns.
   // Horns alone can't fit it (one adjustment, ~17° spline steps) and the linkage isn't
   // linear, so each preset gets its own; between presets the trim blends by lid %.
-  // Prefix c/s/n/w = closed/squint/normal/wide. L/R = as seen facing the eyes:
-  // L = servos 4 (top) + 5 (bottom), R = servos 2 + 3. Keep these 16 together, in order.
-  int cTopL, cBotL, cTopR, cBotR;
-  int sTopL, sBotL, sTopR, sBotR;
-  int nTopL, nBotL, nTopR, nBotR;
-  int wTopL, wBotL, wTopR, wBotR;
+  // Prefix c/s/n/w = closed/squint/normal/wide. L/R = HIS left/right, like up/down
+  // (Scott, 2026-09-25): L = servos 2 (top) + 3 (bottom), the eye on your right as you
+  // face him; R = servos 4 + 5. Keep these 16 together, in order.
+  int cLTop, cLBot, cRTop, cRBot;
+  int sLTop, sLBot, sRTop, sRBot;
+  int nLTop, nLBot, nRTop, nRBot;
+  int wLTop, wLBot, wRTop, wRBot;
   // Controller
   int blinkBtn;      // 0 Cross, 1 Square, 2 either
   // Alive idle and shows. A show is a spell of alive idle that ends in sleep.
@@ -46,10 +47,11 @@ struct EyeSettings {
 
 extern EyeSettings settings;
 
-// Trim for preset p (0 closed, 1 squint, 2 normal, 3 wide) and lid l (0 topL, 1 botL, 2 topR, 3 botR)
-inline int lidTrim(int p, int l) { return (&settings.cTopL)[p * 4 + l]; }
+// Trim for preset p (0 closed, 1 squint, 2 normal, 3 wide) and lid l (0 his left top,
+// 1 his left bottom, 2 his right top, 3 his right bottom)
+inline int lidTrim(int p, int l) { return (&settings.cLTop)[p * 4 + l]; }
 
-// Where the eyes rest with the stick centerd, in the kit's 0..1023 units.
+// Where the eyes rest with the stick centered, in the kit's 0..1023 units.
 inline int restX() { return 512 + settings.parkX; }
 inline int restY() { return 512 - settings.parkY; }
 
