@@ -432,3 +432,5 @@ until anything else happens). Also fixed: d87a7ef's trim rename broke the trim s
 **xCenter -33 saved (Scott, by eye, 2026-09-25)**, not the migrated -16: the old parkX -75 was not true center.
 So his right end now reaches pulse 220+110-33 = 297-110 = 187 and his left 407: re-check both with the look test.
 **yCenter added (build 9bcf632):** servo 1 only (+ = up); lids follow commanded gaze, so lid trims stay valid. 0 until Scott sets it.
+**Checked (Scott, 2026-09-25):** full look to his right at xCenter -33 (pulse 187) does not strain. Saved with
+yCenter 0 (either level already or not moved; not asked). His left (407), up and down not reported.
