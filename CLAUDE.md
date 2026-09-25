@@ -551,3 +551,11 @@ not daisy-chained through the PCA, so servo current doesn't drop across the ESP'
 buck before connecting. Standing trap still applies: USB unplugged while it's powered, flash by OTA. Verify
 with the same scope setup: CH1 on the ESP 5 V pin, CH2 on 3V3, neg pulse >100 µs, level ~0.3 V under the
 new rail. Module rating: chip 3 A; typical blue module ~2 A continuous without a heatsink.
+**Smaller board (Scott asked 2026-09-25, space under the eye rack):** the PS4 controller needs CLASSIC
+Bluetooth (Bluedroid BR/EDR), which only the original ESP32 has — the S3, C3, C6 and S2 don't, so the XIAO
+ESP32-S3/C6 and S3 Superminis in stock are OUT. In stock and fitting: **Type-C D1 Mini ESP32 (WROOM-32), 2 @
+SLN Electronics Bench RB-12** (http://192.168.50.10:8001/web/stock/item/340/), ~39×31 mm, same chip, so the
+firmware carries over (SDA 21/SCL 22, rail ADC GPIO34 — pin exposure on this clone to confirm on the board).
+A new board has a new BT MAC and no link key: re-pair the controller, or set PS4_HOST_MAC and copy NVS.
+Bigger space win, not started: drop the PCA9685 and drive the 6 servos from the ESP32's LEDC PWM (16 channels);
+trims are in PCA counts and would convert. LM2596 module ~43×21 mm; 14 in stock at A3-R7C2.
