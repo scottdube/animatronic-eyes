@@ -510,3 +510,9 @@ bottom edge sits at the 4.10 V trigger level, which is why the pulse trigger cha
 ADC and every trigger have been seeing is HF noise, not load sag. Source NOT established: the USB charger's
 switching ripple, probe-ground pickup, or the ESP32 itself. Next: tip shorted to its own ground at the ESP
 GND (pickup test), then 10 µs/div to read the period.
+**Pickup test (Scott, 2026-09-25):** CH1 tip clipped to its own ground at the ESP GND still shows the band.
+A real rail can't appear between two points on the same ground, so the band is common-mode/pickup in the
+scope setup, not ripple between 5 V and GND. Leading hypothesis (untested): the USB charger's Y-cap couples
+switching + mains noise onto its output ground, and the earthed scope's probe grounds give it a loop. Test:
+run the ESP from a floating source (power bank, or laptop on battery) — band gone = charger common-mode.
+Until the band is gone the scope can't resolve a servo dip; 3 USB-only shows so far ran with no restart.
