@@ -388,3 +388,9 @@ idling nonstop. How idle got back on after idleMode 0 was set live is not establ
 it: saved idleMode is 1). Design gap either way: automatic idle has no end without the radar. Only a bench-empty
 report ends it (emptyAction sleep), and the HA package that sends presence is not written. So on a plain
 power-up it idles 24/7.
+
+## How Scott wants to enjoy them (stated 2026-09-25) — the requirement the scenes must meet
+Everyday: walk into the lab → wait **30 s** (setting) → wake and do its thing for **2–3 min** (setting) → go to
+sleep. **Not running constantly while he's in the lab: the cheap servos are loud and get annoying.** Sometimes
+he wants a longer run, as an option — maybe a Home Assistant voice command for "extended play".
+This replaces "automatic idle whenever unattended", which ran 24/7 and got the eyes powered off.
