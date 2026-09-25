@@ -504,3 +504,9 @@ That scope-show run finished: 150 s, 90 sags, ADC min 3.37 V, no restart (reset 
 while the 5 ms/div display (125 kSa/s, normal acquisition) showed CH1 flat ~4.5 V at the trigger point. The
 ADC meanwhile counted ~1 sag/s in the show (81 in 105 s, min 3.34 V). So the trigger is firing on something
 the decimated display doesn't draw. Not established what. Next: Noise Reject ON + Peak Detect + SINGLE.
+**Peak Detect reveals it (5 ms/div, SINGLE, eyes asleep):** both rails carry a CONTINUOUS dense HF band, no
+gaps — CH1 5 V pin ~4.1–5.0 V (±0.45 V around 4.5), CH2 3V3 ~3.0 V to off-screen above 3.7 V. The band's
+bottom edge sits at the 4.10 V trigger level, which is why the pulse trigger chains constantly. So what the
+ADC and every trigger have been seeing is HF noise, not load sag. Source NOT established: the USB charger's
+switching ripple, probe-ground pickup, or the ESP32 itself. Next: tip shorted to its own ground at the ESP
+GND (pickup test), then 10 µs/div to read the period.
