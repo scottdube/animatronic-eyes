@@ -436,5 +436,5 @@ So his right end now reaches pulse 220+110-33 = 297-110 = 187 and his left 407: 
 yCenter 0 (either level already or not moved; not asked). His left (407), up and down not reported.
 **Up strains a little at full travel (Scott, 2026-09-25); left, right, down don't.** Added `upMax` (bf5ab9b, servo 1
 pulse at full up, kit 500, scales the upper half). Set 490 live and held lookU; by the next read upMax was back to
-500 with nothing unsaved (Revert?), so 490 is untested. Page 882589a: all calibration in one section.
+500 with nothing unsaved (Revert?), so 490 went untested. **Scott settled on upMax 495: no strain, saved.** Page 882589a: all calibration in one section.
 xCenter stays -33 by design: it is the servo's offset; parkX is the everyday knob that reads 0.
