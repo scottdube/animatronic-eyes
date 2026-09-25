@@ -516,3 +516,7 @@ scope setup, not ripple between 5 V and GND. Leading hypothesis (untested): the 
 switching + mains noise onto its output ground, and the earthed scope's probe grounds give it a loop. Test:
 run the ESP from a floating source (power bank, or laptop on battery) — band gone = charger common-mode.
 Until the band is gone the scope can't resolve a servo dip; 3 USB-only shows so far ran with no restart.
+**Laptop USB (floating source), 2026-09-25:** the HF band is gone at rest (charger common-mode confirmed as the
+band's source). Rail level now **4.73–4.79 V** (charger gave 4.46). During a show the pulse trigger (neg,
+>100 µs, 4.10 V) sat in WAIT: no dip wider than 100 µs reached 0.65 V below level. ADC still counts sags
+(15 in 30 s, min 3.72 V) — so the ADC's sag counts are its own noise, not the rail.
