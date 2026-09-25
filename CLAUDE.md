@@ -531,3 +531,13 @@ stop motion while horns are refitted (service persists across restarts; toggle o
 **2 A wall wart show (2026-09-25):** rail level 4.53–4.56 V by ADC, scope ~4.3–4.5 V — lower than laptop
 USB (4.77). The 4.5 V pulse trigger sat in WAIT, but that is NOT a pass: the level was at/under 4.5 V, so a
 negative pulse through 4.5 V can't complete. Needs the trigger ~0.25 V under the rail (4.2 V) to compare.
+**Wall wart, trigger 4.50 V — 5 captures (2026-09-25), the answer:** the rail sits ~4.6 V between moves and
+the trigger DID fire. Four captures show the rail climbing back slowly from ~4.2–4.3 V to ~4.6 V over 40+ ms
+(recovery from a sustained sag, not needles); 3V3 steady at ~3.3 V in those. One capture
+(`docs/scope/2026-09-25-wallwart-1V-step.jpg`): a ~0.3 V, <1 ms notch at the trigger, then a STEP from ~4.65 V
+to **~3.65 V held >12 ms** (still low at screen end); **3V3 fell with it to ~2.95 V (band to ~2.87)** — the
+regulator in dropout, below the ESP32's 3.0 V spec. Readings off photos: ±0.05 V.
+**Verdict: USB → ESP32 5 V pin → PCA9685 V+ is NOT adequate for the servos** — measured 1 V / >10 ms sags on a
+2 A wall wart, and a runaway on laptop USB. The bench PSU on V+ showed no sag (ADC 0 dips). Cause of the
+runaway itself (servo electronics below their ~4.8 V rating?) remains hypothesis. Direction: feed V+ directly
+from a 5 V supply on short thick leads with bulk capacitance at V+, not through the ESP32's USB path.
