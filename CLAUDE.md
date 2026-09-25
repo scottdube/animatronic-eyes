@@ -520,3 +520,6 @@ Until the band is gone the scope can't resolve a servo dip; 3 USB-only shows so 
 band's source). Rail level now **4.73–4.79 V** (charger gave 4.46). During a show the pulse trigger (neg,
 >100 µs, 4.10 V) sat in WAIT: no dip wider than 100 µs reached 0.65 V below level. ADC still counts sags
 (15 in 30 s, min 3.72 V) — so the ADC's sag counts are its own noise, not the rail.
+**RUNAWAY on laptop USB (2026-09-25):** second laptop-powered show, trigger raised to 4.5 V (neg, >100 µs);
+Scott saw a servo runaway and pulled the power. First runaway on the USB-only feed. Cause NOT established —
+the scope's last capture (if it triggered) is the evidence; ask before theorizing.
