@@ -528,3 +528,6 @@ T'D→WAIT repeatedly (dips >0.27 V below level, >100 µs, were happening), then
 off. The noisy source earlier was the bench supply's USB output. Now on a 2 A wall wart (still USB-only to the
 5 V pin): scope looks much cleaner (Scott); rail 4.58 V, it booted into a show, so I put it in 🔧 Service to
 stop motion while horns are refitted (service persists across restarts; toggle off on the page when done).
+**2 A wall wart show (2026-09-25):** rail level 4.53–4.56 V by ADC, scope ~4.3–4.5 V — lower than laptop
+USB (4.77). The 4.5 V pulse trigger sat in WAIT, but that is NOT a pass: the level was at/under 4.5 V, so a
+negative pulse through 4.5 V can't complete. Needs the trigger ~0.25 V under the rail (4.2 V) to compare.
