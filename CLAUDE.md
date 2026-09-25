@@ -512,7 +512,7 @@ switching ripple, probe-ground pickup, or the ESP32 itself. Next: tip shorted to
 GND (pickup test), then 10 µs/div to read the period.
 **Pickup test (Scott, 2026-09-25):** CH1 tip clipped to its own ground at the ESP GND still shows the band.
 A real rail can't appear between two points on the same ground, so the band is common-mode/pickup in the
-scope setup, not ripple between 5 V and GND. Leading hypothesis (untested): the USB charger's Y-cap couples
+scope setup, not ripple between 5 V and GND. Leading hypothesis (untested): the USB source's Y-cap (it was the BENCH supply's USB output, not a wall charger — Scott, later) couples
 switching + mains noise onto its output ground, and the earthed scope's probe grounds give it a loop. Test:
 run the ESP from a floating source (power bank, or laptop on battery) — band gone = charger common-mode.
 Until the band is gone the scope can't resolve a servo dip; 3 USB-only shows so far ran with no restart.
@@ -523,3 +523,8 @@ band's source). Rail level now **4.73–4.79 V** (charger gave 4.46). During a s
 **RUNAWAY on laptop USB (2026-09-25):** second laptop-powered show, trigger raised to 4.5 V (neg, >100 µs);
 Scott saw a servo runaway and pulled the power. First runaway on the USB-only feed. Cause NOT established —
 the scope's last capture (if it triggered) is the evidence; ask before theorizing.
+**Runaway detail + 2 A wall wart (Scott, 2026-09-25):** on the 2nd laptop show the 4.5 V pulse trigger went
+T'D→WAIT repeatedly (dips >0.27 V below level, >100 µs, were happening), then the runaway popped servo horns
+off. The noisy source earlier was the bench supply's USB output. Now on a 2 A wall wart (still USB-only to the
+5 V pin): scope looks much cleaner (Scott); rail 4.58 V, it booted into a show, so I put it in 🔧 Service to
+stop motion while horns are refitted (service persists across restarts; toggle off on the page when done).
