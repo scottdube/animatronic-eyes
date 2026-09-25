@@ -488,3 +488,8 @@ brown the ESP out this run. What it means for margin (the LDO's dropout off a 3.
 dips deeper than a 1 ms average) is not measured — the scope on the 5 V pin is the instrument for that.
 Scott (2026-09-25): the eyes twitch and jump all the time on EITHER supply — it's how this build moves — so
 visible motion can't tell the supplies apart. Next instrument: scope, CH1 ESP32 5 V pin, CH2 ESP32 3V3 pin.
+**Scope, first capture (DHO914, 2026-09-25, eyes ASLEEP, not in a show):** CH1 5 V pin sits ~4.5 V (agrees
+with the ADC's 4.47), CH2 3V3 ~3.35 V. Both carry µs needles in both directions (CH1 ~±0.2 V, CH2 up to
+~+0.27/-0.19 V) at 1 ms/div, 500 kSa/s; no broad sag in that 10 ms window. Bidirectional µs needles read as
+switching/probe-ground pickup, not supply sag — hypothesis. Between the USB show ending and this capture
+(sleep, probes going on) the counter went 95→109 sags and min 3.61→3.50 V: unattributed (probing?).
