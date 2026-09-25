@@ -410,3 +410,6 @@ HA package sln-ha-config f71964f pulled to the NUC 2026-09-25; `ha core check` p
 presence automation reaches the eyes), show running with showLeft counting down, nextShow ~3595 s (periodic,
 showEvery 60). Show ended into mode sleep on time (showLeft -1, pca true, no resets). Quiet-sleep lids stay
 shut (Scott). Voice "eyes extended play" and "eyes sleep" both work (Scott, 2026-09-25).
+**Trims saved by Scott 2026-09-25** (read back from NVS after the 33d1c54 OTA restart; `dirty` was false just
+before the OTA, so nothing unsaved was lost): closed BotL -14; squint TopL -9 BotL -43; normal TopL -14 BotL -41;
+wide TopL 23 BotL 33 BotR 33; all others 0. Save button now answers on the button (33d1c54), not yet pressed by Scott.
