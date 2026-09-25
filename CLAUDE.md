@@ -398,3 +398,9 @@ Re-trigger (Scott): BOTH coming back after the lab has been empty a while AND a 
 **Show cycle built 2026-09-25** (spec revision in docs/superpowers/specs/2026-09-24-eyemech-scenes-design.md).
 Supersedes faa5248's Stop/hold fixes (holdRest removed: nothing automatic runs unprompted now). NOT deployed:
 eyes are off. On deploy, check: power-up → show at +30 s → sleep; quiet sleep lids don't sag; /presence on/off.
+**Power, 2026-09-25:** Scott asked to go back to servos on the ESP32 5 V pin. Advised against: on that pin
+the eyes had two runaways and a "nothing moves" dropout; on the bench supply, none. Meter peaks already reached
+the high 400s mA (a panel meter averages, so real spikes are higher) against a USB port's ~500 mA through
+the board's diode. Consistent with USB power as the cause, not proof. Suggested: one 5 V ≥3 A adapter into the
+PCA9685 V+ terminal, feeding the ESP32 5 V pin from that same rail (a single plug, no bench PSU). The trap:
+don't have USB plugged in as well, or two supplies back-feed; flash by OTA.
