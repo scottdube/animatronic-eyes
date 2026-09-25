@@ -16,7 +16,7 @@ struct Field {
 #define F(name, lo, hi, def) {#name, offsetof(EyeSettings, name), lo, hi, def}
 static const Field SETTINGS[] = {
     F(parkY, 0, 300, 180),        F(parkX, -150, 150, 0),
-    F(xCenter, -40, 40, 0),
+    F(xCenter, -40, 40, 0),       F(yCenter, -40, 40, 0),
     F(lidWide, 0, 100, 100),      F(lidNormal, 0, 100, 75),
     F(lidSquint, 0, 100, 35),     F(lidClosed, 0, 100, 0),
     F(lowLidCurve, 25, 300, 50),

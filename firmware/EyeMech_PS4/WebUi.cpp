@@ -123,6 +123,8 @@ side; now and then he winks, either eye.</p>
 <p class="mut">Set once, after a horn is moved. Everyday adjustments are the sliders above.</p>
 <div class="row"><label>Left/right servo center <span id="v_xCenter"></span></label>
 <input type="range" id="xCenter" min="-40" max="40" step="1" style="direction:rtl"><div class="mut" style="display:flex;justify-content:space-between"><span>◂ his left</span><span>pulse counts; set with pupil center at 0</span><span>his right ▸</span></div></div>
+<div class="row"><label>Up/down servo center <span id="v_yCenter"></span></label>
+<input type="range" id="yCenter" min="-40" max="40" step="1"><div class="mut" style="display:flex;justify-content:space-between"><span>▾ down</span><span>pulse counts; set with pupil center at 0</span><span>up ▴</span></div></div>
 <div class="row"><b>Look test</b><div class="mut">Holds the eyes at full travel to check for a stop or strain. Stop, a preset or a show ends it.</div>
 <div class="sc lk"><button data-c="lookL">◂ His left</button><button data-c="lookU">▴ Up</button><button data-c="lookR">His right ▸</button>
 <button data-c="lookC">● Center</button><button data-c="lookD">▾ Down</button><button data-c="stop">■ Stop</button></div></div>
@@ -130,7 +132,7 @@ side; now and then he winks, either eye.</p>
 <p class="mut">Changes move the eyes immediately. <b>Save</b> keeps them after power-off.
 <br><a href="/update">Firmware update</a></p>
 <script>
-const K=['parkY','parkX','xCenter','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
+const K=['parkY','parkX','xCenter','yCenter','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
