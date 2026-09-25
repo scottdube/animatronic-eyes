@@ -413,3 +413,7 @@ shut (Scott). Voice "eyes extended play" and "eyes sleep" both work (Scott, 2026
 **Trims saved by Scott 2026-09-25** (read back from NVS after the 33d1c54 OTA restart; `dirty` was false just
 before the OTA, so nothing unsaved was lost): closed BotL -14; squint TopL -9 BotL -43; normal TopL -14 BotL -41;
 wide TopL 23 BotL 33 BotR 33; all others 0. Save button now answers on the button (33d1c54), not yet pressed by Scott.
+**Eye X direction MEASURED 2026-09-25:** x 662 (parkX 150, above center) = the eyes look to HIS left (Scott,
+asked "his left or his right?", answered "left"). So higher xval / servo 0 pulse = his left.
+**Perspective rule (Scott, 2026-09-25): left/right always means the ANIMATRON'S left/right**, like up/down,
+so it survives mounting him in a robot. His left eye = servos 2+3 (viewer's right); his right eye = servos 4+5.
