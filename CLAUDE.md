@@ -457,8 +457,9 @@ wired yet (reads 284 mV floating; the page says "not wired"). Heap after boot 37
 **Supply evidence so far:** the bench PSU panel never showed near 1 A (Scott; peaks high 400s mA). A panel meter
 averages over ~0.25–0.5 s, so it can't see ms spikes. The 2–4 A spike figure I gave is an ESTIMATE, not measured;
 the PPK2 (Scott has one, and a scope) on ONE servo can measure a real SG90 peak/stall within its 1 A limit.
-**Rail baseline, divider wired (2026-09-25).** ESP32 on USB; which supply fed the servos in this run is NOT
-confirmed (probably still the bench PSU). Measured on the ESP32 5 V pin:
+**Rail baseline, divider wired (2026-09-25).** ESP32 on USB; servos on the bench PSU (Scott confirmed:
+the only supply they have run on so far). So this baseline measures the ESP32's own USB feed with the servo
+current on a separate path; it says nothing yet about servos sharing the USB path. Measured on the ESP32 5 V pin:
 - Level ~4.47–4.49 V, flat through a show and in sleep alike. That is USB 5 V minus the board's diode: the
   pin sits ~0.5 V under 5 V on USB, so the old absolute 4.6 V dip threshold fired forever (dips stuck at 1).
 - Single samples spread 3.90–4.77 V in a show and 3.95–4.77 V in sleep with the servos drawing nothing: ADC
