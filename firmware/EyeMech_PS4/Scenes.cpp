@@ -24,6 +24,10 @@ static uint32_t nextPeriodic = 0;  // 0 = none (nobody present, or showEvery 0)
 static bool sleepAfterHands = false;  // the controller was let go: sleep after handsOffSecs
 static uint32_t sleepSince = 0;
 static bool wasConnected = false;
+// Look test (page buttons): hold the eyes at a full stick position while resting, to
+// check the end stops and calibration. Anything else that happens clears it.
+static bool looking = false;
+static int lookSx = 0, lookSy = 0;
 
 // ---- alive idle generator --------------------------------------------------
 // Gaze is picked in the kit's 0..1023 units as an offset from the rest
@@ -387,7 +391,12 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   if (mode != prevMode && mode == M_SLEEP) sleepSince = now;
   prevMode = mode;
 
+  if (mode != M_REST) looking = false;
   Frame out = live;
+  if (looking) {
+    out.sx = lookSx;
+    out.sy = lookSy;
+  }
   switch (mode) {
     case M_IDLE:
       out = idleFrame(now);
@@ -435,6 +444,18 @@ const char *sceneModeName() {
 
 bool sceneCommand(const String &cmd) {
   uint32_t now = millis();
+  // look<L|R|U|D|C>: full to his left / his right / up / down, or center (+ sx = his left, + sy = up)
+  if (cmd.length() == 5 && cmd.startsWith("look") && strchr("LRUDC", cmd[4])) {
+    stopScene();
+    showPending = false;
+    sleepAfterHands = false;
+    char c = cmd[4];
+    lookSx = c == 'L' ? 127 : c == 'R' ? -128 : 0;
+    lookSy = c == 'U' ? 127 : c == 'D' ? -128 : 0;
+    looking = true;
+    return true;
+  }
+  looking = false;
   if (cmd == "idle" || cmd == "show") return startShow(now, settings.showSecs);
   else if (cmd == "extended") return startShow(now, settings.extendMins * 60UL);
   else if (cmd == "play") return startPlay(now, false);

@@ -123,13 +123,15 @@ void applyLiveSetting(const String &key) {
   if (key == "lowLidCurve") sceneCommand("stop");  // hold still so the bottoms can be judged
   // A lid trim shows the end it trims: closed trims on the closed preset, open trims on wide
   // A lid trim shows the preset it trims (cLTop = closed, sLTop = squint, ...)
-  if (key.length() == 5 && strchr("csnw", key[0]) && (key.endsWith("L") || key.endsWith("R"))) {
+  if (key.length() == 5 && strchr("csnw", key[0]) && (key[1] == 'L' || key[1] == 'R')) {
     sceneCommand("stop");
     lidIdx = strchr("csnw", key[0]) - "csnw";
   }
   if (key == "") lidIdx = 2;
   // Setting the pupil center: hold the eyes there so it can be judged by eye
   if (key == "parkX" || key == "parkY") sceneCommand("stop");
+  // Calibrating the center: stop a show, but keep a held look so an end stop can be checked
+  if (key == "xCenter" && sceneMode() != M_REST) sceneCommand("stop");
 }
 
 String eyeStatusJson() {
@@ -318,7 +320,7 @@ void loop() {
   // Per eye, his own left/right: a wink shuts one of them
   int lidL = f.wink == 1 ? settings.lidClosed : lid, lidR = f.wink == 2 ? settings.lidClosed : lid;
 
-  lexpulse = map(xval, 0, 1023, 220, 440);
+  lexpulse = constrain(map(xval, 0, 1023, 220, 440) + settings.xCenter, 150, 600);  // + xCenter: calibration
   rexpulse = lexpulse;
 
   leypulse = map(yval, 0, 1023, 250, 500);

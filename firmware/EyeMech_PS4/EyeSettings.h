@@ -9,6 +9,9 @@ struct EyeSettings {
   // Rest position, offsets from mechanical center in the kit's 0..1023 units
   int parkY;         // eyes rest this far below center, 0..300
   int parkX;         // eyes rest this far to HIS left (+) / his right (-), -150..150 (measured 2026-09-25)
+  // Calibration: where the left/right servo's true center is, in pulse counts. The horn's
+  // spline can't land it (~17 deg a tooth), so it lives here and parkX reads 0 at true center.
+  int xCenter;       // + = toward his left, -40..40
   // Lids
   // Lid presets, % open: 0 = the closed positions the horns were seated to, 100 = the
   // open limits below. D-pad up/down steps closed < squint < normal < wide; power-up is normal.

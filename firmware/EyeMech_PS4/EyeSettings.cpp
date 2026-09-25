@@ -16,6 +16,7 @@ struct Field {
 #define F(name, lo, hi, def) {#name, offsetof(EyeSettings, name), lo, hi, def}
 static const Field SETTINGS[] = {
     F(parkY, 0, 300, 180),        F(parkX, -150, 150, 0),
+    F(xCenter, -40, 40, 0),
     F(lidWide, 0, 100, 100),      F(lidNormal, 0, 100, 75),
     F(lidSquint, 0, 100, 35),     F(lidClosed, 0, 100, 0),
     F(lowLidCurve, 25, 300, 50),
@@ -49,7 +50,7 @@ void loadSettings() {
   EyeSettings d;
   resetSettings(d);
   Preferences p;
-  bool migrate = false;
+  bool migrate = false, xMigrate = false;
   if (p.begin(NS, true)) {  // fails when the namespace doesn't exist yet: defaults stand
     for (size_t i = 0; i < N; i++) {
       const Field &f = SETTINGS[i];
@@ -58,6 +59,14 @@ void loadSettings() {
     // Until 2026-09-25 the trims were named as seen FACING him (cTopL = the eye on your
     // left = his right). Carry them over to his own left/right once, then drop the old keys.
     migrate = !p.isKey("cLTop") && p.isKey("cTopL");
+    // Until 2026-09-25 the pupil center carried the servo's calibration (parkX -75 = true
+    // center). Move it into xCenter, in pulse counts (the kit maps 1023 units to 220), so
+    // parkX reads 0 there. Same rest position, and the travel becomes even about it.
+    if (!p.isKey("xCenter") && d.parkX) {
+      d.xCenter = constrain((int)lroundf(d.parkX * 220.0f / 1023), -40, 40);
+      d.parkX = 0;
+      xMigrate = true;
+    }
     if (migrate)
       for (int k = 0; k < 16; k++) {
         const char *pre = "cccc" "ssss" "nnnn" "wwww";
@@ -69,6 +78,7 @@ void loadSettings() {
   }
   settings = d;
   saved = d;
+  if (xMigrate && !migrate && saveSettings()) Serial.println("Settings: pupil center moved into xCenter");
   if (migrate && saveSettings() && p.begin(NS, false)) {
     for (const char *pre : {"c", "s", "n", "w"})
       for (const char *lid : {"TopL", "BotL", "TopR", "BotR"}) p.remove((String(pre) + lid).c_str());
