@@ -500,3 +500,7 @@ a 16-sample average that low needs a dip wider than one needle — either wide d
 missed (an edge trigger at 3.97 V fires on needles, so the screen shows the last needle), or the ADC itself is
 disturbed. The burst length ("~1 ms" above) was NEVER timed — likely shorter. Next: pulse-width trigger.
 That scope-show run finished: 150 s, 90 sags, ADC min 3.37 V, no restart (reset still `power-on`).
+**Pulse trigger (CH1 negative, >100 µs, 4.10 V, Normal) fired CONSTANTLY** — asleep and in a show alike —
+while the 5 ms/div display (125 kSa/s, normal acquisition) showed CH1 flat ~4.5 V at the trigger point. The
+ADC meanwhile counted ~1 sag/s in the show (81 in 105 s, min 3.34 V). So the trigger is firing on something
+the decimated display doesn't draw. Not established what. Next: Noise Reject ON + Peak Detect + SINGLE.
