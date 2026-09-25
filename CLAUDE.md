@@ -470,3 +470,7 @@ confirmed (probably still the bench PSU). Measured on the ESP32 5 V pin:
   no-load floor). The show-from-GET mistake: /scene is POST only; a GET returns "not found".
 **Next:** repeat with the servos on the ESP32 5 V pin (USB only); a real sag shows as the level dropping or dips
 counting. Scope on the pin is the tie-breaker for anything under ~0.3 V.
+
+## Eyeball CAD (2026-09-25)
+The eyeball STL is rebuilt as a native Fusion solid ("Eye Ball native" in the "Eye model"
+document); decoded dimensions and the check against the mesh are in `docs/eyeball-cad.md`.
