@@ -7,9 +7,10 @@
 
 void railBegin();
 int railNowMv();      // average of the latest burst; < 1000 = divider not wired
-int railMinMv();      // lowest single sample since boot or railReset()
+int railMinMv();      // lowest ~1 ms average since boot or railReset()
 int railMaxMv();
-uint32_t railDips();  // times the rail went below RAIL_DIP_MV (with 100 mV hysteresis)
+int railLevelMv();    // the rail's running level (~2 s average)
+uint32_t railDips();  // times a ~1 ms average fell RAIL_DIP_MV below the running level
 void railReset();
 const char *resetReasonName();  // why the chip last restarted: "brownout" is the one to watch
-static const int RAIL_DIP_MV = 4600;
+static const int RAIL_DIP_MV = 400;  // a sag this far below the rail's own level; 1 ms averages reach -0.27 V with the servos asleep

@@ -175,9 +175,9 @@ async function poll(){try{const s=await j('/status');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
  $('mode').textContent=(M[s.mode]||s.mode)+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
- const v=x=>(x/1000).toFixed(2)+' V',low=s.railMin<4600||s.railDips>0;
+ const v=x=>(x/1000).toFixed(2)+' V',low=s.railDips>0||s.rail<4400;
  $('pw').innerHTML=s.rail<1000?'⚡ 5 V rail: not wired (10k/10k divider to GPIO34) · last restart: '+s.reset:
-  (low?'⚠':'✓')+' ⚡ 5 V rail '+v(s.rail)+' · min '+v(s.railMin)+' · max '+v(s.railMax)+' · dips under 4.6 V: '+s.railDips+
+  (low?'⚠':'✓')+' ⚡ 5 V rail '+v(s.rail)+' · min '+v(s.railMin)+' · max '+v(s.railMax)+' · sags over 0.4 V: '+s.railDips+
   ' · last restart: '+(s.reset=='brownout'?'<b>⚠ BROWNOUT</b>':s.reset)+' <button id="rr" style="flex:none;padding:2px 8px;font-size:.85em">reset min</button>';
  const rr=$('rr');if(rr)rr.onclick=async()=>{await fetch('/railreset',{method:'POST'});poll()};
  $('bi').textContent='build '+s.build+' · '+s.slot+' · '+s.ip+' · heap '+s.heap}catch(e){$('st').textContent='⚠ lost contact with the eyes'}}

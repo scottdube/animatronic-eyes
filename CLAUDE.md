@@ -451,9 +451,22 @@ link but the DS4 clone doesn't notice promptly and has no off button; this libra
 the controller must call it, and a DS4 only does that on power-up. Holding P4 ~10 s forces it off; the next
 press is a fresh power-up that calls the stored host. **Hypothesis, untested:** waiting until the light bar goes
 dark by itself (a DS4 gives up after a while) and then one press would work too.
-**Rail monitor (build affbc83, 2026-09-25):** /status `rail`, `railMin`, `railMax`, `railDips` (<4.6 V), `reset`
+**Rail monitor (build affbc83, 2026-09-25):** /status `rail`, `railMin`, `railMax`, `railDips` (see baseline below), `reset`
 (last restart reason); page line under the mode. Needs a 10k/10k divider, ESP32 5 V pin → GPIO34 → GND: NOT
 wired yet (reads 284 mV floating; the page says "not wired"). Heap after boot 37.7 KB (the task stack is 3 KB).
 **Supply evidence so far:** the bench PSU panel never showed near 1 A (Scott; peaks high 400s mA). A panel meter
 averages over ~0.25–0.5 s, so it can't see ms spikes. The 2–4 A spike figure I gave is an ESTIMATE, not measured;
 the PPK2 (Scott has one, and a scope) on ONE servo can measure a real SG90 peak/stall within its 1 A limit.
+**Rail baseline, divider wired (2026-09-25).** ESP32 on USB; which supply fed the servos in this run is NOT
+confirmed (probably still the bench PSU). Measured on the ESP32 5 V pin:
+- Level ~4.47–4.49 V, flat through a show and in sleep alike. That is USB 5 V minus the board's diode: the
+  pin sits ~0.5 V under 5 V on USB, so the old absolute 4.6 V dip threshold fired forever (dips stuck at 1).
+- Single samples spread 3.90–4.77 V in a show and 3.95–4.77 V in sleep with the servos drawing nothing: ADC
+  noise, ±~0.4 V per sample. Mins of single samples are meaningless on this ADC.
+- 16-sample (~1 ms) averages, build after c5cfdcd: min 4.20 V in a show (100 s) vs 4.20 V asleep (60 s).
+  **No servo sag is resolvable by the on-board ADC with this supply.** Sleep still dips ~0.27 V below level,
+  cause unknown (ADC, or real Wi-Fi TX load on the USB cable; the scope settles it).
+- Monitor now tracks 1 ms averages against a ~2 s running level; a dip = 0.4 V below level (clears the 0.27 V
+  no-load floor). The show-from-GET mistake: /scene is POST only; a GET returns "not found".
+**Next:** repeat with the servos on the ESP32 5 V pin (USB only); a real sag shows as the level dropping or dips
+counting. Scope on the pin is the tie-breaker for anything under ~0.3 V.

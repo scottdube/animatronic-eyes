@@ -7,18 +7,24 @@ static volatile int nowMv = 0, minMv = 99999, maxMv = 0;
 static volatile uint32_t dips = 0;
 static volatile bool resetReq = true;  // the first burst starts the stats clean
 
+// Stats are on burst AVERAGES (16 samples, ~1 ms), not single samples: measured
+// 2026-09-25, single samples spread 3.9..4.77 V on a flat 4.47 V rail with the servos
+// asleep and drawing nothing, so a single-sample min is ADC noise. A dip is relative to the
+// rail's own running level (the USB-fed 5 V pin sits ~4.47 V behind the board's diode;
+// a direct feed sits nearer 5.0), so one threshold serves both supplies.
+static volatile int levelMv = 0;
+
 static void railTask(void *) {
   bool below = false;
+  float ema = 0;
   for (;;) {
-    int lo = 99999, hi = 0;
     long sum = 0;
-    for (int i = 0; i < 16; i++) {
-      int mv = analogReadMilliVolts(PIN) * DIVIDER;
-      sum += mv;
-      lo = min(lo, mv);
-      hi = max(hi, mv);
-    }
-    nowMv = sum / 16;
+    for (int i = 0; i < 16; i++) sum += analogReadMilliVolts(PIN) * DIVIDER;
+    int avg = sum / 16;
+    nowMv = avg;
+    if (resetReq || ema == 0) ema = avg;
+    ema += (avg - ema) * 0.0005f;  // ~2 s at ~1 burst per ms: the rail's own level
+    levelMv = (int)ema;
     if (resetReq) {
       resetReq = false;
       minMv = 99999;
@@ -26,12 +32,12 @@ static void railTask(void *) {
       dips = 0;
       below = false;
     }
-    if (lo < minMv) minMv = lo;
-    if (hi > maxMv) maxMv = hi;
-    if (lo < RAIL_DIP_MV) {
+    if (avg < minMv) minMv = avg;
+    if (avg > maxMv) maxMv = avg;
+    if (avg < ema - RAIL_DIP_MV) {
       if (!below) dips++;
       below = true;
-    } else if (lo > RAIL_DIP_MV + 100) {
+    } else if (avg > ema - RAIL_DIP_MV + 100) {
       below = false;
     }
     vTaskDelay(1);  // lets the idle task run (watchdog), ~1 ms
@@ -48,6 +54,7 @@ void railBegin() {
 int railNowMv() { return nowMv; }
 int railMinMv() { return minMv == 99999 ? 0 : minMv; }
 int railMaxMv() { return maxMv; }
+int railLevelMv() { return levelMv; }
 uint32_t railDips() { return dips; }
 void railReset() { resetReq = true; }
 
