@@ -55,7 +55,8 @@ h2{font-size:1.05em;margin:26px 0 0;padding-top:10px;border-top:1px solid var(--
 <div id="st">…</div>
 <div id="mode">…</div>
 <div class="sc"><button data-c="show">∿ Show</button><button data-c="extended">∿∿ Extended</button><button data-c="play">▶ Play</button><button data-c="record">⏺ Record</button>
-<button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button></div>
+<button data-c="stop">■ Stop</button><button data-c="sleep">☾ Sleep</button><button data-c="wake">☀ Wake</button>
+<button data-c="service">🔧 Service</button></div>
 <div class="mut" id="scm">Record needs the controller: it records what you do with it.</div>
 <h2>Eyes and lids</h2>
 <p class="mut">Pupil center: set where the eyes look straight ahead. Moving either slider stops idle and
@@ -82,8 +83,8 @@ a blink goes to closed. The buttons, or moving a slider, show that preset.</p>
 <h2>Shows</h2>
 <p class="mut">A show is a spell of alive idle that ends with the eyes asleep. Everyday: you arrive, the eyes
 wait, do one show, then sleep while you're in the lab, with another show now and then. A show that starts
-from sleep opens wide and looks far to his left first; about once a minute he squints slowly and looks side to
-side; now and then he winks, either eye.</p>
+from sleep opens wide and looks far to his left first; now and then he winks, either eye. Every 30-50 s he also does one of: the slow squint, an eye roll, or a
+circle around the edge of his travel.</p>
 <div class="row"><label>Shows</label>
 <select id="idleMode"><option value="0">Off (eyes rest open)</option><option value="1">Automatic: on arrival and now and then</option><option value="2">On demand only (Triangle, this page, voice)</option></select></div>
 <div class="row"><label>Show starts <span id="v_arriveDelay"></span> s after you arrive</label>
@@ -137,7 +138,7 @@ side; now and then he winks, either eye.</p>
 <script>
 const K=['parkY','parkX','xCenter','yCenter','upMax','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
  'glanceTenths','glanceRange','blinkRate','arriveAction','emptyMins'];
-const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting'};let dirty=false,busy=false,pend=null;
+const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting',service:'🔧 SERVICE: holding still, shows and controller off (🔧 again to end)'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
 const fm=t=>t<90?t+' s':Math.round(t/60)+' min';
 // Trims: one set of four sliders edits the selected preset's (prefix c/s/n/w)
@@ -241,7 +242,7 @@ void webBegin() {
     if (!authorized()) return;
     String c = server.arg("cmd");
     if (!sceneCommand(c)) {
-      server.send(409, "text/plain", "can't " + c + " now (idle off? no recording? no controller?)\n");
+      server.send(409, "text/plain", "can't " + c + " now (in service? shows off? no recording? no controller?)\n");
       return;
     }
     sendJson(eyeStatusJson());

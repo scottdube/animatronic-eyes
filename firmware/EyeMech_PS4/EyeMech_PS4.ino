@@ -87,6 +87,7 @@ int xval = 512;
 int yval = 512;
 int switchval = LOW;
 int lidIdx = 2;           // lid preset: 0 closed, 1 squint, 2 normal (power-up), 3 wide
+void setLidPreset(int idx) { lidIdx = constrain(idx, 0, 3); }  // Scenes: service holds closed
 const int DEADZONE = 16;  // stick movement past this is a takeover
 Frame live;               // what the controller says this loop
 PadState pad;

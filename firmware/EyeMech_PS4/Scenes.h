@@ -19,7 +19,7 @@ struct PadState {
   bool triangle, circle, share;  // scene commands (edges are detected in Scenes)
 };
 
-enum SceneMode { M_REST, M_LIVE, M_IDLE, M_PLAY, M_RECORD, M_SLEEP };
+enum SceneMode { M_REST, M_LIVE, M_IDLE, M_PLAY, M_RECORD, M_SLEEP, M_SERVICE };
 
 void scenesBegin();
 void scenesBoot();  // after settings load: power-up counts as an arrival
@@ -28,7 +28,8 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now);
 
 SceneMode sceneMode();
 const char *sceneModeName();   // "live", "idle", ... for /status
-// From the web page / Home Assistant: show (= idle) | extended | play | record | stop | sleep | wake
+// From the web page / Home Assistant: show (= idle) | extended | play | record | stop | sleep | wake |
+// service (toggle) | look<L|R|U|D|C>
 bool sceneCommand(const String &cmd);
 void scenePresence(bool present);  // from Home Assistant via /presence
 bool scenePresent();

@@ -3,6 +3,9 @@
 #include <PS4Controller.h>
 #include <esp_partition.h>
 #include <math.h>
+#include <Preferences.h>
+
+void setLidPreset(int idx);  // the sketch's lid preset (0 closed .. 3 wide)
 
 // ---- state ----------------------------------------------------------------
 // Everyday use (Scott, 2026-09-25): walk in, 30 s later the eyes wake and do a short
@@ -27,6 +30,23 @@ static bool wasConnected = false;
 // Look test (page buttons): hold the eyes at a full stick position while resting, to
 // check the end stops and calibration. Anything else that happens clears it.
 static bool looking = false;
+// Service (page button): hold still for work on the mechanism. Lids closed (the reference
+// the horns were seated to), eyes at center, servos powered, and nothing starts: no shows,
+// no controller, no sleep (sleep goes limp and a limp servo turns by hand). Kept in NVS
+// so a power cycle mid-job comes back in service, not into the power-up show.
+static bool serviceSaved() {
+  Preferences p;
+  bool on = p.begin("scene", true) && p.getBool("service", false);
+  p.end();
+  return on;
+}
+static void serviceStore(bool on) {
+  Preferences p;
+  if (p.begin("scene", false)) {
+    p.putBool("service", on);
+    p.end();
+  }
+}
 static int lookSx = 0, lookSy = 0;
 
 // ---- alive idle generator --------------------------------------------------
@@ -44,9 +64,16 @@ static uint32_t lastIdleUpdate = 0;
 // Wake: a show that starts from sleep opens wide and looks far to his left first.
 static const uint32_t WAKE_MS = 2500;
 static uint32_t wakeUntil = 0;
-// Slow squint: wide, close slowly to squint, then a slow look side to side, then carry on.
+// Every 30-50 s one of these, never the same twice running:
+//  slow squint: wide, close slowly to squint, then a slow look side to side;
+//  eye roll: up and over from one side to the other, brisk but not a saccade;
+//  circle: the pupils run once around the edge of their travel.
+enum Piece { P_NONE, P_SQUINT, P_ROLL, P_CIRCLE };
 static const uint32_t SQ_OPEN = 600, SQ_CLOSE = 3000, SQ_PAN = 6000, SQ_BACK = 600;
-static uint32_t squintAt = 0;   // start of the next (or running) slow squint
+static const uint32_t MOVE_IN = 400, ROLL_MS = 1300, CIRCLE_MS = 2400, MOVE_OUT = 500;
+static Piece piece = P_NONE, lastPiece = P_NONE;
+static uint32_t pieceAt = 0;    // start of the running piece, or when the next one starts
+static int pieceDir = 1;        // which way a roll or circle goes
 // Winks: now and then one eye closes, either eye.
 static const uint32_t WINK_MS = 400;
 static uint32_t nextWink = 0, winkEnd = 0;
@@ -73,7 +100,8 @@ static uint32_t randMs(uint32_t lo, uint32_t hi) { return lo + (uint32_t)(frand(
 static void idleReset(uint32_t now, bool fromSleep) {
   tx = ty = 0;
   wakeUntil = fromSleep ? now + WAKE_MS : now;
-  squintAt = wakeUntil + randMs(20000, 40000);
+  piece = P_NONE;
+  pieceAt = wakeUntil + randMs(20000, 40000);
   nextWink = wakeUntil + randMs(15000, 45000);
   winkEnd = 0;
   nextGlance = now + 300;
@@ -87,36 +115,78 @@ static void idleReset(uint32_t now, bool fromSleep) {
 // Far to his left: + x is his left (measured 2026-09-25), kept a little off the end stop
 static float farLeft() { return 1023 - 40 - restX(); }
 
+// Stick space (-128..127, full travel each way) to the 0..1023 offset gx/gy use
+static float stickToOff(float v, int center) { return v >= 0 ? v * (1023 - center) / 127.0f : v * center / 128.0f; }
+static float smoothstep(float t) { t = constrain(t, 0.0f, 1.0f); return t * t * (3 - 2 * t); }
+
+// Ease the gaze toward a point on the edge of travel: angle a (0 = his left, 90 = up), r of full travel
+static void edgeTarget(float a, float r, float &x, float &y) {
+  float rad = a * (float)M_PI / 180.0f;
+  x = stickToOff(r * 127.0f * cosf(rad), restX());
+  y = stickToOff(r * 127.0f * sinf(rad), restY());
+}
+static void easeTo(float x, float y, float dt, float tau) {
+  float k = 1.0f - expf(-dt / tau);
+  gx += (x - gx) * k;
+  gy += (y - gy) * k;
+}
+
+static void endPiece(uint32_t now) {
+  lastPiece = piece;
+  piece = P_NONE;
+  tx = ty = 0;
+  pieceAt = now + randMs(30000, 50000);
+  nextGlance = nextBlink = now + 300;
+}
+
 // The set pieces; true = this frame is theirs and ordinary idle waits
 static bool setPiece(uint32_t now, Frame &f) {
   float dt = (float)(now - lastIdleUpdate);
   if (now < wakeUntil) {  // wake: wide, eyes swing far left and hold
-    tx = farLeft();
-    ty = 0;
-    gx += (tx - gx) * (1.0f - expf(-dt / 150.0f));
-    gy += (ty - gy) * (1.0f - expf(-dt / 150.0f));
+    easeTo(farLeft(), 0, dt, 150);
     f.lid = settings.lidWide;
     return true;
   }
-  if (now < squintAt) return false;
-  uint32_t t = now - squintAt;
-  float R = settings.glanceRange / 100.0f * IDLE_X_MAX;
-  if (t < SQ_OPEN) {  // wide, eyes back to center
-    gx += (0 - gx) * (1.0f - expf(-dt / 150.0f));
-    gy += (0 - gy) * (1.0f - expf(-dt / 150.0f));
-    f.lid = settings.lidWide;
-  } else if ((t -= SQ_OPEN) < SQ_CLOSE) {  // slowly down to squint
-    f.lid = settings.lidWide + (settings.lidSquint - settings.lidWide) * (float)t / SQ_CLOSE;
-  } else if ((t -= SQ_CLOSE) < SQ_PAN) {  // one slow sweep: his left, across to his right, back
-    gx = R * sinf(2 * (float)M_PI * t / SQ_PAN);
-    f.lid = settings.lidSquint;
-  } else if ((t -= SQ_PAN) < SQ_BACK) {
-    gx = 0;
-    f.lid = settings.lidNormal;
-  } else {  // done: the next one in about a minute
-    tx = ty = gx = 0;
-    squintAt = now + randMs(45000, 75000);
-    nextGlance = nextBlink = now + 300;
+  if (piece == P_NONE) {
+    if (now < pieceAt) return false;
+    do piece = (Piece)(1 + (int)(frand() * 3) % 3); while (piece == lastPiece);
+    pieceDir = frand() < 0.5f ? 1 : -1;
+    pieceAt = now;
+  }
+  uint32_t t = now - pieceAt;
+  f.lid = settings.lidNormal;
+  if (piece == P_SQUINT) {
+    float R = settings.glanceRange / 100.0f * IDLE_X_MAX;
+    if (t < SQ_OPEN) {  // wide, eyes back to center
+      easeTo(0, 0, dt, 150);
+      f.lid = settings.lidWide;
+    } else if ((t -= SQ_OPEN) < SQ_CLOSE) {  // slowly down to squint
+      f.lid = settings.lidWide + (settings.lidSquint - settings.lidWide) * (float)t / SQ_CLOSE;
+    } else if ((t -= SQ_CLOSE) < SQ_PAN) {  // one slow sweep: his left, across to his right, back
+      gx = R * sinf(2 * (float)M_PI * t / SQ_PAN);
+      f.lid = settings.lidSquint;
+    } else if ((t -= SQ_PAN) >= SQ_BACK) {
+      endPiece(now);
+      return false;
+    }
+    return true;
+  }
+  // Roll: from just below one side, up over the top, to just below the other side.
+  // Circle: once around the edge of travel, starting and ending at one side.
+  float a0 = pieceDir > 0 ? -20 : 200, sweep = piece == P_ROLL ? 220 : 360, r = piece == P_ROLL ? 0.85f : 0.95f;
+  uint32_t T = piece == P_ROLL ? ROLL_MS : CIRCLE_MS;
+  float x, y;
+  if (t < MOVE_IN) {  // get to the start point
+    edgeTarget(a0, r, x, y);
+    easeTo(x, y, dt, 80);
+  } else if ((t -= MOVE_IN) < T) {
+    // A roll eases in and out; a circle runs at an even pace
+    float u = piece == P_ROLL ? smoothstep((float)t / T) : (float)t / T;
+    edgeTarget(a0 + pieceDir * sweep * u, r, gx, gy);
+  } else if ((t -= T) < MOVE_OUT) {
+    easeTo(0, 0, dt, 100);
+  } else {
+    endPiece(now);
     return false;
   }
   return true;
@@ -342,14 +412,14 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   wasConnected = pad.connected;
 
   // Controller: takeover stops any scene; Triangle / Circle / Share are commands
-  if (pad.connected && pad.takeover) {
+  if (pad.connected && pad.takeover && mode != M_SERVICE) {
     lastTakeover = now;
     showPending = false;  // driving during the arrival wait: no show on top of it
     if (mode == M_IDLE || mode == M_PLAY || mode == M_SLEEP) stopScene();
     if (mode != M_RECORD) mode = M_LIVE;
   }
-  bool tri = pad.connected && pad.triangle, cir = pad.connected && pad.circle,
-       sh = pad.connected && pad.share;
+  bool ctl = pad.connected && mode != M_SERVICE;
+  bool tri = ctl && pad.triangle, cir = ctl && pad.circle, sh = ctl && pad.share;
   if (tri && !prevTri) {
     if (mode == M_IDLE) endScene();
     else startShow(now, settings.showSecs);
@@ -391,8 +461,9 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   if (mode != prevMode && mode == M_SLEEP) sleepSince = now;
   prevMode = mode;
 
-  if (mode != M_REST) looking = false;
+  if (mode != M_REST && mode != M_SERVICE) looking = false;
   Frame out = live;
+  if (mode == M_SERVICE) out = {0, 0, false, live.lid};  // the page's preset, nothing from the sticks
   if (looking) {
     out.sx = lookSx;
     out.sy = lookSy;
@@ -438,6 +509,7 @@ const char *sceneModeName() {
     case M_PLAY: return "play";
     case M_RECORD: return "record";
     case M_SLEEP: return "sleep";
+    case M_SERVICE: return "service";
     default: return "rest";
   }
 }
@@ -445,8 +517,23 @@ const char *sceneModeName() {
 bool sceneCommand(const String &cmd) {
   uint32_t now = millis();
   // look<L|R|U|D|C>: full to his left / his right / up / down, or center (+ sx = his left, + sy = up)
+  if (cmd == "service") {
+    if (mode == M_SERVICE) {
+      mode = M_REST;
+      serviceStore(false);
+    } else {
+      stopScene();
+      mode = M_SERVICE;
+      looking = false;
+      setLidPreset(0);
+      serviceStore(true);
+    }
+    showPending = false;
+    sleepAfterHands = false;
+    return true;
+  }
   if (cmd.length() == 5 && cmd.startsWith("look") && strchr("LRUDC", cmd[4])) {
-    stopScene();
+    if (mode != M_SERVICE) stopScene();
     showPending = false;
     sleepAfterHands = false;
     char c = cmd[4];
@@ -456,6 +543,7 @@ bool sceneCommand(const String &cmd) {
     return true;
   }
   looking = false;
+  if (mode == M_SERVICE) return cmd == "stop";  // only the page's own holds; the rest waits
   if (cmd == "idle" || cmd == "show") return startShow(now, settings.showSecs);
   else if (cmd == "extended") return startShow(now, settings.extendMins * 60UL);
   else if (cmd == "play") return startPlay(now, false);
@@ -470,6 +558,12 @@ bool sceneCommand(const String &cmd) {
 }
 
 void scenesBoot() {
+  if (serviceSaved()) {
+    mode = M_SERVICE;
+    setLidPreset(0);
+    Serial.println("Scene: service (held from before the restart)");
+    return;
+  }
   // Power-up counts as an arrival, so the cycle works before the radar reports anything
   if (settings.idleMode == 1) {
     showPending = true;
@@ -502,6 +596,7 @@ bool scenePresent() { return present; }
 
 // Seconds to the next show the eyes will start on their own, -1 = none scheduled
 int sceneNextShowSecs() {
+  if (mode == M_SERVICE) return -1;
   uint32_t now = millis();
   int32_t best = -1;
   if (showPending) best = max<int32_t>(0, (int32_t)(showAt - now));
