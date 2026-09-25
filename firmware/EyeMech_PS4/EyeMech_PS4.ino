@@ -20,6 +20,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <PS4Controller.h>
 #include <esp_mac.h>
+#include <esp_idf_version.h>
 #include <esp_ota_ops.h>
 #include <WiFi.h>
 #include "secrets.h"   // WIFI_SSID / WIFI_PASS, git-ignored; see secrets.h.template
@@ -45,6 +46,30 @@ extern "C" bool btInUse() { return true; }
 // empty to use the ESP32's own MAC (printed at boot); otherwise set it to the
 // MAC the controller is paired to, e.g. "a0:5a:5c:12:34:56".
 const char* PS4_HOST_MAC = "";
+
+// Base MAC this board adopts at boot, or "" for the chip's own. The controller is bonded to
+// the retired DevKit (base d4:8a:fc:9e:7a:cc; BT = base + 2, IDF's rule), and the UniFi
+// reservation for 192.168.30.211 is on that Wi-Fi MAC, so the D1 Mini takes the whole
+// identity: applied before any radio starts, Wi-Fi and BT both derive from it, and
+// PS4.begin() needs no argument. A no-op on the DevKit itself. Two live boards on one MAC
+// fight, so the DevKit stays unpowered once this runs on the D1 Mini.
+const char* BOARD_BASE_MAC = "d4:8a:fc:9e:7a:cc";
+
+static void adoptBaseMac() {
+  uint8_t base[6];
+  if (!strlen(BOARD_BASE_MAC)) return;
+  if (sscanf(BOARD_BASE_MAC, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
+             &base[0], &base[1], &base[2], &base[3], &base[4], &base[5]) != 6) {
+    Serial.printf("BOARD_BASE_MAC unparsable: %s\n", BOARD_BASE_MAC);
+    return;
+  }
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 4, 1)
+  esp_err_t e = esp_iface_mac_addr_set(base, ESP_MAC_BASE);
+#else
+  esp_err_t e = esp_base_mac_addr_set(base);
+#endif
+  Serial.printf("Base MAC %s: %s\n", BOARD_BASE_MAC, esp_err_to_name(e));
+}
 
 // Flip if an axis moves the wrong way on the real mechanism.
 const bool INVERT_X = false;
@@ -206,11 +231,15 @@ void setup() {
   Serial.begin(115200);
   Serial.println("EyeMech PS4");
   Serial.printf("Last restart: %s\n", resetReasonName());
+  adoptBaseMac();  // before railBegin/PS4/WiFi: nothing may have read the MAC yet
   railBegin();
 
   uint8_t m[6];
   esp_read_mac(m, ESP_MAC_BT);
   Serial.printf("ESP32 Bluetooth MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+                m[0], m[1], m[2], m[3], m[4], m[5]);
+  esp_read_mac(m, ESP_MAC_WIFI_STA);
+  Serial.printf("ESP32 Wi-Fi MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
                 m[0], m[1], m[2], m[3], m[4], m[5]);
   if (strlen(PS4_HOST_MAC)) Serial.printf("Using PS4_HOST_MAC: %s\n", PS4_HOST_MAC);
 
