@@ -493,3 +493,9 @@ with the ADC's 4.47), CH2 3V3 ~3.35 V. Both carry µs needles in both directions
 ~+0.27/-0.19 V) at 1 ms/div, 500 kSa/s; no broad sag in that 10 ms window. Bidirectional µs needles read as
 switching/probe-ground pickup, not supply sag — hypothesis. Between the USB show ending and this capture
 (sleep, probes going on) the counter went 95→109 sags and min 3.61→3.50 V: unattributed (probing?).
+**Scope, during the show (same settings, 1 ms/div, edge trigger 3.97 V, STOPped by Scott):** still only µs
+needles; the deepest pair coincide (CH1 to ~4.05 V, CH2 to ~2.98 V, same instant), no broad dip in the 10 ms
+shown. Meanwhile the ADC logged min **3.37 V** and 41 sags in the first 60 s of that show. Conflict unresolved:
+a 16-sample average that low needs a dip wider than one needle — either wide dips exist that this capture
+missed (an edge trigger at 3.97 V fires on needles, so the screen shows the last needle), or the ADC itself is
+disturbed. The burst length ("~1 ms" above) was NEVER timed — likely shorter. Next: pulse-width trigger.
