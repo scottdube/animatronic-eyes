@@ -834,3 +834,9 @@ vs work frame, 2 thou cut). Fixed in pcbmill (issue 004): back program is `G43 H
 the T610 outline keep G37; verify check 4 now FAILS a G37 on the isolation tool. Regenerated, JOB READY, all four
 files overwritten on `/Volumes/Tormach/gcode/`. The 15:00 back_comp on the share was never run. Procedure at the
 machine is unchanged: V-bit in, electrical touch at X4.23 Y1.73, type 0.0014 into TOUCH Z, run back_comp.
+
+**ETS bias measured again on the carrier (2026-09-26, ~15:45).** Scott G37'd T600, drove to the touch-off node X4.23
+Y1.73 and the electrical touch read **Z 0.0053** where the map says 0.0014: **3.9 thou**, against the 4.1 thou
+pcbmill carries as `ets_frame_offset_in`. Second independent measurement of the bias. Answer given: enter 0.0014
+via **Offsets tab → Touch Z** (sets the T600 tool length, G54 untouched), NOT the DRO Z window (moves G54 and drags
+the ETS-measured drills and outline with it). Validation nodes: X0.05 Y0.05 → −0.0196, X3.09 Y2.15 → −0.0031.
