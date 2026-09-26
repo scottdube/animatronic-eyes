@@ -801,3 +801,18 @@ onto BO-0010's BOM and the passives allocated once the design is frozen.
 **Firmware for the swap:** PS4Controller applies a host MAC via esp_base_mac_addr_set (BT − 2, IDF's own rule), but
 the sketch starts Wi-Fi before PS4.begin, so done that way only BT would take the DevKit's identity. Setting the
 base MAC at the top of setup() makes Wi-Fi inherit it too, so the 192.168.30.211 reservation carries over.
+
+**Carrier probe map imported, RED-FLAGGED (2026-09-26, ~14:50).** Scott ran the probe and dropped
+`~/Downloads/probe-results-eyes.ngc` (160 points, full 16 × 10 grid); `probe-import` took it into
+`probe/probe-results.ngc`. Numbers: span **0.021 in** (min −0.0196 at the lower-left corner X0.05 Y0.05, max +0.0014
+at X4.23 Y1.73), plane tilt 0.0022 in/in in X, roughness RMS 0.0007 (limit 0.0005), worst point X4.99 Y0.05 at
+−0.0022 off its neighbours (limit 0.0015). Shape: a smooth dome — the ridge runs up the board at X ≈ 4.2 and the
+whole left edge sits 16–20 thou low; the bottom row (Y 0.05, the by-eye edge) is 2–4 thou below the row above it
+across the middle columns. Excluding the top and bottom rows the interior roughness is 0.0005 RMS, worst +0.0014.
+For scale, the four deskv1 maps (Downloads, Aug 13) spanned **8–12 thou** with interior roughness 0.0001–0.0002 —
+this blank is 2× the span and 3–5× the roughness of anything cut so far. Inside the board footprint (X 0.63..5.27,
+Y 0.55..3.39) the span is still ~15 thou. Reading: NOT voids (no isolated bumps) but the blank is not seated — bowed
+up on a thick wax film under the right-center, or a lump under it. pcbmill's gate says do not cut; `touchoff`,
+`regen`, `verify` are not blocked by the flag, only advised against. Scott to check the seat physically (press the
+ridge at ~4.2 in from the left, 2 in up; a board that moves or clicks is lifted). Re-mount and re-probe, or accept
+the dome and cut with applymap following it — Scott's call.
