@@ -633,7 +633,7 @@ Then `pcbmill --job ~/PCBMill/eyes-carrier-v2 probe-import <path to probe-result
 frame the job expects — `blank.x0/y0 = 0, 0`, width 5.906 × height 3.937, so the lower-left corner of the copper IS
 the origin, and the probe grid (X 0.05..5.75, Y 0.05..3.83) sits inside it with 0.05 in to spare on the low edges.
 By-eye is fine for the carrier: the board has no features that reference the blank edge, and the pcb2gcode offsets
-(x −6.8906, y 5.9405) already put the design inside the blank with margin. Remaining machine-side steps, in order:
+(x −6.8906, y 5.9405) center the board on the blank: the solver measured the copper/outline at X 0.632..5.274, Y 0.545..3.392, so **0.63 in margin left and right, 0.55 in top and bottom**, and the 1/8 outline cutter reaches 0.06 further (0.57 / 0.48 to the blank edge). A by-eye corner error of 1/8 in still leaves everything on copper. Remaining machine-side steps, in order:
 Z0 on the copper with the probe (T99, electrical touch, type 0), run `eyes-carrier-v2_probe.ngc`, bring
 `probe-results.ngc` back to the laptop.
 
