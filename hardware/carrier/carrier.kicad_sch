@@ -2222,7 +2222,7 @@
 		)
 		(uuid "993b7739-f5b3-5933-92f0-050c159a9974")
 	)
-	(global_label "SCL"
+	(global_label "SDA"
 		(shape input)
 		(at 223.52 109.22 0)
 		(fields_autoplaced yes)
@@ -2260,7 +2260,7 @@
 		)
 		(uuid "a0103ddf-2b14-5e4e-ae00-4a1abdbcba49")
 	)
-	(global_label "SDA"
+	(global_label "SCL"
 		(shape input)
 		(at 223.52 114.3 0)
 		(fields_autoplaced yes)
@@ -2561,17 +2561,77 @@
 			)
 		)
 	)
-	(no_connect
-		(at 292.1 80.01)
+	(wire
+		(pts
+			(xy 292.1 80.01) (xy 287.02 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
 		(uuid "fcab0399-09a1-50d5-984e-ff3b3d059d65")
 	)
-	(no_connect
-		(at 292.1 82.55)
+	(global_label "SDA"
+		(shape input)
+		(at 287.02 80.01 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
 		(uuid "4c1b2c9f-4ef9-5d0f-9813-5ffdf86a8700")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 287.02 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 292.1 82.55) (xy 287.02 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "725ff06b-4aac-5041-b93a-51a10ea23ec6")
+	)
+	(global_label "SCL"
+		(shape input)
+		(at 287.02 82.55 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "43db93f3-abbf-5377-a325-eb65277c6d5b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 287.02 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(no_connect
 		(at 292.1 85.09)
-		(uuid "725ff06b-4aac-5041-b93a-51a10ea23ec6")
+		(uuid "8f3e1f4e-9a42-5936-b963-0c43e54bec27")
 	)
 	(wire
 		(pts
@@ -2581,7 +2641,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "43db93f3-abbf-5377-a325-eb65277c6d5b")
+		(uuid "16d551aa-b268-54bb-a9dc-8536385bde1c")
 	)
 	(global_label "GND"
 		(shape input)
@@ -2593,7 +2653,7 @@
 			)
 			(justify right)
 		)
-		(uuid "8f3e1f4e-9a42-5936-b963-0c43e54bec27")
+		(uuid "81e5594e-5c8a-50d6-a8fd-e82e7c3dfc95")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 287.02 87.63 0)
 			(hide yes)
@@ -2615,7 +2675,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "16d551aa-b268-54bb-a9dc-8536385bde1c")
+		(uuid "f37e6f72-adc7-5308-8eee-dac7da545bef")
 	)
 	(global_label "+5V"
 		(shape input)
@@ -2627,7 +2687,7 @@
 			)
 			(justify left)
 		)
-		(uuid "81e5594e-5c8a-50d6-a8fd-e82e7c3dfc95")
+		(uuid "885057de-3643-5689-b418-6f2d812d8ea7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 322.58 74.93 0)
 			(hide yes)
@@ -2643,75 +2703,15 @@
 	)
 	(no_connect
 		(at 317.5 77.47)
-		(uuid "f37e6f72-adc7-5308-8eee-dac7da545bef")
-	)
-	(wire
-		(pts
-			(xy 317.5 80.01) (xy 322.58 80.01)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "885057de-3643-5689-b418-6f2d812d8ea7")
-	)
-	(global_label "SDA"
-		(shape input)
-		(at 322.58 80.01 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
 		(uuid "9f7a6fbe-4309-5a19-982f-602dac6bd704")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 322.58 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
 	)
-	(wire
-		(pts
-			(xy 317.5 82.55) (xy 322.58 82.55)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
+	(no_connect
+		(at 317.5 80.01)
 		(uuid "1794376e-fdc7-5743-9fc7-98cc3684ad57")
 	)
-	(global_label "SCL"
-		(shape input)
-		(at 322.58 82.55 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
+	(no_connect
+		(at 317.5 82.55)
 		(uuid "2c615ab0-a294-5af2-8189-bd4ed318ee72")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 322.58 82.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
 	)
 	(no_connect
 		(at 317.5 85.09)
@@ -4256,7 +4256,7 @@
 			)
 		)
 	)
-	(text "Animatronic eyes carrier: D1 Mini ESP32 + PCA9685 + LM2596 on one milled board, M3 standoffs into the rack.\nPower: 12 V pigtail -> J1 -> LM2596 (set 5.0-5.1 V unloaded, USB unplugged) -> +5V.\n+5V is star-routed on the board: separate traces from U3 OUT+ to U2 V+ and to U1 VCC (pin 35).\nC1/C2 hang on the +5V run to U1 pin 35. No rail divider (dropped 2026-09-25: the on-board ADC only ever saw its own noise).\nU2 rows are internally paralleled (jumper pad groups on the footprint), so either row can carry a net.\nI2C is on IO25 (SDA) / IO27 (SCL), not 21/22: single-sided routing can only reach the OUTER header columns. Wire.begin(25, 27).\nU1 pin numbers = header positions per r0oland ESP32_mini; VERIFY against the board silk before cutting."
+	(text "Animatronic eyes carrier: D1 Mini ESP32 + PCA9685 + LM2596 on one milled board, M3 standoffs into the rack.\nPower: 12 V pigtail -> J1 -> LM2596 (set 5.0-5.1 V unloaded, USB unplugged) -> +5V.\n+5V: U3 OUT+ -> U2 V+ (right row) -> front-edge bar -> left wing -> C1/C2/U1 VCC (pin 35) via the USB end of U1.\nC1/C2 hang on the +5V run to U1 pin 35. No rail divider (dropped 2026-09-25: the on-board ADC only ever saw its own noise).\nU2 rows are internally paralleled (jumper pad groups on the footprint), so either row can carry a net.\nI2C is on IO27 (SDA) / IO25 (SCL), not 21/22: single-sided routing can only reach the OUTER header columns. Wire.begin(27, 25).\nU1 pin numbers = header positions per r0oland ESP32_mini; VERIFY against the board silk before cutting."
 		(exclude_from_sim no)
 		(at 38.1 215.9 0)
 		(effects

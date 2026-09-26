@@ -81,3 +81,12 @@ At 2.54 pitch with 0.6 clearance the diagonal gap between a 2×2 pad group leave
 connects the pad to that sliver and DRC reports "spoke connected to isolated island". `(thermal_bridge_angle 90)` on
 the pad fixes it. Separately, `lib_footprint_mismatch` on a rotated generated footprint meant the NPTH pads and text
 were written without the footprint angle folded in — KiCad stores pad AND text angles absolute.
+
+## A pour pocket walled off by tracks stays filled if it touches a pad — and then only that pad feeds it (2026-09-25)
+
+Routing the carrier, a +5V stub from the y 10.9 run down to C1.1 and the +5V lane past C1.2 sealed a 12 mm² pocket of
+GND pour around C1.2. DRC 0, "0 unconnected", island removal on — and the pocket stayed, because a zone polygon that
+touches any pad of its net is not an island to KiCad. The copper in it is fed only through that pad's spoke; for a
+module GND pin (PCA pad 6) that means the servo return would have gone through the module. The check is cheap and
+DRC does not do it: count `filled_polygon`s in the saved board (one per connected piece of pour) and look at every
+extra one's bbox. Fix was moving the C1.1 feed to a diagonal off the lane so the pocket opens west.

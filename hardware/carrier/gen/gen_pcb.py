@@ -4,12 +4,22 @@ pour keepouts, footprints linked to the schematic symbols, B.Cu routing and a
 GND pour.  Everything is in BOARD coordinates (DXF x, -DXF y, mm) and shifted
 by OX/OY onto the page at write time.
 
-Routing topology (why the pins are what they are is in gen_sch.py):
-  right strip (between the notch edge x=15.8 and the lower-right hole keepout
-  x=25.2) carries three lanes: SCL 16.7, SDA 17.85, +5V 19.2.
-  left strip carries +3V3 17.2 and RAIL_ADC 18.9.
-  corridor below the D1 Mini's last pin row (y 30.9..36.5) carries +5V on the
-  right half, +3V3 and RAIL_ADC on the left half; nothing crosses.
+Routing (V2, Scott's placement, 2026-09-26) -- all B.Cu, no crossings:
+  +12V  J1 -> TP1; J1 -> y=2 under the LM2596 -> IN+.
+  +5V   OUT+ -> lane x=20.5 (slot edge .. U3) -> y=11.2 over H4 -> lane x=33.8
+        outside the PCA right row -> front-edge bar y=34.5 -> x=-37.9 up the
+        left wing -> TP2 / y=10.9 under U1's outer row -> x=-53 (USB end) ->
+        y=-2 through the module middle -> VCC pin 35.  U2.7 stubs down to the bar.
+  +3V3  pin 16 -> module middle y=-12 -> USB end x=-52.5 -> y=-23.5 behind U1
+        -> lane x=-17.2 beside the slot -> y=28.478 into PCA left-row VCC.
+  I2C   pads 24/26 -> east along y=9.3/10.5 -> lanes x=-23.6/-24.8 east of H3
+        -> PCA left row pads 3/4 from inside the module.
+  GND   pour.  It reaches the left wing through the strip under the +5V bar
+        (y 35.6..36.5) and the far-left strip (x -55.4..-54.1); the pocket
+        west of the PCA left row drains under pad 1 (bar at 34.5 leaves 0.89).
+  Rejected: I2C to the RIGHT row across the front bar (crosses the +3V3 lane);
+  +3V3 down the far-left edge (fills the only GND path to U1's middle); any
+  track under the antenna end (IO21/22 are inner-row pins, so they stay unused).
 """
 import os
 import re
@@ -73,9 +83,30 @@ for r, (_, v, *_r) in PLACE.items():
 POWER_W, SIG_W = 1.0, 0.6
 # (net, width, polyline)
 TRACKS = [
-    # empty: V1's routing (commit 6c48d78) belonged to the rejected placement.
-    # Route here once Scott's placement is frozen, or in the GUI (then the
-    # generator stops being the master for copper).
+    # ---- +12V: jack terminal -> test point, and along y=2 under the LM2596 to IN+
+    ("+12V", POWER_W, [(50.5, 2.0), (50.5, -5.0)]),
+    ("+12V", POWER_W, [(50.5, 2.0), (25.7, 2.0), (25.7, 8.4)]),
+    # ---- +5V trunk: OUT+ -> lane between the slot and U3 -> east above H4 ->
+    #      lane outside the PCA right row -> front-edge bar -> up the left wing
+    ("+5V", POWER_W, [(25.7, -31.4), (20.5, -26.2), (20.5, 11.2), (33.8, 11.2), (33.8, 34.5),
+                      (-37.9, 34.5), (-37.9, 17.0), (-35.0, 17.0)]),              # ends on TP2
+    ("+5V", POWER_W, [(29.226, 34.5), (29.226, 31.018)]),                        # U2.7 from below
+    # left wing: TP2 -> under U1's outer row -> USB end -> module middle -> VCC (35, inner row)
+    ("+5V", POWER_W, [(-35.0, 17.0), (-37.9, 17.0), (-37.9, 10.9), (-53.0, 10.9), (-53.0, -2.0),
+                      (-43.85, -2.0), (-43.85, 4.93)]),
+    # C1.1 from the lane, not from the y=10.9 run: a stub down from 10.9 walled
+    # off a pocket around C1.2 that hung on that pad's spoke alone
+    ("+5V", POWER_W, [(-37.9, 25.0), (-42.5, 18.0)]),                            # C1.1
+    ("+5V", POWER_W, [(-51.5, 10.9), (-51.5, 13.0)]),                            # C2.1
+    # ---- +3V3: pin 16 (inner row) -> module middle -> USB end -> behind U1 ->
+    #      lane beside the slot -> PCA left row VCC from inside the module
+    ("+3V3", POWER_W, [(-43.85, -17.93), (-43.85, -12.0), (-52.5, -12.0), (-52.5, -23.5),
+                       (-17.2, -23.5), (-17.2, 28.478), (-29.194, 28.478)]),
+    ("+3V3", POWER_W, [(-40.0, -23.5), (-40.0, -27.0)]),                         # TP3
+    # ---- I2C: both leave the outer row eastward, round H3 on its east side,
+    #      into the PCA left row from inside.  Pad 24 (east) = outer lane = SDA.
+    ("SDA", SIG_W, [(-28.61, 7.47), (-28.61, 9.3), (-23.6, 9.3), (-23.6, 25.938), (-29.194, 25.938)]),
+    ("SCL", SIG_W, [(-31.15, 7.47), (-31.15, 10.5), (-24.8, 10.5), (-24.8, 23.398), (-29.194, 23.398)]),
 ]
 
 # pour keepouts (name, polygon)

@@ -181,21 +181,23 @@ def stub(p, net, side):
 # ---------------------------------------------------------------- circuit
 
 # Single-sided routing decided these.  The D1 Mini's inner header columns
-# can only leave the module through its middle and out below the last pin
-# row; the outer columns can only leave sideways, into the strips beside the
-# module, where any vertical lane blocks every pad facing it.  So:
-#   * I2C on outer-right pads 24/26 (IO27 = SCL, IO25 = SDA) -> right strip
-#     lanes to the PCA's right row.  Wire.begin(25, 27).
-#   * 3V3 (16) and VCC (35) are inner pins: middle -> corridor -> left/right.
-#   * the PCA rows are paralleled on the module, declared as jumper pad groups
-#     on the footprint, so either row can carry a net.
-# The pin choices above were forced by the V1 placement (rejected); Scott's
-# placement may reopen them.  Rail divider DROPPED 2026-09-25 (Scott): the ADC
-# saw its own noise, not sag.
-D1_NETS = {16: "+3V3", 24: "SCL", 26: "SDA", 35: "+5V",
+# can only leave the module through its middle; the outer columns can only
+# leave outward.  Inner pins 16 (3V3) and 35 (VCC) exit through the module
+# middle and out its USB end (the antenna end is the only other exit).
+# The PCA rows are paralleled on the module, declared as jumper pad groups on
+# the footprint, so either row can carry a net.  Rail divider DROPPED
+# 2026-09-25 (Scott): the ADC saw its own noise, not sag.
+# V2 (Scott's placement, routed 2026-09-26): both I2C lines leave the outer
+# row heading east, go round the H3 standoff on its east side and enter the
+# PCA LEFT row from inside the module.  Pad 24 (IO27) is the eastern of the
+# two, so it takes the outer lane and lands on pad 3 (SDA); pad 26 (IO25)
+# takes the inner lane to pad 4 (SCL).  The other way round crosses.
+# Wire.begin(27, 25).  IO21/IO22 are INNER-row pins here: reaching them means
+# a track under the antenna end or through the flash-pin block -> rejected.
+D1_NETS = {16: "+3V3", 24: "SDA", 26: "SCL", 35: "+5V",
            1: "GND", 22: "GND", 33: "GND"}
-PCA_NETS_L = {1: "+5V", 2: "+3V3", 6: "GND"}              # left row: power
-PCA_NETS_R = {7: "+5V", 9: "SDA", 10: "SCL", 12: "GND"}   # right row (7-12)
+PCA_NETS_L = {1: "+5V", 2: "+3V3", 3: "SDA", 4: "SCL", 6: "GND"}   # left row carries everything
+PCA_NETS_R = {7: "+5V", 12: "GND"}                                # right row: +5V in from U3
 
 
 def build():
@@ -273,10 +275,10 @@ def build():
     note("Animatronic eyes carrier: D1 Mini ESP32 + PCA9685 + LM2596 on one milled board, "
          "M3 standoffs into the rack.\\n"
          "Power: 12 V pigtail -> J1 -> LM2596 (set 5.0-5.1 V unloaded, USB unplugged) -> +5V.\\n"
-         "+5V is star-routed on the board: separate traces from U3 OUT+ to U2 V+ and to U1 VCC (pin 35).\\n"
+         "+5V: U3 OUT+ -> U2 V+ (right row) -> front-edge bar -> left wing -> C1/C2/U1 VCC (pin 35) via the USB end of U1.\\n"
          "C1/C2 hang on the +5V run to U1 pin 35. No rail divider (dropped 2026-09-25: the on-board ADC only ever saw its own noise).\\n"
          "U2 rows are internally paralleled (jumper pad groups on the footprint), so either row can carry a net.\\n"
-         "I2C is on IO25 (SDA) / IO27 (SCL), not 21/22: single-sided routing can only reach the OUTER header columns. Wire.begin(25, 27).\\n"
+         "I2C is on IO27 (SDA) / IO25 (SCL), not 21/22: single-sided routing can only reach the OUTER header columns. Wire.begin(27, 25).\\n"
          "U1 pin numbers = header positions per r0oland ESP32_mini; VERIFY against the board silk before cutting.",
          (38.1, 215.9), 1.6)
 

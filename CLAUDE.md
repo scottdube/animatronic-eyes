@@ -600,12 +600,21 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
-**Carrier V2 PLACED (Scott, 2026-09-25), not routed, not cut.** Workflow now: Scott places in the KiCad GUI → (KiCad
+**Carrier V2 ROUTED + EXPORTED (2026-09-25, late), not cut.** Workflow now: Scott places in the KiCad GUI → (KiCad
 closed) `python3 gen/capture_placement.py` copies positions into `gen/placement.py` → `python3 gen/gen_pcb.py .` rebuilds
 the board around them (outline from the DXF, hole keepouts, D1 antenna/flash keepouts that follow U1, pour, legend).
 Why: the GUI-only path broke the outline once already (23 loose Edge.Cuts lines; a box-select drag moved the ones inside
-the box and J1/C1/TP5 were then placed 25 mm off the real board). State: ERC 0, DRC 0 violations, 11 unconnected pads
-(TRACKS is empty — V1's routing belonged to the rejected placement). Placement (board frame, y down): D1 Mini left wing
+the box and J1/C1/TP5 were then placed 25 mm off the real board). State: ERC 0, DRC 0 violations / 0 unconnected / 0
+footprint errors; `export_for_mill.sh` run (gerbers/, ONE merged drill: 3 tools, 71 holes, all exact bit sizes, annulus
+gate passed in a throwaway pcbmill job); copper view `out/bcu_small.png`. **Routing (all in `TRACKS` in gen_pcb.py, the
+docstring there is the map):** +12V J1→TP1 and along y=2 under the buck to IN+; +5V OUT+ → lane between slot and buck →
+over H4 → lane outside the PCA right row → bar along the front edge (y 34.5) → up the left wing at x −37.9 → TP2 →
+y 10.9 under the D1's outer row → x −53 (USB end) → y −2 through the module middle → VCC pad 35; C1/C2 hang off that
+run (C1 from the lane by a diagonal, C2 from the y 10.9 run). +3V3 pad 16 → module middle y −12 → USB end x −52.5 →
+y −23.5 behind the D1 → lane x −17.2 beside the slot (0.75 mm past the module's antenna-end PCB edge — the one
+compromise; DC only) → PCA left-row VCC from inside. I2C pads 24/26 → east along y 9.3/10.5 → lanes x −23.6/−24.8
+east of H3 → PCA left row pads 3/4 from inside. The right row carries only +5V/GND; the jumper groups cover the rest.
+GND pour is ONE polygon (checked by counting `filled_polygon`s) plus a 2 mm² sliver hanging on C1.2's south spoke. Placement (board frame, y down): D1 Mini left wing
 rot 270, USB-C overhanging the LEFT edge, antenna end at the slot; PCA along the BOTTOM edge, servo headers facing
 the bottom edge, **centred on H3/H4 — its own holes line up with the carrier's (Scott)**, so it bolts down there and its
 GND pins 6/12 sit 2.25 mm from the hole centres (the module's own geometry: nylon standoff/washer at H3/H4, and those two
@@ -636,27 +645,31 @@ Renders in `out/` (regenerate with `kicad-cli pcb render`). Decisions, and what 
   the generator for everything else). The pin choices below were forced by the rejected placement and are OPEN again:
   in Scott's placement the D1's outer-bottom row (pads 22/24/26/…, y ≈ 7.5) faces open board toward the PCA and the
   inner rows exit through the module middle — recheck which of 21/22/34 vs 25/27 route before touching firmware.
-- **Pins moved for single-sided routing.** The D1 Mini's inner header columns can only leave through the module middle
-  and out below the last pin row; the outer columns leave sideways, where any vertical lane blocks every pad facing it.
-  So: **SDA = IO25 (pad 26), SCL = IO27 (pad 24)** on the outer-right column, **rail ADC = IO36 (pad 4, inner-left)**.
-  GPIO21/22 and IO34 are inner/outer pins that could not be reached without a crossing. **Firmware for the carrier build:
-  `Wire.begin(25, 27)` and Rail.cpp `PIN = 36` — NOT changed yet; the DevKit build keeps 21/22/34.**
+- **I2C pins, decided by V2 routing: SDA = IO27 (pad 24), SCL = IO25 (pad 26). Firmware for the carrier build:
+  `Wire.begin(27, 25)` — NOT changed yet; the DevKit build keeps 21/22.** IO21/IO22 (pads 27/25) are INNER-row pins in
+  Scott's placement: the inner row can only leave through the module middle and out its USB or antenna end, and the USB
+  end already carries +5V and +3V3 — reaching 21/22 meant a track under the antenna or through the flash-pin block, so
+  rejected. Which of 24/26 is SDA is forced too: 24 is the eastern pad, so it takes the outer lane round H3 and lands on
+  the lower PCA pad (SDA, pad 3); swapping them crosses. IO34/IO36 are moot (divider gone).
 - **Rail monitor DROPPED from the carrier (Scott, 2026-09-25).** R1/R2 10k/10k divider, the RAIL_ADC net and TP4 were my
   assumption, not his plan. Evidence (rail-monitor section above): the ADC's sag counts are its own noise and the real
   sag was only visible on the scope, so on a board with the buck set to 5.0–5.1 V the reading buys nothing a meter on
   TP2 doesn't. Removed from `gen/gen_sch.py` and regenerated (TP numbers kept: TP1/2/3/5/6). Firmware unchanged: Rail.cpp reports "not wired" when the pin floats. IO36 is free again.
   Test points that remain: TP1 +12V, TP2 +5V, TP3 +3V3, TP5 GND, TP6 GND.
-- **+5V star:** buck OUT+ → PCA right-row V+ (5 mm), and separately down the right strip → corridor → D1 pad 35. The
-  divider takes +5V from the PCA's LEFT V+ pin (the rows are paralleled on the module) so it measures the servo rail
-  itself; declared with `jumper_pad_groups` on the footprint (KiCad 10 accepts it; DRC then reports 0 unconnected).
-  Moot now the divider is gone; the jumper groups stay on the footprint (they're true of the module).
-- **Compromises:** C1/C2 are ~12 and ~30 mm of trace from pad 35, not "a few mm" — an inner pin on a single-sided
-  board with the module on headers cannot have parts beside it. No SDA/SCL test points: probe U2's header pins 9/10
-  on the copper side. Pour islands inside the SDA/SCL/+5V loops are removed in KiCad but stay as floating copper on a
-  milled board (harmless).
+- **+5V is a daisy chain, not a star, in V2:** OUT+ → PCA V+ (right row) → front-edge bar → left wing → D1 VCC. A
+  separate run to pad 35 would have to cross the +3V3 lane or the GND paths into the left wing. `jumper_pad_groups` on
+  the PCA footprint (KiCad 10 accepts it) is what lets the right row carry +5V/GND only and the left row everything
+  else without DRC "unconnected". Rejected alternatives that DRC would have passed but the copper would not: I2C to the
+  right row across the front bar (crosses +3V3); +3V3 down the far-left edge (fills the 1.35 mm strip that is GND's only
+  way into the D1's middle); feeding C1 by a stub from the y 10.9 run (walls off a pocket around C1's GND pad — the pour
+  then hangs on that pad's spoke alone; KiCad keeps it because a pad counts as a connection).
+- **Compromises:** C1/C2 are ~35 and ~25 mm of trace from pad 35 (round the USB end), not "a few mm" — an inner pin on
+  a single-sided board with the module on headers cannot have parts beside it. No SDA/SCL test points: probe U2's left
+  header pins 3/4 on the copper side. The GND strip under the +5V bar is 0.94 mm and the one under PCA pad 1 is 0.89 —
+  both above the 0.5 min width, both real paths (the left wing also has the far-left strip).
 - **D1 Mini pad numbering is r0oland's (the ratgdo library).** espboards.dev's table disagrees; **photograph both rows
   of the actual module's silk before cutting** and check pads 4, 16, 24, 26, 33, 35 against it.
-**Still to decide (Scott):** placement (his, in progress); which face points at the rack and the height available (buck module ~10
+**Still to decide (Scott):** which face points at the rack and the height available (buck module ~10
 mm, PCA headers + servo plugs); calipers on the clone PCA and an LM2596; D1 Mini from BO-0009 or bought; KF301 (#291)
 onto BO-0010's BOM and the passives allocated once the design is frozen.
 **Firmware for the swap:** PS4Controller applies a host MAC via esp_base_mac_addr_set (BT − 2, IDF's own rule), but
