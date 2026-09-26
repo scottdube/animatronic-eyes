@@ -54,16 +54,18 @@ def P(x, y):
 
 # ------------------------------------------------------------- geometry
 # outline.dxf polyline, DXF y flipped (KiCad y grows downward)
-# The DXF had a kink 13 mm in from each back corner ((-47.326, 24.189) and its
-# mirror): Scott's cleanup of the Fusion export moved a line.  The wood fit check
-# against the case (2026-09-26) showed the case runs ONE straight chamfer there,
-# so those two vertices are dropped and the chamfer goes corner to corner.
-OUTLINE = [(40.630, 37.041), (-40.598, 37.041), (-55.950, 18.361),
+# Back chamfers: the DXF had a kink 13 mm in from each back corner (Scott's
+# cleanup of the Fusion export moved a line).  Corner-to-corner still stuck out
+# past the green case panel in the 2026-09-26 wood check, so the chamfer is the
+# corner-to-corner line moved 4 mm inward, parallel (Scott's estimate, not a
+# measurement of the panel): back-edge end -40.598 -> -35.420, side end
+# 18.361 -> 12.061, mirrored about the board's x centre (0.016).
+OUTLINE = [(35.452, 37.041), (-35.420, 37.041), (-55.950, 12.061),
            (-55.950, -11.852), (-58.931, -27.035), (-58.931, -35.125), (-58.772, -35.261),
            (-10.883, -35.261), (-10.883, -26.121), (-15.765, -21.771), (-15.765, 3.856),
            (0.016, 3.856), (15.797, 3.856), (15.797, -21.771), (10.915, -26.121),
            (10.915, -35.261), (58.803, -35.261), (58.963, -35.125), (58.963, -27.035),
-           (55.982, -11.852), (55.982, 18.361)]
+           (55.982, -11.852), (55.982, 12.061)]
 HOLES = [(-49.481, -27.738), (49.513, -27.738), (-28.455, 15.270), (28.487, 15.270)]
 HOLE_KEEPOUT_R = 3.25        # M3 nylon standoff hex + washer
 
@@ -103,12 +105,18 @@ POWER_W, SIG_W = 1.0, 0.6
 # (net, width, polyline)
 TRACKS = [
     # ---- +12V: jack terminal -> test point, and along y=2 under the LM2596 to IN+
-    ("+12V", POWER_W, [(45.05, 15.7), (50.5, 15.7), (50.5, -5.0)]),   # J1.1 east under its own body, north past TP5 to TP1; the y=2 run tees off (straight north would graze IN- by 0.05)
-    ("+12V", POWER_W, [(50.5, 2.0), (25.7, 2.0), (25.7, 8.4)]),
+    # J1.1 east under its own body, north to TP1's row, east onto TP1.  The
+    # vertical sits at x=47.5, not 50.5: with the back chamfer 4 mm deeper the
+    # pour's only path from the right edge round the bend into the J1 pocket
+    # was pinched to 0.1 mm (poured as two islands); at 47.5 that path is 3.7 mm
+    # and TP5 keeps pour on its west side.  Straight north from J1.1 would graze
+    # IN- by 0.05.
+    ("+12V", POWER_W, [(45.05, 15.7), (47.5, 15.7), (47.5, -5.0), (50.5, -5.0)]),
+    ("+12V", POWER_W, [(47.5, 2.0), (25.7, 2.0), (25.7, 8.4)]),
     # ---- +5V trunk: OUT+ -> lane between the slot and U3 -> east above H4 ->
     #      lane outside the PCA right row -> front-edge bar -> up the left wing
     ("+5V", POWER_W, [(25.7, -31.4), (20.5, -26.2), (20.5, 11.2), (33.8, 11.2), (33.8, 34.5),
-                      (-37.9, 34.5), (-37.9, 17.0), (-35.0, 17.0)]),              # ends on TP2
+                      (-33.8, 34.5), (-33.8, 18.2), (-35.0, 17.0)]),              # ends on TP2; turns north at -33.8 (was -37.9: outside the 4 mm-deeper back chamfer)
     ("+5V", POWER_W, [(29.226, 34.5), (29.226, 31.018)]),                        # U2.7 from below
     # left wing: TP2 -> under U1's outer row -> USB end -> module middle -> VCC (35, inner row)
     ("+5V", POWER_W, [(-35.0, 17.0), (-37.9, 17.0), (-37.9, 10.9), (-53.0, 10.9), (-53.0, -2.0),

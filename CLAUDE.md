@@ -600,6 +600,20 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier back chamfers 4 mm deeper (2026-09-26, later still).** Corner-to-corner still stuck out past the green
+case panel at both back corners (Scott's third photo, red arrows). Scott: "has to come in like probably four
+millimeters is my guess on either side … indented slightly from the green panel." OUTLINE: the corner-to-corner
+line moved 4 mm inward, parallel — back-edge end -40.598 → -35.420, side end 18.361 → 12.061, mirrored about
+x=0.016. **That number is his estimate, not a measurement of the panel**; two caliper readings per corner (where
+the case chamfer starts along the back edge and where it ends along the side) would replace it. **No placement
+moved** — placement.py is byte-identical. Two traces did, because the new edge cut through them: the +5V trunk
+turned north at x=-37.9, and (-37.9, 34.5) is 0.5 mm outside the deeper chamfer (edge is at y≈34.0 there), so it
+now turns at -33.8 → (-33.8, 18.2) → TP2; and the +12V vertical moved 50.5 → 47.5 because the chamfer meeting
+the old x=50.5 run left the pour 0.1 mm to get from the right edge into the J1 pocket — it poured as two
+islands (U2 pad 12 unconnected). First attempt moved TP5 instead (54, 7.5 → 54, -11); Scott objected, rightly:
+the trace was the thing in the way, not his test point. TP5 back at (54, 7.5). DRC+parity 0/0/0, ERC 0, pour
+one polygon, gerbers/fit-check/STEP regenerated. Drills unchanged.
+
 **Carrier outline fixed from the wood fit check + silk enlarged (2026-09-26, later).** The wood copy against the
 green case showed the back corners wrong: the DXF had a kink 13 mm in from each back corner (14.5 mm at 62° then
 10.4 mm at 34°) where the case runs one straight chamfer, wood sitting up to 4.7 mm inside it. Scott: "I must have
