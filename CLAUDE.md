@@ -612,9 +612,13 @@ Renders in `out/` (regenerate with `kicad-cli pcb render`). Decisions, and what 
   Its holes are 55.88 × 19.05 — NOT the carrier's 57.0 — so **the PCA has no mounting holes on the carrier; it sits on
   its two soldered headers** (M2.5 standoffs would hit the header plastic anyway). Clone assumed identical: **calipers
   before cutting** (row spacing, pitch), same for the LM2596 pin grid (17.6 × 39.8, ratgdo's numbers).
-- **Placement (unconfirmed by Scott):** PCA bridges the slot at the top with servo headers facing the slot; D1 Mini in the
-  bottom band, antenna end over the slot (no copper possible there), USB-C overhanging the bottom edge; LM2596 on the right
-  wing (IN at the bottom); 12 V KF301 terminal bottom right; divider + 3V3/RAIL/GND test points on the left wing.
+- **Placement V1 REJECTED by Scott (2026-09-25).** I put the PCA across the slot with the D1 Mini in the bottom band.
+  The servo wires enter from the BACK of the rack — the side where the D1 Mini was — and the slot is a clearance area a
+  servo passes through, so a PCA lying across it blocks that servo. I had never asked which edge the servo wires come
+  from. **Scott is doing the layout himself in the KiCad GUI**; the schematic, netlist and footprints stay as generated.
+  **Master from here on: the `.kicad_pcb` Scott edits, not `gen/gen_pcb.py`** — do not re-run gen_pcb.py (it would
+  overwrite his placement); footprints.py and gen_sch.py still own their files. The pin choices below were forced by
+  the rejected placement and may reopen once he places the modules — recheck reachability before touching firmware.
 - **Pins moved for single-sided routing.** The D1 Mini's inner header columns can only leave through the module middle
   and out below the last pin row; the outer columns leave sideways, where any vertical lane blocks every pad facing it.
   So: **SDA = IO25 (pad 26), SCL = IO27 (pad 24)** on the outer-right column, **rail ADC = IO36 (pad 4, inner-left)**.
@@ -629,7 +633,7 @@ Renders in `out/` (regenerate with `kicad-cli pcb render`). Decisions, and what 
   milled board (harmless).
 - **D1 Mini pad numbering is r0oland's (the ratgdo library).** espboards.dev's table disagrees; **photograph both rows
   of the actual module's silk before cutting** and check pads 4, 16, 24, 26, 33, 35 against it.
-**Still to decide (Scott):** placement above; which face points at the rack and the height available (buck module ~10
+**Still to decide (Scott):** placement (his, in progress); which face points at the rack and the height available (buck module ~10
 mm, PCA headers + servo plugs); calipers on the clone PCA and an LM2596; D1 Mini from BO-0009 or bought; KF301 (#291)
 onto BO-0010's BOM and the passives allocated once the design is frozen.
 **Firmware for the swap:** PS4Controller applies a host MAC via esp_base_mac_addr_set (BT − 2, IDF's own rule), but
