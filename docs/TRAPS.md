@@ -41,3 +41,19 @@ the intended next point instead of trusting start/end.
 `setAngleExtent(True, angle)` sweeps `angle` on EACH side of the sketch plane, so 42° gave an 84°
 cut. Pass half the wanted width. And `setAngleExtent` on an existing RevolveFeature fails with
 "Didn't roll editing feature back" even after `timelineObject.rollTo(False)` — delete and recreate.
+
+## KiCad 10 file versions differ per file type (2026-09-25)
+A generated `carrier.kicad_sym` with the schematic's `(version 20260306)` fails to load and ERC reports
+"symbol library not found at <path>" even though the file is there — "not found" means "did not parse".
+Symbol libraries are `20251024` (copy the header of a stock `.kicad_sym`); schematics `20260306`; boards
+`20260206`; footprints `20241229`. `kicad-cli sym upgrade --force` / `fp upgrade --force <DIR>` is the
+validator — `fp upgrade` takes a library directory, not a `.kicad_mod`, and "fails" on a single file.
+
+## ERC endpoint_off_grid: place symbols on 1.27 mm multiples (2026-09-25)
+52 warnings from a generated schematic whose symbol origins were round numbers. Every symbol origin, wire
+end and label must be a multiple of 1.27; pin ends are then on grid by construction.
+
+## Single-sided D1 Mini: the pin you want is usually unreachable (2026-09-25)
+Inner header columns can only leave the module through its middle and out past the last pin row; outer
+columns leave sideways, and a vertical lane beside the module blocks every pad facing it. Pick the pins
+from the routing, not the datasheet defaults — here I2C went to IO25/IO27 and the ADC to IO36.

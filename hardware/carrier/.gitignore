@@ -1,0 +1,10 @@
+# derived: regenerate with export_for_mill.sh / kicad-cli
+gerbers/
+out/
+*.rpt
+# KiCad session state
+*.kicad_prl
+*-backups/
+fp-info-cache
+~*.lck
+__pycache__/
