@@ -14,6 +14,8 @@ import uuid as uuidlib
 sys.path.insert(0, os.path.dirname(__file__))
 import sexp
 from footprints import D1_NAMES, D1_FLASH, PCA_NAMES
+import footprints as F
+import re
 
 LIB = "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"
 NS = uuidlib.UUID("a11e5c0d-0000-4000-8000-0000000000e5")
@@ -54,6 +56,14 @@ def pins_of(lib, name):
             at = sexp.first(p, "at")
             out[sexp.first(p, "number")[1].strip('"')] = (float(at[1]), float(at[2]))
     return out
+
+
+def fp_descr(footprint):
+    """Description of a carrier: footprint, read off the generator so the symbol
+    and the footprint always agree (schematic parity compares the two)."""
+    if not footprint or not footprint.startswith("carrier:"):
+        return ""
+    return re.search(r'\(descr "([^"]*)"', F.ALL[footprint.split(":", 1)[1]]()).group(1)
 
 
 def define_module(name, left, right, width, descr, ref="U"):
@@ -125,8 +135,8 @@ def comp(lib, name, ref, value, x, y, rot=0, mirror=None, footprint="",
     for pname, pval, off, hide in (("Reference", ref, ref_off, False),
                                    ("Value", value, val_off, False),
                                    ("Footprint", footprint, (0, 0), True),
-                                   ("Datasheet", "~", (0, 0), True),
-                                   ("Description", "", (0, 0), True)):
+                                   ("Datasheet", "", (0, 0), True),   # "" not "~": the footprints carry "" and parity compares them
+                                   ("Description", fp_descr(footprint), (0, 0), True)):   # = the footprint's descr, or DRC parity flags every part
         h = "\n\t\t\t(hide yes)" if hide else ""
         body.append(f'\t\t(property "{pname}" "{pval}"\n\t\t\t(at {round(x + off[0], 4)} {round(y + off[1], 4)} 0){h}\n'
                     f"\t\t\t{PROPS()}\n\t\t\t(effects\n\t\t\t\t(font\n\t\t\t\t\t(size 1.27 1.27)\n\t\t\t\t)\n\t\t\t)\n\t\t)")
@@ -244,7 +254,7 @@ def build():
     stub(u3["2"], "GND", "L")
     stub(u3["3"], "+5V", "R")
     stub(u3["4"], "GND", "R")
-    j1 = comp("Connector", "Screw_Terminal_01x02", "J1", "12V pigtail", 50.8, 81.28,
+    j1 = comp("Connector", "Screw_Terminal_01x02", "J1", "12V in", 50.8, 81.28,
               mirror="y", footprint="carrier:KF301_1x02_P5.08", ref_off=(0, -5.08), val_off=(0, 5.08))
     stub(j1["1"], "+12V", "R")
     stub(j1["2"], "GND", "R")

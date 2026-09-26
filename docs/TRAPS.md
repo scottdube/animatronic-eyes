@@ -102,3 +102,12 @@ with the `${KIPRJMOD}` path made absolute), try the rotation candidates side by 
 top-ortho crop at a known feature (mounting hole, pin 1). Rotation order matters too - `(rotate (xyz -90 0 180))`
 and `(0 0 180)` then `(-90 0 0)` are different frames - so test the exact triple, don't compose it in your head.
 `--pan` gave all-black frames in this KiCad; use `--zoom` and crop with PIL instead.
+
+## DRC "schematic parity" checks more than nets (2026-09-26)
+
+A generated board that passed DRC 0/0/0 threw 61 parity errors the first time Scott ran DRC in the GUI, which has
+schematic parity on by default while `kicad-cli pcb drc` does not. Four separate things: no-connect pads must carry
+the netlist's `unconnected-(REF-PINNAME-PadN)` net, not no net; the footprint's Description property must equal the
+symbol's; Datasheet "" and "~" are different; and the PCB Value must equal the symbol Value (placement.py carried
+"12V in", gen_sch said "12V pigtail"). None of these affect copper. Run `kicad-cli pcb drc --schematic-parity` so
+the CLI sees what the GUI sees.

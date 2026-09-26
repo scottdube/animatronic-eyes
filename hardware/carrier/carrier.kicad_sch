@@ -1912,7 +1912,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 203.2 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -1923,7 +1923,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "D1 Mini ESP32 (WROOM-32), 40-pin, 1.78/1.181 pads, flash pins NPTH"
 			(at 203.2 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -2426,7 +2426,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 304.8 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -2437,7 +2437,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "PCA9685 16ch servo board (Adafruit rev C geometry), 2x 1x06 rows 58.42 mm apart, body 62.23 x 25.4"
 			(at 304.8 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -2793,7 +2793,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 101.6 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -2804,7 +2804,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "LM2596 buck module, 4 pins 17.6 x 39.8 mm (ratgdo footprint, NOT caliper-verified)"
 			(at 101.6 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -2994,7 +2994,7 @@
 				)
 			)
 		)
-		(property "Value" "12V pigtail"
+		(property "Value" "12V in"
 			(at 50.8 86.36 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3015,7 +3015,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 50.8 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -3026,7 +3026,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181"
 			(at 50.8 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -3162,7 +3162,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 101.6 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -3173,7 +3173,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "220 uF radial electrolytic, 6.3 dia, 2.5 pitch, pin 1 = +"
 			(at 101.6 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -3309,7 +3309,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 121.92 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -3320,7 +3320,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "100 nF ceramic disc/MLCC, 5.08 mm pitch (0.1 in leads)"
 			(at 121.92 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -3456,7 +3456,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 50.8 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3467,7 +3467,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)"
 			(at 50.8 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3566,7 +3566,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 63.5 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3577,7 +3577,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)"
 			(at 63.5 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3676,7 +3676,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 76.2 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3687,7 +3687,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)"
 			(at 76.2 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3786,7 +3786,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 101.6 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3797,7 +3797,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)"
 			(at 101.6 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3896,7 +3896,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 114.3 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -3907,7 +3907,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)"
 			(at 114.3 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4006,7 +4006,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 269.24 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4017,7 +4017,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "M3 rack standoff hole, drilled 3.175 (the bit), NPTH; pour keepout is a board rule area"
 			(at 269.24 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4079,7 +4079,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 284.48 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4090,7 +4090,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "M3 rack standoff hole, drilled 3.175 (the bit), NPTH; pour keepout is a board rule area"
 			(at 284.48 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4152,7 +4152,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 299.72 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4163,7 +4163,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "M3 rack standoff hole, drilled 3.175 (the bit), NPTH; pour keepout is a board rule area"
 			(at 299.72 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4225,7 +4225,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" ""
 			(at 314.96 190.5 0)
 			(hide yes)
 			(show_name no)
@@ -4236,7 +4236,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "M3 rack standoff hole, drilled 3.175 (the bit), NPTH; pour keepout is a board rule area"
 			(at 314.96 190.5 0)
 			(hide yes)
 			(show_name no)

@@ -5,11 +5,12 @@ GND pour.  Everything is in BOARD coordinates (DXF x, -DXF y, mm) and shifted
 by OX/OY onto the page at write time.
 
 Routing (V2, Scott's placement, 2026-09-26) -- all B.Cu, no crossings:
-  +12V  J1.1 (50.5,14.5) north along x=50.5 to TP1; the y=2 run tees off it under
-        the LM2596 to IN+.  J1 sits below the buck, turned so its wire entry faces
-        the PCA edge = the back of the box (Scott, 2026-09-26); the wires leave
-        over the chamfered corner.  Earlier it stood on the right edge with the
-        entry facing that edge - no way to get wires in.
+  +12V  J1.1 (45.05,15.7) east under J1 to x=50.5, north to TP1; the y=2 run tees
+        off it under the LM2596 to IN+.  J1 sits below the buck between H4 and the
+        chamfer (Scott's placement), wire entry toward the PCA edge = the back of
+        the box; the wires leave over the chamfered corner.  Earlier it stood on
+        the right edge with the entry facing that edge - no way to get wires in -
+        and my first move left its body against the buck's IN- corner.
   +5V   OUT+ -> lane x=20.5 (slot edge .. U3) -> y=11.2 over H4 -> lane x=33.8
         outside the PCA right row -> front-edge bar y=34.5 -> x=-37.9 up the
         left wing -> TP2 / y=10.9 under U1's outer row -> x=-53 (USB end) ->
@@ -72,6 +73,7 @@ for i, (hx, hy) in enumerate(HOLES, 1):
 
 # pad nets, ref -> {pad: net}
 from gen_sch import D1_NETS, PCA_NETS_L, PCA_NETS_R   # noqa: E402  (same source of truth)
+from footprints import D1_NAMES, D1_FLASH, PCA_NAMES  # noqa: E402
 NETS = {
     "U1": {str(k): v for k, v in D1_NETS.items()},
     "U2": {str(k): v for k, v in {**PCA_NETS_L, **PCA_NETS_R}.items()},
@@ -80,6 +82,15 @@ NETS = {
     "C1": {"1": "+5V", "2": "GND"}, "C2": {"1": "+5V", "2": "GND"},
     "R1": {"1": "+5V", "2": "RAIL_ADC"}, "R2": {"1": "RAIL_ADC", "2": "GND"},
 }
+# no-connect pins: the schematic netlist names each one unconnected-(REF-PIN-PadN)
+# and DRC schematic parity wants the pad to carry that exact net (Scott saw 30
+# "pad missing net" parity errors in the GUI before this was added)
+for n in range(1, 41):
+    if n not in D1_FLASH and n not in D1_NETS:
+        NETS["U1"][str(n)] = f"unconnected-(U1-{D1_NAMES[n]}-Pad{n})"
+for n in range(1, 13):
+    if str(n) not in NETS["U2"]:
+        NETS["U2"][str(n)] = f"unconnected-(U2-{PCA_NAMES[(n - 1) % 6]}-Pad{n})"
 for r, (_, v, *_r) in PLACE.items():
     if r.startswith("TP"):
         NETS[r] = {"1": v}
@@ -88,7 +99,7 @@ POWER_W, SIG_W = 1.0, 0.6
 # (net, width, polyline)
 TRACKS = [
     # ---- +12V: jack terminal -> test point, and along y=2 under the LM2596 to IN+
-    ("+12V", POWER_W, [(50.5, 14.5), (50.5, -5.0)]),   # J1.1 north past TP5 to TP1; the y=2 run tees off it
+    ("+12V", POWER_W, [(45.05, 15.7), (50.5, 15.7), (50.5, -5.0)]),   # J1.1 east under its own body, north past TP5 to TP1; the y=2 run tees off (straight north would graze IN- by 0.05)
     ("+12V", POWER_W, [(50.5, 2.0), (25.7, 2.0), (25.7, 8.4)]),
     # ---- +5V trunk: OUT+ -> lane between the slot and U3 -> east above H4 ->
     #      lane outside the PCA right row -> front-edge bar -> up the left wing
@@ -100,7 +111,7 @@ TRACKS = [
                       (-43.85, -2.0), (-43.85, 4.93)]),
     # C1.1 from the lane, not from the y=10.9 run: a stub down from 10.9 walled
     # off a pocket around C1.2 that hung on that pad's spoke alone
-    ("+5V", POWER_W, [(-37.9, 25.0), (-42.5, 18.0)]),                            # C1.1
+    ("+5V", POWER_W, [(-37.9, 17.0), (-39.75, 17.0)]),   # C1.1: Scott turned C1 180 and slid it to y=17 so the TP2 stub continues west (was a diagonal off the lane at y=25)
     ("+5V", POWER_W, [(-51.5, 10.9), (-51.5, 13.0)]),                            # C2.1
     # ---- +3V3: pin 16 (inner row) -> module middle -> USB end -> behind U1 ->
     #      lane beside the slot -> PCA left row VCC from inside the module

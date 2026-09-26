@@ -600,6 +600,18 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier: J1 placed by Scott, C1 turned, schematic parity clean (2026-09-26, later).** My J1 move left its body
+against the buck's IN- corner; Scott put it at (45.05, 15.7) rot 180 between H4 and the chamfer and turned C1 180 to
+(-39.75, 17.0) so the +5V stub from TP2 just continues west into C1.1 (the diagonal off the lane is gone, and with it
+the C1 pour sliver: the pour is ONE polygon now). +12V: J1.1 east under J1 to x=50.5, north to TP1 (straight north
+would graze IN- by 0.05). **The "schematic parity" errors Scott saw were the generator's, not the GUI's:** (a) NC
+pads carried no net while the netlist names each one `unconnected-(REF-PIN-PadN)` (30 errors), (b) footprint
+Description vs symbol "" (15), (c) Datasheet "" vs "~" (15), (d) J1 value "12V in" vs "12V pigtail". gen_pcb now
+assigns the unconnected nets from D1_NAMES/PCA_NAMES, gen_sch copies each footprint's descr into the symbol and
+writes Datasheet "" and "12V in". `kicad-cli pcb drc --schematic-parity` is now part of the check: 0/0/0, ERC 0.
+`docs/animatronic-eyes-pcb.step` is re-exported with `kicad-cli pcb export step --subst-models` after every
+regeneration (Scott exported one from the GUI; it went stale the moment the board was rebuilt).
+
 **Carrier: J1 turned + moved, D1 model fixed (2026-09-26, Scott's review of the 3D view).** (1) J1 stood on the
 right edge with its wire entry facing that edge - no way to get wires in. Now at (50.5, 14.5) rot 180, below the
 buck, **wire entry toward the PCA edge = the back of the box (Scott)**; the wires leave over the chamfered corner.
