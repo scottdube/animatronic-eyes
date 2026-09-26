@@ -226,10 +226,11 @@ def kf301_2p():
             rect(-2.54, -4.1, 7.62, 3.5, "F.SilkS"),
             rect(-2.8, -4.4, 7.9, 3.8, "F.CrtYd", 0.05),
             rect(-2.54, -4.1, 7.62, 3.5, "F.Fab", 0.1),
-            text("user", "12V", 0, -5.2, "F.SilkS", 0.8),
-            text("user", "GND", 5.08, -5.2, "F.SilkS", 0.8)]
+            # labels and ref inside the body: on the carrier the wire-entry face is at the board edge
+            text("user", "12V", 0, 2.4, "F.SilkS", 0.8),
+            text("user", "GND", 5.08, 2.4, "F.SilkS", 0.8)]
     return footprint("KF301_1x02_P5.08", "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181",
-                     body, ref_at=(2.54, 5.0), val_at=(2.54, 0))
+                     body, ref_at=(2.54, -2.4), val_at=(2.54, 0))
 
 
 def r_axial_p10():

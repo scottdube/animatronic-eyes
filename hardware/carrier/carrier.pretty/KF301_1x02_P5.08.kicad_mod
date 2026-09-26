@@ -5,7 +5,7 @@
 	(layer "F.Cu")
 	(descr "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181")
 	(property "Reference" "REF**"
-		(at 2.54 5 0)
+		(at 2.54 -2.4 0)
 		(layer "F.SilkS")
 		(uuid "58dda0c0-c4af-5fe7-9799-edf987a29c9b")
 		(effects
@@ -171,7 +171,7 @@
 		(uuid "f65cb769-2d0b-5463-ac58-481386fc5ad8")
 	)
 	(fp_text user "12V"
-		(at 0 -5.2 0)
+		(at 0 2.4 0)
 		(layer "F.SilkS")
 		(uuid "06a0906c-4567-5ce7-a558-c2785b62121b")
 		(effects
@@ -182,7 +182,7 @@
 		)
 	)
 	(fp_text user "GND"
-		(at 5.08 -5.2 0)
+		(at 5.08 2.4 0)
 		(layer "F.SilkS")
 		(uuid "f766abc0-5f51-53b5-962e-e6503c6319c9")
 		(effects
