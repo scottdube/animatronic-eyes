@@ -596,4 +596,15 @@
 		(uuid "c1890411-33c8-5c91-ba60-b6a76e8f62fe")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3dmodels/PCA9685.step"
+		(offset
+			(xyz -0.18 -0.36 2.54)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 0 180)
+		)
+	)
 )

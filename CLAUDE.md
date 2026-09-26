@@ -600,6 +600,20 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier 3D models attached (2026-09-26).** Every footprint carries a `(model ...)` block, emitted by
+`gen/footprints.py` (`model()` helper, `models=[...]` per footprint), so the 3D viewer / STEP export show the real
+stack. Sources: `hardware/carrier/3dmodels/` (34 MB, committed on purpose - the ratgdo files are not in any package
+manager) holds `D1_Mini_ESP32.stp` + `LM2596.step` copied from Scott's ratgdo KiCad project with ratgdo's offsets
+(same pad frames), and `PCA9685.step` from `~/Downloads/16-channel-i2c-servo-controller-1/` (GrabCAD-style, 'antoi'
+2022 - the same file Fusion's Electronic Parts library uses; the Fusion MCP timed out on the export and then reported
+"unavailable" for the rest of the session, so the Downloads copy was used). Terminal block, caps, resistor and test
+points are stock KiCad 10 models; KF301 uses the Phoenix MKDS 1,5 model rotated 180 + 5.08 offset so the wire
+entry faces the board edge. **PCA9685 transform is rotate (-90,0,180), offset (-0.18,-0.36,2.54), found by
+rendering candidates, not by reading the STEP** - see TRAPS. Verified by `kicad-cli pcb render` top-ortho crops
+(module holes centred on H3/H4, header pins on the U2 pads) and a right-side view. Model z = 2.54 (header plastic);
+the real height is whatever standoff goes at H3/H4 - Scott's call, and the D1/LM2596 heights are ratgdo's guess of
+header plastic too. Renders in `out/` (gitignored): `render_iso.png`, `render_right.png`, `render_top_hi.png`.
+
 **Carrier V2 ROUTED + EXPORTED (2026-09-25, late), not cut.** Workflow now: Scott places in the KiCad GUI → (KiCad
 closed) `python3 gen/capture_placement.py` copies positions into `gen/placement.py` → `python3 gen/gen_pcb.py .` rebuilds
 the board around them (outline from the DXF, hole keepouts, D1 antenna/flash keepouts that follow U1, pour, legend).

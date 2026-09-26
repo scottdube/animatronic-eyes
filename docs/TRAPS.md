@@ -90,3 +90,15 @@ touches any pad of its net is not an island to KiCad. The copper in it is fed on
 module GND pin (PCA pad 6) that means the servo return would have gone through the module. The check is cheap and
 DRC does not do it: count `filled_polygon`s in the saved board (one per connected piece of pour) and look at every
 extra one's bbox. Fix was moving the C1.1 feed to a diagonal off the lane so the pocket opens west.
+
+## A STEP file's raw points are not where KiCad puts the model (2026-09-26)
+
+I read the PCA9685 STEP's CARTESIAN_POINTs, computed a bounding box, and derived an offset from it. KiCad imported
+the model standing on edge, 29 mm off. The raw points sit in each solid's own frame; the assembly placement
+(AXIS2_PLACEMENT_3D / ITEM_DEFINED_TRANSFORMATION) is applied on top, and this file's placement rotates the whole
+board. The D1 Mini and LM2596 files never showed the problem because ratgdo had already tuned their offsets.
+Rule: **find a model's frame by rendering** (`kicad-cli pcb render --side top/right` on a scratch copy of the board
+with the `${KIPRJMOD}` path made absolute), try the rotation candidates side by side, then set the offset from a
+top-ortho crop at a known feature (mounting hole, pin 1). Rotation order matters too - `(rotate (xyz -90 0 180))`
+and `(0 0 180)` then `(-90 0 0)` are different frames - so test the exact triple, don't compose it in your head.
+`--pan` gave all-black frames in this KiCad; use `--zoom` and crop with PIL instead.

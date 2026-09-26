@@ -644,4 +644,15 @@
 		(uuid "2109f564-9629-5f11-85bc-5911118240f6")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3dmodels/D1_Mini_ESP32.stp"
+		(offset
+			(xyz -0.5 -0.5 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 -90)
+		)
+	)
 )

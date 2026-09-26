@@ -64,7 +64,32 @@ def text(kind, s, x, y, layer, size=1.0, hide=False):
             f'\t\t)\n\t)')
 
 
-def footprint(name, descr, body, ref_at=(0, 0), val_at=(0, 2), jumpers=()):
+# 3D models.  D1 Mini + LM2596 are the ratgdo project's files (my-rat-ratgdo/
+# kicad_files/D1 Mini - ESP32/3dmodels) with ratgdo's tuned offsets - both
+# footprints here share ratgdo's pad frame.  PCA9685.step is a GrabCAD-style
+# model (author 'antoi', 2022; Scott's Downloads/16-channel-i2c-servo-
+# controller-1).  Its raw CARTESIAN_POINTs lie flat, but the assembly
+# placement stands the board on edge, so the frame was found by rendering:
+# rotate (-90,0,180) lays it flat with the servo field toward +y, and the
+# offset then puts its mounting holes on H3/H4 (KiCad applies the offset in
+# the board frame AFTER the rotation).  z 2.54 = header plastic; the real
+# height is the H3/H4 standoff, Scott's call.  Its servo-pin tails hang
+# 10 mm below its PCB in the model - that is the model, not the part.  The stock Phoenix
+# MKDS model has its wire entry on the footprint's +y side; KF301 here has it
+# on -y, hence the 180 + 5.08 offset.  Verified 2026-09-26 by rendering.
+STOCK3D = "${KICAD10_3DMODEL_DIR}"
+PROJ3D = "${KIPRJMOD}/3dmodels"
+
+
+def model(path, offset=(0, 0, 0), rotate=(0, 0, 0), scale=(1, 1, 1)):
+    """3D model block. Offsets are in the footprint's own frame (mm), rotation
+    in degrees; KiCad applies the footprint's placement on top."""
+    xyz = lambda v: f"(xyz {v[0]:g} {v[1]:g} {v[2]:g})"
+    return (f'\t(model "{path}"\n\t\t(offset\n\t\t\t{xyz(offset)}\n\t\t)\n'
+            f'\t\t(scale\n\t\t\t{xyz(scale)}\n\t\t)\n\t\t(rotate\n\t\t\t{xyz(rotate)}\n\t\t)\n\t)')
+
+
+def footprint(name, descr, body, ref_at=(0, 0), val_at=(0, 2), jumpers=(), models=()):
     head = [f'(footprint "{name}"', "\t(version 20241229)", '\t(generator "gen_carrier")',
             '\t(generator_version "10.0")', '\t(layer "F.Cu")', f'\t(descr "{descr}")',
             text("Reference", "REF**", *ref_at, "F.SilkS"),
@@ -82,7 +107,7 @@ def footprint(name, descr, body, ref_at=(0, 0), val_at=(0, 2), jumpers=()):
     if jumpers:   # pads the MODULE ties together; DRC then treats them as connected
         head.append('\t(jumper_pad_groups ' + " ".join(
             "(" + " ".join(f'"{p}"' for p in g) + ")" for g in jumpers) + ')')
-    return "\n".join(head + body + ["\t(embedded_fonts no)", ")"]) + "\n"
+    return "\n".join(head + body + ["\t(embedded_fonts no)"] + list(models) + [")"]) + "\n"
 
 
 # ------------------------------------------------------------ D1 Mini ESP32
@@ -133,7 +158,8 @@ def d1_mini_esp32():
     body.append(text("user", "1", -16.8, -11.43, "F.SilkS", 0.8))
     body.append(text("user", "22", 16.9, -11.43, "F.SilkS", 0.8))
     return footprint("D1_Mini_ESP32_THT", "D1 Mini ESP32 (WROOM-32), 40-pin, 1.78/1.181 pads, flash pins NPTH",
-                     body, ref_at=(18.4, 0), val_at=(0, 0), jumpers=[("1", "22", "33")])
+                     body, ref_at=(18.4, 0), val_at=(0, 0), jumpers=[("1", "22", "33")],
+                     models=[model(PROJ3D + "/D1_Mini_ESP32.stp", (-0.5, -0.5, 0), (0, 0, -90))])
 
 
 # ------------------------------------------------------------ LM2596 module
@@ -152,7 +178,8 @@ def lm2596():
             text("user", "OUT+", 17.6, 37.4, "F.SilkS", 0.8),
             text("user", "OUT-", 0, 37.4, "F.SilkS", 0.8)]
     return footprint("LM2596_Module", "LM2596 buck module, 4 pins 17.6 x 39.8 mm (ratgdo footprint, NOT caliper-verified)",
-                     body, ref_at=(8.8, 20), val_at=(8.8, 30))
+                     body, ref_at=(8.8, 20), val_at=(8.8, 30),
+                     models=[model(PROJ3D + "/LM2596.step", (-1.25, 2, 2.5), (0, 0, 90))])
 
 
 # ------------------------------------------------------------ PCA9685 module
@@ -198,7 +225,8 @@ def pca9685():
         body.append(text("user", nm, PCA_ROW_X - 3.0, PCA_PIN_Y[i], "F.SilkS", 0.8))
     return footprint("PCA9685_Adafruit_Module", "PCA9685 16ch servo board (Adafruit rev C geometry), 2x 1x06 rows 58.42 mm apart, body 62.23 x 25.4",
                      body, ref_at=(-34, 0), val_at=(0, 0),
-                     jumpers=[(str(i + 1), str(i + 7)) for i in range(6)])
+                     jumpers=[(str(i + 1), str(i + 7)) for i in range(6)],
+                     models=[model(PROJ3D + "/PCA9685.step", (-0.18, -0.36, 2.54), (-90, 0, 180))])
 
 
 # ------------------------------------------------------------ small parts
@@ -215,7 +243,8 @@ def testpoint():
     body = [pad(1, 0, 0, size=2.2, drill=1.181),
             f'\t(fp_circle\n\t\t(center 0 0)\n\t\t(end 1.5 0)\n\t\t(stroke\n\t\t\t(width 0.12)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.SilkS")\n\t\t(uuid "{uid()}")\n\t)']
     return footprint("TestPoint_THT_D2.2_1.181", "Drilled test point, 2.2 pad on the 1.181 bit (0.51 annulus)",
-                     body, ref_at=(0, -2.4), val_at=(0, 2.4))
+                     body, ref_at=(0, -2.4), val_at=(0, 2.4),
+                     models=[model(STOCK3D + "/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step")])
 
 
 def kf301_2p():
@@ -230,7 +259,8 @@ def kf301_2p():
             text("user", "12V", 0, 2.4, "F.SilkS", 0.8),
             text("user", "GND", 5.08, 2.4, "F.SilkS", 0.8)]
     return footprint("KF301_1x02_P5.08", "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181",
-                     body, ref_at=(2.54, -2.4), val_at=(2.54, 0))
+                     body, ref_at=(2.54, -2.4), val_at=(2.54, 0),
+                     models=[model(STOCK3D + "/TerminalBlock_Phoenix.3dshapes/TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal.step", (5.08, 0, 0), (0, 0, 180))])
 
 
 def r_axial_p10():
@@ -240,7 +270,8 @@ def r_axial_p10():
             rect(-1.2, -1.5, 11.36, 1.5, "F.CrtYd", 0.05),
             rect(1.9, -1.25, 8.26, 1.25, "F.Fab", 0.1)]
     return footprint("R_Axial_P10.16", "1/4 W axial resistor, 10.16 mm pitch, pads 1.78/1.181",
-                     body, ref_at=(5.08, -2.4), val_at=(5.08, 0))
+                     body, ref_at=(5.08, -2.4), val_at=(5.08, 0),
+                     models=[model(STOCK3D + "/Resistor_THT.3dshapes/R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal.step")])
 
 
 def cp_radial_d6_3():
@@ -253,7 +284,8 @@ def cp_radial_d6_3():
             f'\t(fp_circle\n\t\t(center 1.25 0)\n\t\t(end 3.6 0)\n\t\t(stroke\n\t\t\t(width 0.05)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.CrtYd")\n\t\t(uuid "{uid()}")\n\t)',
             text("user", "+", -1.6, -2.6, "F.SilkS", 0.9)]
     return footprint("CP_Radial_D6.3_P2.5", "220 uF radial electrolytic, 6.3 dia, 2.5 pitch, pin 1 = +",
-                     body, ref_at=(1.25, -4.4), val_at=(1.25, 4.4))
+                     body, ref_at=(1.25, -4.4), val_at=(1.25, 4.4),
+                     models=[model(STOCK3D + "/Capacitor_THT.3dshapes/CP_Radial_D6.3mm_P2.50mm.step")])
 
 
 def c_disc_p5():
@@ -262,7 +294,8 @@ def c_disc_p5():
             rect(-1.2, -1.7, 6.3, 1.7, "F.CrtYd", 0.05),
             rect(-0.6, -1.4, 5.7, 1.4, "F.Fab", 0.1)]
     return footprint("C_Disc_P5.08", "100 nF ceramic disc/MLCC, 5.08 mm pitch (0.1 in leads)",
-                     body, ref_at=(2.54, -2.5), val_at=(2.54, 0))
+                     body, ref_at=(2.54, -2.5), val_at=(2.54, 0),
+                     models=[model(STOCK3D + "/Capacitor_THT.3dshapes/C_Disc_D6.0mm_W2.5mm_P5.00mm.step")])
 
 
 ALL = {"D1_Mini_ESP32_THT": d1_mini_esp32, "LM2596_Module": lm2596,

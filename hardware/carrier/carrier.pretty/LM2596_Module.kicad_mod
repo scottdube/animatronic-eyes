@@ -252,4 +252,15 @@
 		(uuid "a1f95125-cc55-5837-a8f1-586f723e4388")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3dmodels/LM2596.step"
+		(offset
+			(xyz -1.25 2 2.5)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 90)
+		)
+	)
 )

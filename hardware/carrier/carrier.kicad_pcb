@@ -258,6 +258,17 @@
 			(uuid "b9171a6e-3911-5504-af1b-f3f3ff8b452e")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:C_Disc_P5.08"
 		(layer "F.Cu")
@@ -454,6 +465,17 @@
 			(uuid "4f21822d-f8e0-507f-b31b-8c455cfcc4d1")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Capacitor_THT.3dshapes/C_Disc_D6.0mm_W2.5mm_P5.00mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:LM2596_Module"
 		(layer "F.Cu")
@@ -715,6 +737,17 @@
 			(uuid "a0b347be-91e3-511a-b5fd-346a8bf07e89")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/LM2596.step"
+			(offset
+				(xyz -1.25 2 2.5)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 90)
+			)
+		)
 	)
 	(footprint "carrier:CP_Radial_D6.3_P2.5"
 		(layer "F.Cu")
@@ -1052,6 +1085,17 @@
 			(uuid "73a26bed-76e5-5c1d-aea0-d86020c2212c")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Capacitor_THT.3dshapes/CP_Radial_D6.3mm_P2.50mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:MountingHole_M3_3.175"
 		(layer "F.Cu")
@@ -1192,6 +1236,17 @@
 			(uuid "5f41ee41-1dc5-58bb-8743-d25736e7669d")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:TestPoint_THT_D2.2_1.181"
 		(layer "F.Cu")
@@ -1269,6 +1324,17 @@
 			(uuid "6ebf9554-d072-5e3c-928a-6dd3e21c1ab4")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:TestPoint_THT_D2.2_1.181"
 		(layer "F.Cu")
@@ -1346,6 +1412,17 @@
 			(uuid "7398b495-2673-5e48-adcb-508df343a91c")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:D1_Mini_ESP32_THT"
 		(layer "F.Cu")
@@ -2002,6 +2079,17 @@
 			(uuid "819d3618-06c4-5c85-a45f-442b553ca183")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/D1_Mini_ESP32.stp"
+			(offset
+				(xyz -0.5 -0.5 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 -90)
+			)
+		)
 	)
 	(footprint "carrier:PCA9685_Adafruit_Module"
 		(layer "F.Cu")
@@ -2610,6 +2698,17 @@
 			(uuid "8b185249-f2f6-508a-954f-6bed93ab14d9")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/PCA9685.step"
+			(offset
+				(xyz -0.18 -0.36 2.54)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 0 180)
+			)
+		)
 	)
 	(footprint "carrier:MountingHole_M3_3.175"
 		(layer "F.Cu")
@@ -2813,6 +2912,17 @@
 			(uuid "b35c7666-6462-5174-a950-a186b6773b86")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TestPoint.3dshapes/TestPoint_Loop_D2.50mm_Drill1.0mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "carrier:KF301_1x02_P5.08"
 		(layer "F.Cu")
@@ -3030,6 +3140,17 @@
 			(uuid "5e4ffc7f-cc26-5716-a501-12008c86acd4")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/TerminalBlock_Phoenix.3dshapes/TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal.step"
+			(offset
+				(xyz 5.08 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 180)
+			)
+		)
 	)
 	(gr_line
 		(start 41.069 64.875)
