@@ -610,8 +610,11 @@ as the copper (electrical touch, type 0): `verify` check 5 audits each hole's de
 redeployed to `~/gcode/eyes-carrier-v2_probe.ngc` (same 16 × 10 grid). Rejected the interim idea of typing the
 thickness into TOUCH Z on a backer-referenced frame: it works, but it makes the operator encode the frame by hand
 every job, which is how deskv1's map origin went unrecorded. With 0.0315 stock and zdrill −0.045 the holes land
-0.0135 past the board bottom (need 0.003..0.030). At the console: T99/H99, electrical touch on the copper, TOUCH Z =
-0, run the probe, bring `probe-results.ngc` back, `probe-import`.
+0.0135 past the board bottom (need 0.003..0.030). **Two zeros, Scott's reminder:** (1) the PROBE (T99/H99) is zeroed on the copper, TOUCH Z = 0, and runs the map — this
+zero only frames the map and does not have to be exact; (2) the FINAL zero is the V-bit itself, touched electrically
+on the copper with a meter at the map's highest node, typing that node's z into TOUCH Z (`pcbmill touchoff` names the
+node and two validation nodes). The cuts run on zero (2); zero (1) only has to be close enough that #7/#8 clear. Then
+bring `probe-results.ngc` back, `probe-import`, `touchoff`.
 
 **Carrier probe program deployed to the LAPTOP, not the share (2026-09-26, 13:00).** Scott: "use the gcode dir on this
 laptop" — `machine.gcode_dir` is now `/Users/scottdube/gcode` (was `/Volumes/Tormach/gcode`, the value every job
