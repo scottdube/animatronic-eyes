@@ -54,12 +54,16 @@ def P(x, y):
 
 # ------------------------------------------------------------- geometry
 # outline.dxf polyline, DXF y flipped (KiCad y grows downward)
-OUTLINE = [(40.630, 37.041), (-40.598, 37.041), (-47.326, 24.189), (-55.950, 18.361),
+# The DXF had a kink 13 mm in from each back corner ((-47.326, 24.189) and its
+# mirror): Scott's cleanup of the Fusion export moved a line.  The wood fit check
+# against the case (2026-09-26) showed the case runs ONE straight chamfer there,
+# so those two vertices are dropped and the chamfer goes corner to corner.
+OUTLINE = [(40.630, 37.041), (-40.598, 37.041), (-55.950, 18.361),
            (-55.950, -11.852), (-58.931, -27.035), (-58.931, -35.125), (-58.772, -35.261),
            (-10.883, -35.261), (-10.883, -26.121), (-15.765, -21.771), (-15.765, 3.856),
            (0.016, 3.856), (15.797, 3.856), (15.797, -21.771), (10.915, -26.121),
            (10.915, -35.261), (58.803, -35.261), (58.963, -35.125), (58.963, -27.035),
-           (55.982, -11.852), (55.982, 18.361), (47.358, 24.189)]
+           (55.982, -11.852), (55.982, 18.361)]
 HOLES = [(-49.481, -27.738), (49.513, -27.738), (-28.455, 15.270), (28.487, 15.270)]
 HOLE_KEEPOUT_R = 3.25        # M3 nylon standoff hex + washer
 
@@ -272,7 +276,7 @@ def build(outdir):
         items.append(keepout(name, poly))
     items.append(gnd_pour(rectp(-60, -36, 60, 38)))
     # legend
-    items.append(gr_text("EYES CARRIER V2 2026-09-25", -58.0, -33.2, 0.9))
+    items.append(gr_text("EYES CARRIER V2 2026-09-26", -58.0, -33.2, 1.2))
     doc = open(os.path.join(HERE, "pcb_header.sexp")).read().rstrip("\n")
     doc += "\n" + "\n".join(items) + "\n\t(embedded_fonts no)\n)\n"
     open(os.path.join(outdir, "carrier.kicad_pcb"), "w").write(doc)

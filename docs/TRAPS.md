@@ -111,3 +111,13 @@ the netlist's `unconnected-(REF-PINNAME-PadN)` net, not no net; the footprint's 
 symbol's; Datasheet "" and "~" are different; and the PCB Value must equal the symbol Value (placement.py carried
 "12V in", gen_sch said "12V pigtail"). None of these affect copper. Run `kicad-cli pcb drc --schematic-parity` so
 the CLI sees what the GUI sees.
+
+## A hand-cleaned DXF is a hypothesis until something physical checks it (2026-09-26)
+
+The carrier outline came from Scott's Fusion export, which he tidied by hand because
+of how it transferred. One line moved in the tidy-up and the board carried a kink at
+both back corners through routing, DRC, gerbers and the STEP review — none of which can
+see a wrong-but-valid outline. The 1.5 mm basswood laser copy laid against the case
+found it in a minute. Rule: any outline that was edited after export gets a wood fit
+check before the mill runs, and once corrected, the generator's OUTLINE list is the
+master, not the DXF.

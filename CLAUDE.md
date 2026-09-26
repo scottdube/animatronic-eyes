@@ -600,6 +600,17 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier outline fixed from the wood fit check + silk enlarged (2026-09-26, later).** The wood copy against the
+green case showed the back corners wrong: the DXF had a kink 13 mm in from each back corner (14.5 mm at 62° then
+10.4 mm at 34°) where the case runs one straight chamfer, wood sitting up to 4.7 mm inside it. Scott: "I must have
+messed up the DXF when I cleaned it up." Fix in `gen/gen_pcb.py` OUTLINE: the two kink vertices dropped, chamfer now
+corner to corner (21 vertices). `outline.dxf` is therefore NOT the master any more — the OUTLINE list is; a
+re-export from Fusion must be diffed against it, not pasted over it. Silk read small on the wood: `text()` default
+(refdes) 1.0 → 1.2, pin labels 0.8 → 1.0, legend 0.9 → 1.2 (dated 2026-09-26); the LM2596 IN/OUT labels moved
+1.3 mm inward to clear its outline (2 silk_overlap warnings otherwise). DRC+parity 0/0/0, ERC 0, pour one polygon,
+gerbers + drill re-exported, fit-check SVG and STEP regenerated. Drills unchanged, so the pcbmill gate result stands.
+Every carrier hole lined up in the wood (holes ≈ kerf big; H-holes took a 0.130 in gauge pin).
+
 **Carrier laser fit check (2026-09-26).** Scott lasers a copy of every board in 1.5 mm basswood (outline + holes)
 before the mill runs. `python3 hardware/fitcheck/make_fitcheck.py` → `hardware/fitcheck/eyes-carrier-fitcheck.svg`
 for xTool Creative Space: **red** = cut (closed outline path + all 71 holes as stroked circles at the nominal drill

@@ -51,7 +51,7 @@ def rect(x1, y1, x2, y2, layer, w=0.12):
                       line(x2, y2, x1, y2, layer, w), line(x1, y2, x1, y1, layer, w)])
 
 
-def text(kind, s, x, y, layer, size=1.0, hide=False):
+def text(kind, s, x, y, layer, size=1.2, hide=False):
     h = "\n\t\t(hide yes)" if hide else ""
     if kind in ("Reference", "Value"):
         return (f'\t(property "{kind}" "{s}"\n\t\t(at {x} {y} 0)\n'
@@ -161,8 +161,8 @@ def d1_mini_esp32():
     body.append(rect(-15.7, -19.05, 15.7, 17.78, "F.Fab", 0.1))
     body.append(text("user", "USB-C", 0, 21.0, "F.Fab", 0.8))
     body.append(text("user", "ANTENNA - NO COPPER", 0, -15.5, "F.Fab", 0.8))
-    body.append(text("user", "1", -16.8, -11.43, "F.SilkS", 0.8))
-    body.append(text("user", "22", 16.9, -11.43, "F.SilkS", 0.8))
+    body.append(text("user", "1", -16.8, -11.43, "F.SilkS", 1.0))
+    body.append(text("user", "22", 16.9, -11.43, "F.SilkS", 1.0))
     return footprint("D1_Mini_ESP32_THT", "D1 Mini ESP32 (WROOM-32), 40-pin, 1.78/1.181 pads, flash pins NPTH",
                      body, ref_at=(18.4, 0), val_at=(0, 0), jumpers=[("1", "22", "33")],
                      models=[model(PROJ3D + "/D1_Mini_ESP32_male.stp", (-0.5, -0.5, -8.5), (0, 0, -90))])
@@ -179,10 +179,10 @@ def lm2596():
             rect(-1.7, -1.6, 19.3, 41.4, "F.SilkS"),      # 21 x 43 body
             rect(-2.0, -1.9, 19.6, 41.7, "F.CrtYd", 0.05),
             rect(-1.7, -1.6, 19.3, 41.4, "F.Fab", 0.1),
-            text("user", "IN+", 17.6, 2.4, "F.SilkS", 0.8),
-            text("user", "IN-", 0, 2.4, "F.SilkS", 0.8),
-            text("user", "OUT+", 17.6, 37.4, "F.SilkS", 0.8),
-            text("user", "OUT-", 0, 37.4, "F.SilkS", 0.8)]
+            text("user", "IN+", 16.3, 2.4, "F.SilkS", 1.0),
+            text("user", "IN-", 1.3, 2.4, "F.SilkS", 1.0),
+            text("user", "OUT+", 16.3, 37.4, "F.SilkS", 1.0),
+            text("user", "OUT-", 1.3, 37.4, "F.SilkS", 1.0)]
     return footprint("LM2596_Module", "LM2596 buck module, 4 pins 17.6 x 39.8 mm (ratgdo footprint, NOT caliper-verified)",
                      body, ref_at=(8.8, 20), val_at=(8.8, 30),
                      models=[model(PROJ3D + "/LM2596.step", (-1.25, 2, 2.5), (0, 0, 90))])
@@ -227,8 +227,8 @@ def pca9685():
     body.append(text("user", "SERVO HEADERS 16x3", 0, 8.8, "F.Fab", 0.8))
     body.append(text("user", "V+ terminal", 0, -8.9, "F.Fab", 0.8))
     for i, nm in enumerate(PCA_NAMES):
-        body.append(text("user", nm, -PCA_ROW_X + 3.0, PCA_PIN_Y[i], "F.SilkS", 0.8))
-        body.append(text("user", nm, PCA_ROW_X - 3.0, PCA_PIN_Y[i], "F.SilkS", 0.8))
+        body.append(text("user", nm, -PCA_ROW_X + 3.0, PCA_PIN_Y[i], "F.SilkS", 1.0))
+        body.append(text("user", nm, PCA_ROW_X - 3.0, PCA_PIN_Y[i], "F.SilkS", 1.0))
     return footprint("PCA9685_Adafruit_Module", "PCA9685 16ch servo board (Adafruit rev C geometry), 2x 1x06 rows 58.42 mm apart, body 62.23 x 25.4",
                      body, ref_at=(-34, 0), val_at=(0, 0),
                      jumpers=[(str(i + 1), str(i + 7)) for i in range(6)],
@@ -262,8 +262,8 @@ def kf301_2p():
             rect(-2.8, -4.4, 7.9, 3.8, "F.CrtYd", 0.05),
             rect(-2.54, -4.1, 7.62, 3.5, "F.Fab", 0.1),
             # labels and ref inside the body: on the carrier the wire-entry face points at the PCA (back of the box)
-            text("user", "12V", 0, 2.4, "F.SilkS", 0.8),
-            text("user", "GND", 5.08, 2.4, "F.SilkS", 0.8)]
+            text("user", "12V", 0, 2.4, "F.SilkS", 1.0),
+            text("user", "GND", 5.08, 2.4, "F.SilkS", 1.0)]
     return footprint("KF301_1x02_P5.08", "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181",
                      body, ref_at=(2.54, -2.4), val_at=(2.54, 0),
                      models=[model(STOCK3D + "/TerminalBlock_Phoenix.3dshapes/TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal.step", (5.08, 0, 0), (0, 0, 180))])
@@ -288,7 +288,7 @@ def cp_radial_d6_3():
              for a, b in zip(ring, ring[1:] + ring[:1])]
     body += [
             f'\t(fp_circle\n\t\t(center 1.25 0)\n\t\t(end 3.6 0)\n\t\t(stroke\n\t\t\t(width 0.05)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.CrtYd")\n\t\t(uuid "{uid()}")\n\t)',
-            text("user", "+", -1.6, -2.6, "F.SilkS", 0.9)]
+            text("user", "+", -1.6, -2.6, "F.SilkS", 1.1)]
     return footprint("CP_Radial_D6.3_P2.5", "220 uF radial electrolytic, 6.3 dia, 2.5 pitch, pin 1 = +",
                      body, ref_at=(1.25, -4.4), val_at=(1.25, 4.4),
                      models=[model(STOCK3D + "/Capacitor_THT.3dshapes/CP_Radial_D6.3mm_P2.50mm.step")])
