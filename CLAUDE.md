@@ -616,7 +616,9 @@ on the copper with a meter at the map's highest node, typing that node's z into 
 node and two validation nodes). The cuts run on zero (2); zero (1) only has to be close enough that #7/#8 clear. Then
 bring `probe-results.ngc` back, `probe-import`, `touchoff`.
 
-**Carrier probe program deployed to the LAPTOP, not the share (2026-09-26, 13:00).** Scott: "use the gcode dir on this
+**CORRECTION (2026-09-26, 14:30): the probe program is on the SHARE, `/Volumes/Tormach/gcode/eyes-carrier-v2_probe.ngc`.** Scott: "wrong gcode folder it is a mounted drive." `/Volumes/Tormach` is the `Tormach` share on the NAS BIG_BROTHER (192.168.1.200), mounted as sdube the whole time — the deskv1 files are in it. I had been probing the controller's own SMB share on 192.168.1.100, a different share, and never ran `mount`. `machine.gcode_dir` is back to the default `/Volumes/Tormach/gcode`, the file is deployed there (byte-identical to the laptop copy, which is deleted). The paragraph below is kept as the record of the wrong turn.
+
+**Carrier probe program deployed to the LAPTOP, not the share (2026-09-26, 13:00) — WRONG, see above.** Scott: "use the gcode dir on this
 laptop" — `machine.gcode_dir` is now `/Users/scottdube/gcode` (was `/Volumes/Tormach/gcode`, the value every job
 carries by default) and `~/gcode/eyes-carrier-v2_probe.ngc` is there for him to carry over. Job `status`: probe map
 NOT IMPORTED, every cutting artifact missing, verification never run — nothing but the probe program exists yet,
