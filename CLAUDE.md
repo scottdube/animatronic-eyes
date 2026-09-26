@@ -600,6 +600,18 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier mill job opened (2026-09-26, evening).** `~/PCBMill/eyes-carrier-v2` created with `pcbmill new` from
+`gerbers/` (B.Cu, ONE merged drill, Edge_Cuts, .kicad_pcb). `drill-info`: 3 tools, 71 holes, span 4.27 × 2.46 in;
+`consolidate`: T1/T2 0.0465 → 0.0465, T3 0.125 → 0.125, all error +0.0000, annulus ≥ 0.25 mm. Set
+`cam.isolation_width 0.03` and `cam.outline_enabled true` (job defaults were None/False). **BLOCKER: no blank in
+stock is big enough.** Board is 117.88 × 72.29 mm = 4.64 × 2.85 in; the only copper clad in inventory is MCIGICM
+single-sided FR-4 4 × 2.7 in (100 × 70 mm), 4 pcs at SLN RB-06 (/web/part/223/; #234 Chanzon 7×10 cm shows 0).
+deskv1 ran on exactly that size. Need ≥ ~4.9 × 3.1 in with the 3 mm eyeballed margin — 6 × 4 in (150 × 100 mm)
+single-sided is the common next size. Also unmeasured: whether the Modvise/MDF fixture and probe grid cover a
+4.64 in board (deskv1's probe map spanned ~4.2 × 3.0 in). Still to do in the job, in order: set `blank.*` to the
+real blank, `solve-offsets`, `probe-gen`, `deploy` (needs /Volumes/Tormach mounted — not mounted from the laptop
+right now), run the probe on the machine, `probe-import`, `touchoff`, `regen`, `verify`, `runsheet`, `deploy`.
+
 **Carrier back chamfers 4 mm deeper (2026-09-26, later still).** **FITS** — second wood copy sits inside the green panel (Scott: "probably took off more than you needed to, but it simplified it, so I think it's fine"). Outline frozen for V2. Corner-to-corner still stuck out past the green
 case panel at both back corners (Scott's third photo, red arrows). Scott: "has to come in like probably four
 millimeters is my guess on either side … indented slightly from the green panel." OUTLINE: the corner-to-corner
