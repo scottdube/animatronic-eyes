@@ -625,9 +625,17 @@ which is correct at this stage. What was learned trying the share first: the con
 mount would land at `/Volumes/gcode`, not `/Volumes/Tormach/gcode`, and `mkdir /Volumes/Tormach` is denied even
 outside the sandbox. `open smb://…` and `osascript mount volume` both put a dialog in front of Scott, which he
 cancelled. Probe program facts for the console: 16 × 10 grid from X 0.05 / Y 0.05 step 0.38 / 0.42 in, Z safe
-0.25 above WCS Z0, probe limit −0.05; **T99 / H99 (G43 H99), G54 Z0 on the MDF backer, NOT the copper**; it writes
+0.25 above WCS Z0, probe limit −0.05; **T99 / H99 (G43 H99), G54 Z0 on the COPPER** (superseded the backer zero the same afternoon, see above); it writes
 `probe-results.ngc` beside itself (LOGOPEN bare name) and flushes every row, so an abort loses at most one row.
 Then `pcbmill --job ~/PCBMill/eyes-carrier-v2 probe-import <path to probe-results.ngc>`.
+
+**G54 X0 Y0 set (2026-09-26).** Scott: "x 0 y 0 are lower left hand corner set by eye with the vbit." That is the
+frame the job expects — `blank.x0/y0 = 0, 0`, width 5.906 × height 3.937, so the lower-left corner of the copper IS
+the origin, and the probe grid (X 0.05..5.75, Y 0.05..3.83) sits inside it with 0.05 in to spare on the low edges.
+By-eye is fine for the carrier: the board has no features that reference the blank edge, and the pcb2gcode offsets
+(x −6.8906, y 5.9405) already put the design inside the blank with margin. Remaining machine-side steps, in order:
+Z0 on the copper with the probe (T99, electrical touch, type 0), run `eyes-carrier-v2_probe.ngc`, bring
+`probe-results.ngc` back to the laptop.
 
 **Carrier mill job opened (2026-09-26, evening).** `~/PCBMill/eyes-carrier-v2` created with `pcbmill new` from
 `gerbers/` (B.Cu, ONE merged drill, Edge_Cuts, .kicad_pcb). `drill-info`: 3 tools, 71 holes, span 4.27 × 2.46 in;
