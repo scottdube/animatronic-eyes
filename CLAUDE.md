@@ -840,3 +840,5 @@ Y1.73 and the electrical touch read **Z 0.0053** where the map says 0.0014: **3.
 pcbmill carries as `ets_frame_offset_in`. Second independent measurement of the bias. Answer given: enter 0.0014
 via **Offsets tab → Touch Z** (sets the T600 tool length, G54 untouched), NOT the DRO Z window (moves G54 and drags
 the ETS-measured drills and outline with it). Validation nodes: X0.05 Y0.05 → −0.0196, X3.09 Y2.15 → −0.0031.
+Validation after Touch Z: X0.05 Y0.05 read **−0.0190** (map −0.0196, +0.6 thou), X3.09 Y2.15 read **−0.0038** (map
+−0.0031, −0.7 thou). Map transfers to the V-bit frame within a thou; cleared to run back_comp.
