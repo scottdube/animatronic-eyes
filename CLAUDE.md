@@ -826,3 +826,11 @@ regen, verify → **JOB READY**, 12 checks, 9 and 10 WARN only (14 slivers left:
 7 WARN-grade). Rejected re-drawing the pads oval in KiCad: right fix for v3, but it re-opens the design for a board
 already mounted. Run sheet at `~/PCBMill/eyes-carrier-v2/out/runsheet.txt`; deployed to `/Volumes/Tormach/gcode/`:
 `eyes-carrier-v2_back_comp.ngc`, `_drill_comp.ngc`, `_outline_comp.ngc` (+ the probe program, unchanged content).
+
+**Carrier: isolation program REDEPLOYED without G37 (2026-09-26, ~15:30).** Scott, reading the run sheet: "are you
+having it check tool length on all but 600?" It was checking all of them, T600 included — issue 002 (Aug 13) had put
+G37 on every tool, contradicting the sheet's own "ELECTRICAL touch-off MANDATORY" line for the V-bit (ETS +4.1 thou
+vs work frame, 2 thou cut). Fixed in pcbmill (issue 004): back program is `G43 H600` only after the M0; drills and
+the T610 outline keep G37; verify check 4 now FAILS a G37 on the isolation tool. Regenerated, JOB READY, all four
+files overwritten on `/Volumes/Tormach/gcode/`. The 15:00 back_comp on the share was never run. Procedure at the
+machine is unchanged: V-bit in, electrical touch at X4.23 Y1.73, type 0.0014 into TOUCH Z, run back_comp.
