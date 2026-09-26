@@ -600,6 +600,19 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier probe program deployed to the LAPTOP, not the share (2026-09-26, 13:00).** Scott: "use the gcode dir on this
+laptop" — `machine.gcode_dir` is now `/Users/scottdube/gcode` (was `/Volumes/Tormach/gcode`, the value every job
+carries by default) and `~/gcode/eyes-carrier-v2_probe.ngc` is there for him to carry over. Job `status`: probe map
+NOT IMPORTED, every cutting artifact missing, verification never run — nothing but the probe program exists yet,
+which is correct at this stage. What was learned trying the share first: the controller is **`tormachpcnc`
+192.168.1.100**, Samba on Linux Mint, one share named **`gcode`** (guest, port 445 open, SSH closed); so a Finder
+mount would land at `/Volumes/gcode`, not `/Volumes/Tormach/gcode`, and `mkdir /Volumes/Tormach` is denied even
+outside the sandbox. `open smb://…` and `osascript mount volume` both put a dialog in front of Scott, which he
+cancelled. Probe program facts for the console: 16 × 10 grid from X 0.05 / Y 0.05 step 0.38 / 0.42 in, Z safe
+0.25 above WCS Z0, probe limit −0.05; **T99 / H99 (G43 H99), G54 Z0 on the MDF backer, NOT the copper**; it writes
+`probe-results.ngc` beside itself (LOGOPEN bare name) and flushes every row, so an abort loses at most one row.
+Then `pcbmill --job ~/PCBMill/eyes-carrier-v2 probe-import <path to probe-results.ngc>`.
+
 **Carrier mill job opened (2026-09-26, evening).** `~/PCBMill/eyes-carrier-v2` created with `pcbmill new` from
 `gerbers/` (B.Cu, ONE merged drill, Edge_Cuts, .kicad_pcb). `drill-info`: 3 tools, 71 holes, span 4.27 × 2.46 in;
 `consolidate`: T1/T2 0.0465 → 0.0465, T3 0.125 → 0.125, all error +0.0000, annulus ≥ 0.25 mm. Set
@@ -613,8 +626,8 @@ error 6e-5. **0.8 mm stock changes the depths:** verify check 5 wants every hole
 defaults (zdrill −0.075, zcut_outline −0.08) would land 0.0435 in into the MDF and FAIL. Set `cam.zdrill −0.045`
 (→ ≈ −0.0135) and `cam.zcut_outline −0.05` (profile ≈ 0.0185 into the backer, what deskv1 did). The probe map is
 what the audit actually measures against, so re-check after `probe-import`. Still to do in the job, in order: set `blank.*` to the
-real blank, `solve-offsets`, `probe-gen`, `deploy` (needs /Volumes/Tormach mounted — not mounted from the laptop
-right now), run the probe on the machine, `probe-import`, `touchoff`, `regen`, `verify`, `runsheet`, `deploy`.
+real blank, `solve-offsets`, `probe-gen`, `deploy` — ALL DONE by 13:00 (see the paragraph above); next is Scott running the
+probe on the machine, then `probe-import`, `touchoff`, `regen`, `verify`, `runsheet`, `deploy`.
 
 **Carrier back chamfers 4 mm deeper (2026-09-26, later still).** **FITS** — second wood copy sits inside the green panel (Scott: "probably took off more than you needed to, but it simplified it, so I think it's fine"). Outline frozen for V2. Corner-to-corner still stuck out past the green
 case panel at both back corners (Scott's third photo, red arrows). Scott: "has to come in like probably four
