@@ -600,6 +600,16 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier laser fit check (2026-09-26).** Scott lasers a copy of every board in 1.5 mm basswood (outline + holes)
+before the mill runs. `python3 hardware/fitcheck/make_fitcheck.py` → `hardware/fitcheck/eyes-carrier-fitcheck.svg`
+for xTool Creative Space: **red** = cut (closed outline path + all 71 holes as stroked circles at the nominal drill
+diameter, 1.181 / 3.175), **black** = engrave (F.SilkS incl. the V2 legend). Top view, NOT mirrored. Reads the board
+file only, so it runs with KiCad open. Rejected handing over kicad-cli's own SVG: it draws drill marks as filled
+discs (XCS would engrave them solid), outline in light grey and silk in pale yellow (no colour Scott can select on),
+its viewBox has no stroke margin so the right/bottom edges clip, and it carries opacity-0 `<text>` helpers that XCS
+imports as text objects. Regenerate after any placement/outline change; the holes are the drill sizes with no kerf
+allowance, so a laser hole comes out a kerf larger than the milled one — fine for a fit check, not a gauge.
+
 **Carrier: J1 placed by Scott, C1 turned, schematic parity clean (2026-09-26, later).** My J1 move left its body
 against the buck's IN- corner; Scott put it at (45.05, 15.7) rot 180 between H4 and the chamfer and turned C1 180 to
 (-39.75, 17.0) so the +5V stub from TP2 just continues west into C1.1 (the diagonal off the lane is gone, and with it
