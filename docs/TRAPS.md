@@ -57,3 +57,27 @@ end and label must be a multiple of 1.27; pin ends are then on grid by construct
 Inner header columns can only leave the module through its middle and out past the last pin row; outer
 columns leave sideways, and a vertical lane beside the module blocks every pad facing it. Pick the pins
 from the routing, not the datasheet defaults — here I2C went to IO25/IO27 and the ADC to IO36.
+
+## KiCad Edge.Cuts made of loose lines scramble under box-select (2026-09-25)
+
+The carrier outline is 23 separate `gr_line`s. A box-select in the PCB editor grabs whichever of them are fully inside
+the box, so a drag "moved the board" for some segments and not others; parts were then placed against edges that no
+longer existed (J1 25 mm off the real board). Nothing in DRC flags an open outline. Fix was regenerating the lines from
+the DXF polygon; the durable fix is the capture → regenerate workflow (`gen/capture_placement.py`), so the outline is
+never hand-touched. Alternative rejected: one `gr_poly` outline — KiCad still lets you drag a vertex.
+
+## A mounting hole inside a module's footprint fights every DRC courtyard check (2026-09-25)
+
+The PCA9685 bolts to H3/H4, so the hole footprints sit inside the PCA's body. With a full-body courtyard on the PCA
+and a circle courtyard + silk ring on the hole, DRC threw courtyards_overlap, pth_inside_courtyard,
+npth_inside_courtyard and four silk collisions — all describing the intended geometry. Resolution: the PCA courtyard is
+its two header rows only (the area under the body is usable, the module is on standoffs), the hole footprint has no
+courtyard and no silk ring, and the pour keepout stays as a board rule area. Do not "fix" by moving the PCA off the
+holes.
+
+## Round pads default to 45° thermal spokes, which land on the sliver between four pads (2026-09-25)
+
+At 2.54 pitch with 0.6 clearance the diagonal gap between a 2×2 pad group leaves a ~0.6 mm copper sliver; a 45° spoke
+connects the pad to that sliver and DRC reports "spoke connected to isolated island". `(thermal_bridge_angle 90)` on
+the pad fixes it. Separately, `lib_footprint_mismatch` on a rotated generated footprint meant the NPTH pads and text
+were written without the footprint angle folded in — KiCad stores pad AND text angles absolute.

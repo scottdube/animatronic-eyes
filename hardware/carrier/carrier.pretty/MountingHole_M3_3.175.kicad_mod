@@ -7,7 +7,7 @@
 	(property "Reference" "REF**"
 		(at 0 -4.2 0)
 		(layer "F.SilkS")
-		(uuid "a1f95125-cc55-5837-a8f1-586f723e4388")
+		(uuid "b3df8389-a423-58ce-ac34-225c9c6b9bd2")
 		(effects
 			(font
 				(size 1 1)
@@ -18,7 +18,7 @@
 	(property "Value" "MountingHole_M3_3.175"
 		(at 0 4.2 0)
 		(layer "F.Fab")
-		(uuid "4c008d43-9e53-5dd5-b50a-a8ad95fc6562")
+		(uuid "f8260402-5acb-5c00-b861-dd850f68a984")
 		(effects
 			(font
 				(size 1 1)
@@ -30,7 +30,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "11d52d1f-c99c-5490-8649-f568d187ec5a")
+		(uuid "4c008d43-9e53-5dd5-b50a-a8ad95fc6562")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -41,7 +41,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "d04a97db-b255-554a-9e43-96d0934a3f35")
+		(uuid "65c750a0-f03b-5c90-8117-4c7e10718084")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -50,28 +50,6 @@
 	)
 	(attr through_hole)
 	(duplicate_pad_numbers_are_jumpers no)
-	(fp_circle
-		(center 0 0)
-		(end 3.25 0)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.SilkS")
-		(uuid "b3df8389-a423-58ce-ac34-225c9c6b9bd2")
-	)
-	(fp_circle
-		(center 0 0)
-		(end 3.5 0)
-		(stroke
-			(width 0.05)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.CrtYd")
-		(uuid "f8260402-5acb-5c00-b861-dd850f68a984")
-	)
 	(pad "" np_thru_hole circle
 		(at 0 0)
 		(size 3.175 3.175)

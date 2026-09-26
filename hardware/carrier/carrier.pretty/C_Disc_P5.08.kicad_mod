@@ -176,6 +176,7 @@
 		(drill 1.181)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
+		(thermal_bridge_angle 90)
 		(uuid "d948da14-3695-517e-a53d-8b197c57efc6")
 	)
 	(pad "2" thru_hole circle
@@ -184,6 +185,7 @@
 		(drill 1.181)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
+		(thermal_bridge_angle 90)
 		(uuid "b3df8389-a423-58ce-ac34-225c9c6b9bd2")
 	)
 	(embedded_fonts no)

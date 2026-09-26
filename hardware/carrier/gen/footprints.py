@@ -23,7 +23,10 @@ NPTH = 1.181          # pin passes through, no copper
 
 
 def pad(num, x, y, size=PAD_D, drill=DRILL, shape="circle", npth=False,
-        rect=False):
+        rect=False, solid=False):
+    """solid=True: pour connects without thermal relief (servo/buck GND return
+    pins - a 0.5 mm spoke is a 0.5 mm trace, and the keepout at H3/H4 leaves
+    the PCA's GND pins one spoke).  Everything else keeps reliefs for soldering."""
     if npth:
         return (f'\t(pad "" np_thru_hole circle\n\t\t(at {x} {y})\n'
                 f'\t\t(size {drill} {drill})\n\t\t(drill {drill})\n'
@@ -32,7 +35,9 @@ def pad(num, x, y, size=PAD_D, drill=DRILL, shape="circle", npth=False,
     return (f'\t(pad "{num}" thru_hole {shp}\n\t\t(at {x} {y})\n'
             f'\t\t(size {size} {size})\n\t\t(drill {drill})\n'
             f'\t\t(layers "*.Cu" "*.Mask")\n\t\t(remove_unused_layers no)\n'
-            f'\t\t(uuid "{uid()}")\n\t)')
+            f'\t\t(thermal_bridge_angle 90)\n'   # KiCad defaults round pads to 45, whose spokes land on the sliver between 2x2 pads
+            + ('\t\t(zone_connect 2)\n' if solid else '')
+            + f'\t\t(uuid "{uid()}")\n\t)')
 
 
 def line(x1, y1, x2, y2, layer, w=0.12):
@@ -117,8 +122,11 @@ def d1_mini_esp32():
     # tab overhang the notch / bottom edge on the carrier); full body on F.Fab
     body.append(rect(-15.7, -13.6, 15.7, 17.5, "F.SilkS"))
     body.append(rect(-4.5, 17.78, 4.5, 24.13, "F.Fab", 0.1))
-    body.append(rect(-16.0, -19.3, 16.0, 18.0, "F.CrtYd", 0.05))
-    body.append(rect(-4.8, 18.0, 4.8, 24.4, "F.CrtYd", 0.05))
+    # courtyard as ONE closed polyline (two rects sharing an edge is "self-intersecting" to DRC)
+    cy = [(-16.0, -19.3), (16.0, -19.3), (16.0, 18.0), (4.8, 18.0), (4.8, 24.4),
+          (-4.8, 24.4), (-4.8, 18.0), (-16.0, 18.0)]
+    for (x1, y1), (x2, y2) in zip(cy, cy[1:] + cy[:1]):
+        body.append(line(x1, y1, x2, y2, "F.CrtYd", 0.05))
     body.append(rect(-15.7, -19.05, 15.7, 17.78, "F.Fab", 0.1))
     body.append(text("user", "USB-C", 0, 21.0, "F.Fab", 0.8))
     body.append(text("user", "ANTENNA - NO COPPER", 0, -15.5, "F.Fab", 0.8))
@@ -133,9 +141,9 @@ def d1_mini_esp32():
 # 2 IN-, 3 OUT+, 4 OUT-.  Board ~43 x 21 mm; silk drawn as the ratgdo file did.
 def lm2596():
     body = [pad(1, 17.6, 0, size=2.4, drill=1.181, rect=True),
-            pad(2, 0, 0, size=2.4, drill=1.181),
+            pad(2, 0, 0, size=2.4, drill=1.181, solid=True),      # IN-  (GND, full buck current)
             pad(3, 17.6, 39.8, size=2.4, drill=1.181),
-            pad(4, 0, 39.8, size=2.4, drill=1.181),
+            pad(4, 0, 39.8, size=2.4, drill=1.181, solid=True),   # OUT- (GND, full 5 V return)
             rect(-1.7, -1.6, 19.3, 41.4, "F.SilkS"),      # 21 x 43 body
             rect(-2.0, -1.9, 19.6, 41.7, "F.CrtYd", 0.05),
             rect(-1.7, -1.6, 19.3, 41.4, "F.Fab", 0.1),
@@ -162,15 +170,24 @@ PCA_NAMES = ["V+", "VCC", "SDA", "SCL", "OE", "GND"]
 def pca9685():
     body = []
     for i, y in enumerate(PCA_PIN_Y):
-        body.append(pad(i + 1, -PCA_ROW_X, y))
-        body.append(pad(i + 7, PCA_ROW_X, y))
+        body.append(pad(i + 1, -PCA_ROW_X, y, solid=(i == 5)))   # pin 6/12 = GND, servo return
+        body.append(pad(i + 7, PCA_ROW_X, y, solid=(i == 5)))
     # body outline sits on the board edge (top) and crosses the notch (bottom),
     # so silk is corner ticks on the wings only; the full outline is on F.Fab
     for sx in (-1, 1):
-        for sy, y0 in ((-1, -12.2), (1, 12.7)):
+        for sy, y0 in ((-1, -12.2), (1, 11.6)):   # bottom ticks pulled in: body overhangs the edge 0.5
             body.append(line(sx * 31.115, y0, sx * 31.115, y0 - sy * 2.5, "F.SilkS"))
             body.append(line(sx * 31.115, y0, sx * (31.115 - 2.5), y0, "F.SilkS"))
-    body.append(rect(-31.4, -13.0, 31.4, 13.0, "F.CrtYd", 0.05))
+    # courtyard = the two header rows only.  The module rides on H3/H4 (its own
+    # holes line up with the carrier's, Scott 2026-09-25) and on its headers, so
+    # the carrier area under its body is free for anything under the header
+    # height; a full-body courtyard would also collide with H3/H4 by design.
+    for sx in (-1, 1):
+        body.append(rect(sx * (PCA_ROW_X - 1.5), -7.6, sx * (PCA_ROW_X + 1.5), 7.4, "F.CrtYd", 0.05))
+    # its mounting holes, drawn for the record (the carrier's H3/H4 sit here)
+    for hx in (-28.471, 28.471):
+        body.append(f'\t(fp_circle\n\t\t(center {hx} -9.525)\n\t\t(end {hx + 1.6} -9.525)\n\t\t(stroke\n\t\t\t(width 0.1)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.Fab")\n\t\t(uuid "{uid()}")\n\t)')
+    body.append(text("user", "holes = carrier H3/H4", 0, -11.0, "F.Fab", 0.8))
     body.append(rect(-31.115, -12.7, 31.115, 12.7, "F.Fab", 0.1))
     # servo pin field 16 x 3, 2.54 pitch, x -24.13..24.13, y 6.22..11.30
     body.append(rect(-25.4, 5.0, 25.4, 12.5, "F.Fab", 0.1))
@@ -186,9 +203,10 @@ def pca9685():
 
 # ------------------------------------------------------------ small parts
 def mounting_hole_m3():
-    body = [pad("", 0, 0, drill=3.175, npth=True),
-            f'\t(fp_circle\n\t\t(center 0 0)\n\t\t(end 3.25 0)\n\t\t(stroke\n\t\t\t(width 0.12)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.SilkS")\n\t\t(uuid "{uid()}")\n\t)',
-            f'\t(fp_circle\n\t\t(center 0 0)\n\t\t(end 3.5 0)\n\t\t(stroke\n\t\t\t(width 0.05)\n\t\t\t(type solid)\n\t\t)\n\t\t(fill no)\n\t\t(layer "F.CrtYd")\n\t\t(uuid "{uid()}")\n\t)']
+    # no courtyard: H3/H4 sit inside the PCA's header-row geometry on purpose, and
+    # the copper guard is the board rule area, not this footprint
+    # no silk ring either: at H3/H4 a 3.25 ring lands on the PCA's GND pads
+    body = [pad("", 0, 0, drill=3.175, npth=True)]
     return footprint("MountingHole_M3_3.175", "M3 rack standoff hole, drilled 3.175 (the bit), NPTH; pour keepout is a board rule area",
                      body, ref_at=(0, -4.2), val_at=(0, 4.2))
 

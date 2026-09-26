@@ -186,12 +186,13 @@ def stub(p, net, side):
 # module, where any vertical lane blocks every pad facing it.  So:
 #   * I2C on outer-right pads 24/26 (IO27 = SCL, IO25 = SDA) -> right strip
 #     lanes to the PCA's right row.  Wire.begin(25, 27).
-#   * rail divider on inner-left pad 4 (IO36, ADC1_CH0, input-only) -> exits
-#     through the middle, corridor, left strip.  Rail.cpp PIN = 36.
 #   * 3V3 (16) and VCC (35) are inner pins: middle -> corridor -> left/right.
-#   * +5V reaches the divider from the PCA's LEFT V+ pin: the PCA rows are
-#     paralleled on the module, declared as jumper pad groups on the footprint.
-D1_NETS = {4: "RAIL_ADC", 16: "+3V3", 24: "SCL", 26: "SDA", 35: "+5V",
+#   * the PCA rows are paralleled on the module, declared as jumper pad groups
+#     on the footprint, so either row can carry a net.
+# The pin choices above were forced by the V1 placement (rejected); Scott's
+# placement may reopen them.  Rail divider DROPPED 2026-09-25 (Scott): the ADC
+# saw its own noise, not sag.
+D1_NETS = {16: "+3V3", 24: "SCL", 26: "SDA", 35: "+5V",
            1: "GND", 22: "GND", 33: "GND"}
 PCA_NETS_L = {1: "+5V", 2: "+3V3", 6: "GND"}              # left row: power
 PCA_NETS_R = {7: "+5V", 9: "SDA", 10: "SCL", 12: "GND"}   # right row (7-12)
@@ -253,24 +254,13 @@ def build():
         wire(c["1"], (x, c["1"][1] - 2.54)); glabel("+5V", (x, c["1"][1] - 2.54), 0)
         wire(c["2"], (x, c["2"][1] + 2.54)); glabel("GND", (x, c["2"][1] + 2.54), 0)
 
-    # --- rail divider: +5V - R1 - RAIL_ADC - R2 - GND  (10k/10k, GPIO36 = ADC1_CH0)
-    r1 = comp("Device", "R", "R1", "10k", 60.96, 129.54, footprint="carrier:R_Axial_P10.16",
-              ref_off=(3.81, -1.27), val_off=(3.81, 1.27))
-    r2 = comp("Device", "R", "R2", "10k", 60.96, 149.86, footprint="carrier:R_Axial_P10.16",
-              ref_off=(3.81, -1.27), val_off=(3.81, 1.27))
-    wire(r1["1"], (60.96, r1["1"][1] - 2.54)); glabel("+5V", (60.96, r1["1"][1] - 2.54), 0)
-    wire(r1["2"], r2["1"])
-    mid = (60.96, 139.7)
-    items.append(f'\t(junction\n\t\t(at 60.96 139.7)\n\t\t(diameter 0)\n\t\t(color 0 0 0 0)\n\t\t(uuid "{uid()}")\n\t)')
-    wire(mid, (68.58, 139.7)); glabel("RAIL_ADC", (68.58, 139.7), 0)
-    wire(r2["2"], (60.96, r2["2"][1] + 2.54)); glabel("GND", (60.96, r2["2"][1] + 2.54), 0)
-
     # --- test points
     # no SDA/SCL test points: the only copper those nets have outside the PCA
     # body is the two lanes beside the D1 Mini, too narrow for a pad; probe
     # them on U2's header pins 9/10 (they protrude on the copper side)
-    for i, (net, x) in enumerate((("+12V", 50.8), ("+5V", 63.5), ("+3V3", 76.2), ("RAIL_ADC", 88.9),
-                                  ("GND", 101.6), ("GND", 114.3)), 1):
+    # TP4 (RAIL_ADC) removed with the divider; numbers kept so the board's refs stay
+    for i, net, x in ((1, "+12V", 50.8), (2, "+5V", 63.5), (3, "+3V3", 76.2),
+                      (5, "GND", 101.6), (6, "GND", 114.3)):
         tp = comp("Connector", "TestPoint", f"TP{i}", net, x, 190.5,
                   footprint="carrier:TestPoint_THT_D2.2_1.181", ref_off=(0, -5.08), val_off=(0, -2.54))
         wire(tp["1"], (x, 195.58)); glabel(net, (x, 195.58), 0)
@@ -284,8 +274,8 @@ def build():
          "M3 standoffs into the rack.\\n"
          "Power: 12 V pigtail -> J1 -> LM2596 (set 5.0-5.1 V unloaded, USB unplugged) -> +5V.\\n"
          "+5V is star-routed on the board: separate traces from U3 OUT+ to U2 V+ and to U1 VCC (pin 35).\\n"
-         "C1/C2 hang on the +5V run to U1 pin 35. R1/R2 divide the PCA V+ rail to GPIO36 (ADC1_CH0) for the rail monitor (Rail.cpp PIN=36, DIVIDER=2).\\n"
-         "U2 rows are internally paralleled (jumper pad groups on the footprint): +5V feeds the right V+ from the buck and the left V+ feeds the divider.\\n"
+         "C1/C2 hang on the +5V run to U1 pin 35. No rail divider (dropped 2026-09-25: the on-board ADC only ever saw its own noise).\\n"
+         "U2 rows are internally paralleled (jumper pad groups on the footprint), so either row can carry a net.\\n"
          "I2C is on IO25 (SDA) / IO27 (SCL), not 21/22: single-sided routing can only reach the OUTER header columns. Wire.begin(25, 27).\\n"
          "U1 pin numbers = header positions per r0oland ESP32_mini; VERIFY against the board silk before cutting.",
          (38.1, 215.9), 1.6)

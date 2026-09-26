@@ -48,23 +48,11 @@ OUTLINE = [(40.630, 37.041), (-40.598, 37.041), (-47.326, 24.189), (-55.950, 18.
 HOLES = [(-49.481, -27.738), (49.513, -27.738), (-28.455, 15.270), (28.487, 15.270)]
 HOLE_KEEPOUT_R = 3.25        # M3 nylon standoff hex + washer
 
-# ref -> (footprint, value, x, y, rot)
-PLACE = {
-    "U2": ("PCA9685_Adafruit_Module", "PCA9685 16ch servo", 0, -22.56, 0),
-    "U1": ("D1_Mini_ESP32_THT", "D1 Mini ESP32 (Type-C)", 0, 18.0, 0),
-    "U3": ("LM2596_Module", "LM2596 buck 12V->5.05V", 51.6, 17.9, 180),
-    "J1": ("KF301_1x02_P5.08", "12V pigtail", 36.5, 31.0, 180),
-    "C1": ("CP_Radial_D6.3_P2.5", "220u", 22.25, 33.3, 0),
-    "C2": ("C_Disc_P5.08", "100n", 22.5, 0.0, 90),
-    "R1": ("R_Axial_P10.16", "10k", -36.0, -8.0, 270),
-    "R2": ("R_Axial_P10.16", "10k", -39.5, 2.16, 90),
-    "TP1": ("TestPoint_THT_D2.2_1.181", "+12V", 40.0, 24.0, 0),
-    "TP2": ("TestPoint_THT_D2.2_1.181", "+5V", 24.0, -8.0, 0),
-    "TP3": ("TestPoint_THT_D2.2_1.181", "+3V3", -44.0, -18.88, 0),
-    "TP4": ("TestPoint_THT_D2.2_1.181", "RAIL_ADC", -43.0, 2.16, 0),
-    "TP5": ("TestPoint_THT_D2.2_1.181", "GND", 26.0, 4.0, 0),
-    "TP6": ("TestPoint_THT_D2.2_1.181", "GND", -43.0, -8.0, 0),
-}
+# ref -> (footprint, value, x, y, rot): Scott places in the KiCad GUI, then
+# `python3 gen/capture_placement.py` copies the positions into placement.py and
+# this script rebuilds the board around them (outline, keepouts, pour, fresh
+# footprint copies).  Never edit placement.py by hand while KiCad is open.
+from placement import PLACE   # noqa: E402
 for i, (hx, hy) in enumerate(HOLES, 1):
     PLACE[f"H{i}"] = ("MountingHole_M3_3.175", "M3 rack standoff", hx, hy, 0)
 
@@ -85,19 +73,9 @@ for r, (_, v, *_r) in PLACE.items():
 POWER_W, SIG_W = 1.0, 0.6
 # (net, width, polyline)
 TRACKS = [
-    ("+12V", POWER_W, [(36.5, 31.0), (36.5, 20.4), (34.0, 17.9)]),
-    ("+12V", POWER_W, [(36.5, 24.0), (40.0, 24.0)]),
-    ("+5V", POWER_W, [(34.0, -21.9), (34.0, -16.34), (29.21, -16.34)]),
-    ("+5V", POWER_W, [(29.21, -16.34), (29.21, -8.0), (19.2, -8.0), (19.2, 33.3), (22.25, 33.3)]),
-    ("+5V", POWER_W, [(19.2, 31.4), (8.0, 31.4), (8.0, 24.35), (11.43, 24.35)]),
-    ("+5V", POWER_W, [(19.2, 0.0), (22.5, 0.0)]),
-    ("+5V", POWER_W, [(-29.21, -16.34), (-36.0, -16.34), (-36.0, -8.0)]),
-    ("+3V3", POWER_W, [(-11.43, 24.35), (-9.5, 24.35), (-9.5, 31.4), (-17.2, 31.4),
-                       (-17.2, -18.88), (-44.0, -18.88)]),
-    ("RAIL_ADC", SIG_W, [(-11.43, 9.11), (-8.0, 9.11), (-8.0, 33.0), (-18.9, 33.0),
-                         (-18.9, 2.16), (-43.0, 2.16)]),
-    ("SDA", SIG_W, [(29.21, -21.42), (17.85, -21.42), (17.85, 11.65), (13.97, 11.65)]),
-    ("SCL", SIG_W, [(29.21, -23.96), (16.7, -23.96), (16.7, 9.11), (13.97, 9.11)]),
+    # empty: V1's routing (commit 6c48d78) belonged to the rejected placement.
+    # Route here once Scott's placement is frozen, or in the GUI (then the
+    # generator stops being the master for copper).
 ]
 
 # pour keepouts (name, polygon)
@@ -111,9 +89,20 @@ def rectp(x1, y1, x2, y2):
 
 
 KEEPOUTS = [(f"H{i} standoff", circle(hx, hy, HOLE_KEEPOUT_R)) for i, (hx, hy) in enumerate(HOLES, 1)]
-KEEPOUTS += [("D1 antenna", rectp(-15.7, -1.5, 15.7, 5.4)),
-             ("D1 flash pins L", rectp(-15.2, 25.6, -10.2, 30.7)),
-             ("D1 flash pins R", rectp(10.2, 25.6, 15.2, 30.7))]
+
+
+def d1_keepouts():
+    """Antenna end and the two flash-pin blocks, in U1's local frame, moved with it."""
+    fp, val, ux, uy, ur = PLACE["U1"]
+    # antenna keepout runs to the pin-1 row centre line: stopping short of the pads
+    # leaves a copper sliver that becomes an island on a thermal spoke
+    local = [("D1 antenna", rectp(-15.7, -19.5, 15.7, -11.43)),
+             ("D1 flash pins L", rectp(-15.2, 7.6, -10.2, 12.7)),
+             ("D1 flash pins R", rectp(10.2, 7.6, 15.2, 12.7))]
+    out = []
+    for name, poly in local:
+        out.append((name, [(ux + rot_xy(x, y, ur)[0], uy + rot_xy(x, y, ur)[1]) for x, y in poly]))
+    return out
 
 # ------------------------------------------------------------- helpers
 def rot_xy(x, y, rot):
@@ -164,12 +153,16 @@ def embed(ref, fpname, value, x, y, rot, sym_uuid, nets):
     def fix_pad(m):
         num = m.group(1)
         blk = m.group(0)
-        if rot:
-            blk = re.sub(r'\(at ([-\d.]+) ([-\d.]+)\)', rf'(at \1 \2 {rot})', blk, 1)
         if num in nets:
             blk = blk.replace('(remove_unused_layers no)', f'(remove_unused_layers no)\n\t\t(net "{nets[num]}")', 1)
         return blk
-    t = re.sub(r'\(pad "([^"]*)" thru_hole[\s\S]*?\n\t\)', fix_pad, t)
+    t = re.sub(r'\(pad "([^"]*)" (?:np_)?thru_hole[\s\S]*?\n\t\)', fix_pad, t)
+    # KiCad stores pad AND text angles absolute (footprint angle included); a
+    # pad or text left at 0 in a rotated footprint reads as rotated the other
+    # way, which is what "does not match copy in library" was reporting
+    if rot:
+        body_start = t.index('\n\t(property ')
+        t = t[:body_start] + re.sub(r'\(at ([-\d.]+) ([-\d.]+)(?: 0)?\)', rf'(at \1 \2 {rot})', t[body_start:])
     # every uuid inside must be unique on the board
     t = re.sub(r'\(uuid "[^"]+"\)', lambda m: f'(uuid "{uid()}")', t)
     return "\n".join("\t" + ln for ln in t.rstrip("\n").split("\n"))
@@ -229,12 +222,11 @@ def build(outdir):
         for a, b in zip(poly, poly[1:]):
             items.append(segment(net, w, a, b))
     # zones: keepouts first, pour last
-    for name, poly in KEEPOUTS:
+    for name, poly in KEEPOUTS + d1_keepouts():
         items.append(keepout(name, poly))
     items.append(gnd_pour(rectp(-60, -36, 60, 38)))
     # legend
-    items.append(gr_text("EYES CARRIER V1 2026-09-25", -40.0, 36.0, 0.9))
-    items.append(gr_text("SERVO RAIL ADC", -47.0, 5.5, 0.8))
+    items.append(gr_text("EYES CARRIER V2 2026-09-25", -58.0, -33.2, 0.9))
     doc = open(os.path.join(HERE, "pcb_header.sexp")).read().rstrip("\n")
     doc += "\n" + "\n".join(items) + "\n\t(embedded_fonts no)\n)\n"
     open(os.path.join(outdir, "carrier.kicad_pcb"), "w").write(doc)
@@ -268,7 +260,7 @@ def check_tracks(pads):
 if __name__ == "__main__":
     outdir = sys.argv[1] if len(sys.argv) > 1 else "."
     pads = build(outdir)
-    for r in ("U1", "U2", "U3", "R1", "R2", "C2", "J1"):
+    for r in ("U1", "U2", "U3", "C2", "J1"):
         print(r, {n: p for n, p in pads[r].items() if n in NETS.get(r, {})})
     bad = check_tracks(pads)
     print("dangling track ends:", bad or "none")

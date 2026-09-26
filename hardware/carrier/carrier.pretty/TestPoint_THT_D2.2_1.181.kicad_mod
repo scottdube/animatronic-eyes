@@ -67,6 +67,7 @@
 		(drill 1.181)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
+		(thermal_bridge_angle 90)
 		(uuid "d948da14-3695-517e-a53d-8b197c57efc6")
 	)
 	(embedded_fonts no)
