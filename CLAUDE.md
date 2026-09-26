@@ -600,6 +600,17 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier Z zero is on the COPPER, offset by the blank thickness (2026-09-26, afternoon).** The blank was already waxed
+to the MDF before probing, so Scott cannot touch the backer. verify check 5 (`verify.py:300-367`) treats absolute
+Z0 as the backer: hole bottoms = map copper height + zdrill must sit between -0.003 and -0.030, and applymap runs
+absolute. Zeroing on copper with 0 typed in makes every bottom read -0.045 and FAILS the backer limit for a cut
+that is physically fine. So: touch the probe on the copper and type the CALIPERED blank thickness into TOUCH Z
+(nominal 0.8 mm = 0.0315 in), which makes the copper read +0.0315 and the map, touchoff and audit all behave as
+designed. Margin on a thickness error: breakthrough needs bottom <= -0.003 (nominal -0.0135, 0.0105 spare) and
+backer damage >= -0.030 (0.0165 spare), so a few thou of caliper error changes nothing. Rejected re-parameterising
+the job (zdrill -0.0135, zcut_outline -0.0185, moved limits) to keep Z0 on copper: touches four numbers and the
+verify semantics for a one-field change at the console.
+
 **Carrier probe program deployed to the LAPTOP, not the share (2026-09-26, 13:00).** Scott: "use the gcode dir on this
 laptop" — `machine.gcode_dir` is now `/Users/scottdube/gcode` (was `/Volumes/Tormach/gcode`, the value every job
 carries by default) and `~/gcode/eyes-carrier-v2_probe.ngc` is there for him to carry over. Job `status`: probe map
