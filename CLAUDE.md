@@ -600,7 +600,7 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
-**Carrier back chamfers 4 mm deeper (2026-09-26, later still).** Corner-to-corner still stuck out past the green
+**Carrier back chamfers 4 mm deeper (2026-09-26, later still).** **FITS** — second wood copy sits inside the green panel (Scott: "probably took off more than you needed to, but it simplified it, so I think it's fine"). Outline frozen for V2. Corner-to-corner still stuck out past the green
 case panel at both back corners (Scott's third photo, red arrows). Scott: "has to come in like probably four
 millimeters is my guess on either side … indented slightly from the green panel." OUTLINE: the corner-to-corner
 line moved 4 mm inward, parallel — back-edge end -40.598 → -35.420, side end 18.361 → 12.061, mirrored about
