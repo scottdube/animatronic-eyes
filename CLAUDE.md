@@ -816,3 +816,13 @@ up on a thick wax film under the right-center, or a lump under it. pcbmill's gat
 `regen`, `verify` are not blocked by the flag, only advised against. Scott to check the seat physically (press the
 ridge at ~4.2 in from the left, 2 in up; a board that moves or clicks is lifted). Re-mount and re-probe, or accept
 the dome and cut with applymap following it — Scott's call.
+
+**Carrier CLEARED TO CUT (2026-09-26, ~15:00).** Scott pressed the ridge: "board is solid, accept the dome and cut."
+`touchoff`: jog to **X4.2300 Y1.7300**, V-bit electrical touch, type **0.0014** into TOUCH Z; validate at X0.05 Y0.05
+(DRO −0.0196) and X3.09 Y2.15 (DRO −0.0031). First `verify` FAILED check 9 (slivers): at isolation 0.030 the
+2.54 mm-pitch U1/U2 header rows leave 16 copper slivers 0.29–0.93 mm wide between pads, each needing ≥ 0.036–0.039 in.
+Set **`cam.isolation_width 0.04`** (pcbmill's own suggestion; deskv1 ran 0.03 but had no header rows this tight),
+regen, verify → **JOB READY**, 12 checks, 9 and 10 WARN only (14 slivers left: 7 planned pour-exclusion islands,
+7 WARN-grade). Rejected re-drawing the pads oval in KiCad: right fix for v3, but it re-opens the design for a board
+already mounted. Run sheet at `~/PCBMill/eyes-carrier-v2/out/runsheet.txt`; deployed to `/Volumes/Tormach/gcode/`:
+`eyes-carrier-v2_back_comp.ngc`, `_drill_comp.ngc`, `_outline_comp.ngc` (+ the probe program, unchanged content).
