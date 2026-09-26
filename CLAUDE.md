@@ -624,9 +624,17 @@ Renders in `out/` (regenerate with `kicad-cli pcb render`). Decisions, and what 
   So: **SDA = IO25 (pad 26), SCL = IO27 (pad 24)** on the outer-right column, **rail ADC = IO36 (pad 4, inner-left)**.
   GPIO21/22 and IO34 are inner/outer pins that could not be reached without a crossing. **Firmware for the carrier build:
   `Wire.begin(25, 27)` and Rail.cpp `PIN = 36` — NOT changed yet; the DevKit build keeps 21/22/34.**
+- **Rail monitor DROPPED from the carrier (Scott, 2026-09-25).** R1/R2 10k/10k divider, the RAIL_ADC net and TP4 were my
+  assumption, not his plan. Evidence (rail-monitor section above): the ADC's sag counts are its own noise and the real
+  sag was only visible on the scope, so on a board with the buck set to 5.0–5.1 V the reading buys nothing a meter on
+  TP2 doesn't. Scott deletes R1, R2, TP4 in the schematic editor + Update PCB from Schematic. **Pending when KiCad is
+  closed:** remove them from `gen/gen_sch.py` (D1_NETS pad 4, the R1/R2 symbols, TP4, the divider note) so a regenerated
+  schematic matches his. Firmware unchanged: Rail.cpp reports "not wired" when the pin floats. IO36 is free again.
+  Test points that remain: TP1 +12V, TP2 +5V, TP3 +3V3, TP5 GND, TP6 GND.
 - **+5V star:** buck OUT+ → PCA right-row V+ (5 mm), and separately down the right strip → corridor → D1 pad 35. The
   divider takes +5V from the PCA's LEFT V+ pin (the rows are paralleled on the module) so it measures the servo rail
   itself; declared with `jumper_pad_groups` on the footprint (KiCad 10 accepts it; DRC then reports 0 unconnected).
+  Moot now the divider is gone; the jumper groups stay on the footprint (they're true of the module).
 - **Compromises:** C1/C2 are ~12 and ~30 mm of trace from pad 35, not "a few mm" — an inner pin on a single-sided
   board with the module on headers cannot have parts beside it. No SDA/SCL test points: probe U2's header pins 9/10
   on the copper side. Pour islands inside the SDA/SCL/+5V loops are removed in KiCad but stay as floating copper on a
