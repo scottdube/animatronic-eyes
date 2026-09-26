@@ -66,7 +66,13 @@ def text(kind, s, x, y, layer, size=1.0, hide=False):
 
 # 3D models.  D1 Mini + LM2596 are the ratgdo project's files (my-rat-ratgdo/
 # kicad_files/D1 Mini - ESP32/3dmodels) with ratgdo's tuned offsets - both
-# footprints here share ratgdo's pad frame.  PCA9685.step is a GrabCAD-style
+# footprints here share ratgdo's pad frame.  ratgdo's D1 file ("+ MF") is the
+# module on male headers plugged into 8.5 mm female sockets; this board
+# solders the male headers straight in (Scott), so D1_Mini_ESP32_male.stp is
+# that file with the socket geometry unlinked (the SHAPE_REPRESENTATION_
+# RELATIONSHIP #38 line deleted - the two socket occurrences stay in the
+# assembly but carry no solid) and the model dropped 8.5 so the male header
+# plastic sits on the carrier.  PCA9685.step is a GrabCAD-style
 # model (author 'antoi', 2022; Scott's Downloads/16-channel-i2c-servo-
 # controller-1).  Its raw CARTESIAN_POINTs lie flat, but the assembly
 # placement stands the board on edge, so the frame was found by rendering:
@@ -159,7 +165,7 @@ def d1_mini_esp32():
     body.append(text("user", "22", 16.9, -11.43, "F.SilkS", 0.8))
     return footprint("D1_Mini_ESP32_THT", "D1 Mini ESP32 (WROOM-32), 40-pin, 1.78/1.181 pads, flash pins NPTH",
                      body, ref_at=(18.4, 0), val_at=(0, 0), jumpers=[("1", "22", "33")],
-                     models=[model(PROJ3D + "/D1_Mini_ESP32.stp", (-0.5, -0.5, 0), (0, 0, -90))])
+                     models=[model(PROJ3D + "/D1_Mini_ESP32_male.stp", (-0.5, -0.5, -8.5), (0, 0, -90))])
 
 
 # ------------------------------------------------------------ LM2596 module
@@ -251,11 +257,11 @@ def kf301_2p():
     """KF301 5.08 mm 2-position screw terminal (InvenTree #291). Pins 5.08 apart,
     body 10.2 x 7.6, wire entry on the -y side."""
     body = [pad(1, 0, 0, size=2.6, drill=1.181, rect=True),
-            pad(2, 5.08, 0, size=2.6, drill=1.181),
+            pad(2, 5.08, 0, size=2.6, drill=1.181, solid=True),   # GND: the whole 12 V return, same as the buck IN-
             rect(-2.54, -4.1, 7.62, 3.5, "F.SilkS"),
             rect(-2.8, -4.4, 7.9, 3.8, "F.CrtYd", 0.05),
             rect(-2.54, -4.1, 7.62, 3.5, "F.Fab", 0.1),
-            # labels and ref inside the body: on the carrier the wire-entry face is at the board edge
+            # labels and ref inside the body: on the carrier the wire-entry face points at the PCA (back of the box)
             text("user", "12V", 0, 2.4, "F.SilkS", 0.8),
             text("user", "GND", 5.08, 2.4, "F.SilkS", 0.8)]
     return footprint("KF301_1x02_P5.08", "KF301-5.0 screw terminal 2P 5.08 mm, pads 2.6/1.181",

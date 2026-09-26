@@ -206,6 +206,7 @@
 		(drill 1.181)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
+		(zone_connect 2)
 		(thermal_bridge_angle 90)
 		(uuid "b3df8389-a423-58ce-ac34-225c9c6b9bd2")
 	)

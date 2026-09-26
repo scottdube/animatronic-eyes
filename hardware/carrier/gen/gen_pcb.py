@@ -5,7 +5,11 @@ GND pour.  Everything is in BOARD coordinates (DXF x, -DXF y, mm) and shifted
 by OX/OY onto the page at write time.
 
 Routing (V2, Scott's placement, 2026-09-26) -- all B.Cu, no crossings:
-  +12V  J1 -> TP1; J1 -> y=2 under the LM2596 -> IN+.
+  +12V  J1.1 (50.5,14.5) north along x=50.5 to TP1; the y=2 run tees off it under
+        the LM2596 to IN+.  J1 sits below the buck, turned so its wire entry faces
+        the PCA edge = the back of the box (Scott, 2026-09-26); the wires leave
+        over the chamfered corner.  Earlier it stood on the right edge with the
+        entry facing that edge - no way to get wires in.
   +5V   OUT+ -> lane x=20.5 (slot edge .. U3) -> y=11.2 over H4 -> lane x=33.8
         outside the PCA right row -> front-edge bar y=34.5 -> x=-37.9 up the
         left wing -> TP2 / y=10.9 under U1's outer row -> x=-53 (USB end) ->
@@ -84,7 +88,7 @@ POWER_W, SIG_W = 1.0, 0.6
 # (net, width, polyline)
 TRACKS = [
     # ---- +12V: jack terminal -> test point, and along y=2 under the LM2596 to IN+
-    ("+12V", POWER_W, [(50.5, 2.0), (50.5, -5.0)]),
+    ("+12V", POWER_W, [(50.5, 14.5), (50.5, -5.0)]),   # J1.1 north past TP5 to TP1; the y=2 run tees off it
     ("+12V", POWER_W, [(50.5, 2.0), (25.7, 2.0), (25.7, 8.4)]),
     # ---- +5V trunk: OUT+ -> lane between the slot and U3 -> east above H4 ->
     #      lane outside the PCA right row -> front-edge bar -> up the left wing

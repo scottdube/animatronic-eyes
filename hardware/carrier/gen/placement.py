@@ -7,12 +7,12 @@ PLACE = {
     "U1": ("D1_Mini_ESP32_THT", "D1 Mini ESP32 (Type-C)", -37.5, -6.5, 270),
     "U2": ("PCA9685_Adafruit_Module", "PCA9685 16ch servo", 0.016, 24.795, 0),
     "U3": ("LM2596_Module", "LM2596 buck 12V->5.05V", 43.3, 8.4, 180),
-    "J1": ("KF301_1x02_P5.08", "12V in", 50.5, 2.0, 270),
+    "J1": ("KF301_1x02_P5.08", "12V in", 50.5, 14.5, 180),   # turned + moved 2026-09-26: wire entry toward the PCA (back of the box)
     "C1": ("CP_Radial_D6.3_P2.5", "220u", -42.5, 18.0, 0),
     "C2": ("C_Disc_P5.08", "100n", -51.5, 13.0, 0),
     "TP1": ("TestPoint_THT_D2.2_1.181", "+12V", 50.5, -5.0, 0),
     "TP2": ("TestPoint_THT_D2.2_1.181", "+5V", -35.0, 17.0, 0),
     "TP3": ("TestPoint_THT_D2.2_1.181", "+3V3", -40.0, -27.0, 0),
-    "TP5": ("TestPoint_THT_D2.2_1.181", "GND", 50.5, 13.5, 0),
+    "TP5": ("TestPoint_THT_D2.2_1.181", "GND", 54.0, 7.5, 0),   # was 50.5,13.5 - now under J1
     "TP6": ("TestPoint_THT_D2.2_1.181", "GND", -54.5, -25.0, 0),
 }

@@ -600,6 +600,16 @@ of 10 at x ±11.43/±13.97, 2.54 pitch, 1.4 mm pad / 0.8 drill → 0.29 mm annul
 redraw at 1.78) and a symbol whose pin NUMBERS are header positions (IO34 = pin 11, IO21/SDA = 27, IO22/SCL = 25,
 VCC(USB) = 35, GND = 1/22/33, 3V3 = 16; SD0..CLK/CMD = 17,19,20,37,38,39,40 → NPTH). Its LM2596 footprint: four 2.54 mm
 pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT yet checked against the physical parts.
+**Carrier: J1 turned + moved, D1 model fixed (2026-09-26, Scott's review of the 3D view).** (1) J1 stood on the
+right edge with its wire entry facing that edge - no way to get wires in. Now at (50.5, 14.5) rot 180, below the
+buck, **wire entry toward the PCA edge = the back of the box (Scott)**; the wires leave over the chamfered corner.
+TP5 moved from under it to (54.0, 7.5). +12V now runs J1.1 north along x=50.5 to TP1 with the y=2 run to IN+ teeing
+off it; J1's GND pad got a solid pour connection (it is the whole 12 V return, like the buck IN-). DRC 0/0/0, pour
+still one polygon + the 1.5 mm² C1 sliver, gerbers + drill re-exported, pcbmill bit map exact and annulus gate
+passed. (2) ratgdo's D1 file is the module on female sockets; Scott solders the male headers straight in, so
+`3dmodels/D1_Mini_ESP32_male.stp` is that file with the socket solid unlinked (one STEP line deleted, see
+footprints.py) and dropped 8.5 mm; the 32 MB socketed original is gone from the tree (git history has it).
+
 **Carrier 3D models attached (2026-09-26).** Every footprint carries a `(model ...)` block, emitted by
 `gen/footprints.py` (`model()` helper, `models=[...]` per footprint), so the 3D viewer / STEP export show the real
 stack. Sources: `hardware/carrier/3dmodels/` (34 MB, committed on purpose - the ratgdo files are not in any package
