@@ -603,12 +603,16 @@ pads / 1.2 drill at (0,0) (17.6,0) (0,39.8) (17.6,39.8). Both are ratgdo's, NOT 
 **Carrier mill job opened (2026-09-26, evening).** `~/PCBMill/eyes-carrier-v2` created with `pcbmill new` from
 `gerbers/` (B.Cu, ONE merged drill, Edge_Cuts, .kicad_pcb). `drill-info`: 3 tools, 71 holes, span 4.27 × 2.46 in;
 `consolidate`: T1/T2 0.0465 → 0.0465, T3 0.125 → 0.125, all error +0.0000, annulus ≥ 0.25 mm. Set
-`cam.isolation_width 0.03` and `cam.outline_enabled true` (job defaults were None/False). **BLOCKER: no blank in
-stock is big enough.** Board is 117.88 × 72.29 mm = 4.64 × 2.85 in; the only copper clad in inventory is MCIGICM
-single-sided FR-4 4 × 2.7 in (100 × 70 mm), 4 pcs at SLN RB-06 (/web/part/223/; #234 Chanzon 7×10 cm shows 0).
-deskv1 ran on exactly that size. Need ≥ ~4.9 × 3.1 in with the 3 mm eyeballed margin — 6 × 4 in (150 × 100 mm)
-single-sided is the common next size. Also unmeasured: whether the Modvise/MDF fixture and probe grid cover a
-4.64 in board (deskv1's probe map spanned ~4.2 × 3.0 in). Still to do in the job, in order: set `blank.*` to the
+`cam.isolation_width 0.03` and `cam.outline_enabled true` (job defaults were None/False). **Blank: PATIKIL single-sided FR-4 150 × 100 × 0.8 mm, 5 pcs at SLN RB-06** (/web/part/1082/, bought
+2026-08-23). I first reported "no blank in stock is big enough" — WRONG: the search found it and my `tail -40` cut it
+off (see memory truncated-search-absence). Board 117.88 × 72.29 mm sits on it with ≥ 0.55 in spare per side;
+MDF fixture is 6⅛ × 4⅛ in (Scott). Job: blank 5.906 × 3.937 × **0.0315 in** (0.8 mm — NOT the 0.062 default);
+`solve-offsets` → x_offset −6.8906, y_offset 5.9405, copper extents X 0.632..5.274, Y 0.545..3.392 in, centre
+error 6e-5. **0.8 mm stock changes the depths:** verify check 5 wants every hole bottom between −0.003 and
+−0.030 in below the backer, and applymap runs absolute (bottom = copper height + zdrill), so the 0.062-in
+defaults (zdrill −0.075, zcut_outline −0.08) would land 0.0435 in into the MDF and FAIL. Set `cam.zdrill −0.045`
+(→ ≈ −0.0135) and `cam.zcut_outline −0.05` (profile ≈ 0.0185 into the backer, what deskv1 did). The probe map is
+what the audit actually measures against, so re-check after `probe-import`. Still to do in the job, in order: set `blank.*` to the
 real blank, `solve-offsets`, `probe-gen`, `deploy` (needs /Volumes/Tormach mounted — not mounted from the laptop
 right now), run the probe on the machine, `probe-import`, `touchoff`, `regen`, `verify`, `runsheet`, `deploy`.
 
