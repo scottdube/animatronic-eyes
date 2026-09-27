@@ -844,3 +844,4 @@ Validation after Touch Z: X0.05 Y0.05 read **−0.0190** (map −0.0196, +0.6 th
 −0.0031, −0.7 thou). Map transfers to the V-bit frame within a thou; cleared to run back_comp.
 **Isolation cut DONE (2026-09-26, ~17:30)** on the dome, with the G43-only program. Drilling next: T605 #56 then
 T606 1/8, G37 in-program; then outline T610.
+**Drilling DONE (2026-09-26, ~17:45).** Outline next: T610, G37 in-program, zcut −0.05.
