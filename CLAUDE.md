@@ -680,6 +680,8 @@ re-export from Fusion must be diffed against it, not pasted over it. Silk read s
 gerbers + drill re-exported, fit-check SVG and STEP regenerated. Drills unchanged, so the pcbmill gate result stands.
 Every carrier hole lined up in the wood (holes ≈ kerf big; H-holes took a 0.130 in gauge pin).
 
+**Carrier legend onto the real board (2026-09-27).** `python3 hardware/fitcheck/make_fitcheck.py --board` → `hardware/fitcheck/eyes-carrier-silk.svg`: same drawing as the fit check, but outline + 71 holes are **blue = align only** (set to not output in XCS, line up on the milled holes with the camera), **black** = F.SilkS legend incl. `EYES CARRIER V2 2026-09-26`. Component (bare FR-4) face up, NOT mirrored. One script for both so the fit check and the legend can't drift. **No recorded laser setting for marking FR-4** — the Score 10 %/200 mm/s row is basswood; test on the blank offcut first and record the row in `~/code/docs/laser/README.md`.
+
 **Carrier laser fit check (2026-09-26).** Scott lasers a copy of every board in 1.5 mm basswood (outline + holes)
 before the mill runs. `python3 hardware/fitcheck/make_fitcheck.py` → `hardware/fitcheck/eyes-carrier-fitcheck.svg`
 for xTool Creative Space: **red** = cut (closed outline path + all 71 holes as stroked circles at the nominal drill
