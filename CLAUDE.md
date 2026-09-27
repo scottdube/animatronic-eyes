@@ -867,3 +867,8 @@ now refuses only regions holding copper or regions that admit the pour (tests in
 **Run order:** `clear_area6_comp.ngc`, `clear_area2_comp.ngc`, `clear_area5_comp.ngc` (T610, one tool change
 for all three), then `eyes-carrier-v2_outline_ramp.ngc` (T615). `--tool-number 610` is mandatory now that the
 job's outline tool is 615: without it clear would emit T615.
+**Clearing merged into ONE file (2026-09-26, ~20:50).** Scott: "why isnt the clearing in 1 file?" No reason but
+pcbmill's `clear` being one region per call. `out/eyes-carrier-v2_clear_comp.ngc` = the three `_comp` bodies
+(6, 2, 5) under one header and one T610 tool block; each section starts at clearance Z 0.0929 before its XY
+rapid. Deployed; the three single-area files were removed from the share (still in `out/`). **Run order now:**
+`eyes-carrier-v2_clear_comp.ngc` (T610), then `eyes-carrier-v2_outline_ramp.ngc` (T615).
