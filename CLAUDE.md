@@ -900,3 +900,12 @@ VCC/GND pins (joint or trace between TP2 and pad 35, or its GND pads), a weak re
 **Thermal photo, powered (Scott):** ambient 74.0 °F, ESP32 module can 91.2 °F (the hot spot), the part at the D1's top
 edge 76.7 °F (read as the regulator — which part it is is my guess from the image). No hot spot: rules out a heavy
 load and an overloaded regulator; an ESP32 running at ~+17 °F is normal. Module-pin 5V/3V3 readings still not taken.
+**D1 flashed on the carrier (2026-09-28), build 30e6860 over USB.** The chip read as ESP32-D0WD-V3 rev 3.1, 4 MB, flash
+3.3 V strap. What was on it before printed a repeating garbage line at 115200: foreign firmware, not ours. Boot log
+after the flash: base MAC d4:8a:fc:9e:7a:cc adopted (BT …:ce), Bluetooth up, **PCA9685 prescale 254 (answering) on
+IO27/IO25**, Wi-Fi at 192.168.30.211 rssi −36. DevKit unplugged (Scott). **Settings are defaults:** 22 of 43 keys
+differ from docs/settings/2026-09-25-devkit-values.json (trims, centers, lid presets). Controller not tried yet; no
+NVS copy was made, so this is the "MAC alone" path.
+**The 2.7 V was read while the foreign firmware ran.** Not re-measured on ours yet. **Thermal on USB power (Scott):**
+a 115 °F spot at the D1's USB corner (ambient 74.4); on 12 V that corner was ~77 °F. So the hot part is on the USB
+path — on USB the D1 feeds the carrier's whole +5V net (PCA V+, the buck's output). Which part it is: not identified.
