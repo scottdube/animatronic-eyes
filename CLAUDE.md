@@ -878,3 +878,9 @@ pcbmill's `clear` being one region per call. `out/eyes-carrier-v2_clear_comp.ngc
 (6, 2, 5) under one header and one T610 tool block; each section starts at clearance Z 0.0929 before its XY
 rapid. Deployed; the three single-area files were removed from the share (still in `out/`). **Run order now:**
 `eyes-carrier-v2_clear_comp.ngc` (T610), then `eyes-carrier-v2_outline_ramp.ngc` (T615).
+**Assembly BOM check (2026-09-28, Scott assembling today):** InvenTree part #837's BOM (BO-0010) still lists
+**2× 10k 1/4 W for the rail divider, which the carrier dropped** — stale line, not removed yet (asked Scott).
+The BOM also has no line for the 12 V adapter, the M3 standoffs or the D1 Mini headers. Carrier schematic
+(kicad-cli BOM): C1 220u, C2 100n, J1 KF301, U1 D1 Mini, U2 PCA9685, U3 LM2596, TP1/2/3/5/6, H1–H4. Still open
+at assembly: D1 Minis both allocated to BO-0009; stock 683 adapter is shrink-fit's; firmware still on the
+default I2C pins (carrier needs `Wire.begin(27, 25)`).
