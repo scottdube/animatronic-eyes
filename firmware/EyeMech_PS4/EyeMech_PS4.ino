@@ -89,6 +89,11 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // it resets into sleep with every output off, and the ESP32 keeps writing positions
 // it ignores: nothing moves, not even a buzz (seen 2026-09-24). Once a second the
 // prescaler is read back; if it isn't ours, the chip is set up again.
+// 60 Hz on the internal 25 MHz oscillator: 25e6 / (4096 * 60) - 1, rounded as Adafruit's
+// setPWMFreq() does. The check compares against this, not against whatever the chip read
+// back at boot: a dead module on the carrier (2026-09-28) read 254 every time, matched
+// itself, and reported pca true while every output sat at 0 V.
+const uint8_t PCA_PRESCALE_60HZ = 101;
 uint8_t pcaPrescale = 0;
 bool pcaOk = false;
 uint32_t pcaResets = 0;
@@ -103,14 +108,13 @@ void pcaSetup() {
 
 void pcaCheck() {
   uint8_t p = pwm.readPrescale();
-  pcaOk = p == pcaPrescale && p != 0 && p != 0xFF;
+  pcaPrescale = p;
+  pcaOk = p == PCA_PRESCALE_60HZ;
   if (!pcaOk) {
     pcaResets++;
     Serial.printf("PCA9685: prescale read %u, expected %u - setting it up again (#%lu)\n",
-                  p, pcaPrescale, (unsigned long)pcaResets);
-    uint8_t want = pcaPrescale;
+                  p, PCA_PRESCALE_60HZ, (unsigned long)pcaResets);
     pcaSetup();
-    if (want && want != 0xFF) pcaPrescale = want;
   }
 }
 
@@ -312,7 +316,7 @@ void setup() {
 
   Wire.begin(I2C_SDA, I2C_SCL);  // once: pcaCheck() re-runs pcaSetup() on the live bus
   pcaSetup();
-  pcaOk = pcaPrescale != 0 && pcaPrescale != 0xFF;
+  pcaOk = pcaPrescale == PCA_PRESCALE_60HZ;
   Serial.printf("PCA9685: prescale %u (%s)\n", pcaPrescale, pcaOk ? "answering" : "NOT answering");
 }
 
