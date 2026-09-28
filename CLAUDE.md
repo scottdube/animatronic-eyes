@@ -924,3 +924,5 @@ suspicion. From the copper side the "same" pins read −1.9 V (3V3) and 0 V (5V)
 against itself: the fit is that the black lead sat on the 5V pin when probing from underneath (mirrored view), not a
 fault — a header pin is one piece of metal top to bottom. Hypothesis until re-probed underneath against TP5. The
 earlier 2.7 V is then also suspect as a probe-reference reading, not a rail fault. Open: that re-probe.
+**Correction (Scott): the black lead WAS on ground both times, not between the pins.** So the question is which copper
+he used as ground underneath: the −1.9/0 pair is what a reference on the +5V net reads. Check that spot to TP5.

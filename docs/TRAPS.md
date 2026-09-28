@@ -122,8 +122,9 @@ found it in a minute. Rule: any outline that was edited after export gets a wood
 check before the mill runs, and once corrected, the generator's OUTLINE list is the
 master, not the DXF.
 
-## Probing the carrier from the copper side mirrors every pin (2026-09-28)
-Top of the D1: 3V3 pin 3.3 V, 5V pin 5.2 V. Same pins from underneath: −1.9 V and 0 V. −1.9 = 3.3 − 5.2, so the black
-lead was on +5V, not GND. The legend is on the component side, so from the copper side every position is mirrored and
-nothing is labelled. Clip the black lead to TP5/TP6 (GND) first, and read any "impossible" or negative number as
-arithmetic between two rails before calling it a fault. This probably also explains the 2.7 V "3V3" chased first.
+## Copper-side readings that differ from the top of the same pin (2026-09-28, cause OPEN)
+Top of the D1, lead to ground: 3V3 pin 3.3 V, 5V pin 5.2 V. Same pins from underneath, black lead on "ground"
+(Scott): −1.9 V and 0 V. A header pin is one piece of metal, so the pin can't differ: the REFERENCE did. −1.9 = 3.3 − 5.2
+exactly and 0 = 5V against itself, which is what a reference on the +5V net gives. On a milled board every leftover
+copper region looks like pour, and +5V is a copper region separated only by an isolation groove. Hypothesis until the
+reference spot is checked against TP5. Rule: clip the black lead to TP5/TP6, not to "the copper nearby".
