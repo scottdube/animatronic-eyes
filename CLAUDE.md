@@ -1035,3 +1035,9 @@ arrays not split (one array covers ch 0–3, another 4–7; all six channels dea
 gets replaced either way. How it died (bad unit, soldering, or the open-D1-GND period) is NOT established.
 /pcatest set back to run. Fix: desolder U2, fit a known-good PCA9685 (the DevKit's proven module, or a stock one — Scott
 read one at SLN A3-R8C1 on 2026-09-25); test a replacement's outputs BEFORE soldering it in (DevKit + jumpers + /pcatest).
+**Scope shows clean pulses (Scott's photo, ~15:45):** 3.3 V, ~1.4 ms wide, ~17 ms period (60 Hz), 5 ms/div 1 V/div.
+But .211 is now answering as the **DevKit**: build c5cfdcd-dirty (DevKit firmware), no /pca route, rail divider wired
+(4.57 V), reset power-on, mode idle (the power-up show). So the pulses are the DevKit's PCA module, not the carrier's —
+which, if that is where the probe was, confirms the known-good module AND that this scope setup shows pulses when they
+exist. Not yet confirmed with Scott which board the probe was on. Carrier verdict above stands on its own evidence.
+Same MAC: the D1 and the DevKit must not both be powered.
