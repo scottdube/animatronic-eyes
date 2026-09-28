@@ -909,3 +909,7 @@ NVS copy was made, so this is the "MAC alone" path.
 **The 2.7 V was read while the foreign firmware ran.** Not re-measured on ours yet. **Thermal on USB power (Scott):**
 a 115 °F spot at the D1's USB corner (ambient 74.4); on 12 V that corner was ~77 °F. So the hot part is on the USB
 path — on USB the D1 feeds the carrier's whole +5V net (PCA V+, the buck's output). Which part it is: not identified.
+**3V3 still 2.7 V on our firmware (Scott, USB power), with Wi-Fi, BT and the PCA all working.** Which point he probed
+(TP3 or the D1's pin) is not recorded. Next discriminator: the D1's own 3V3 pin to its own GND pin, then TP3 at the
+same moment. Equal → the module's regulator/rail is low. Pin 3.3, TP3 2.7 → an open or high-resistance joint in the
+milled +3V3 path (pad 16 → under the module → lane x −17.2 → PCA VCC).
