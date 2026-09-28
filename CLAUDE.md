@@ -955,3 +955,9 @@ sleep throughout (no takeover registered), no ESP reset. Connect-then-drop, repe
 has no link key for this controller (NVS not copied; the first connection may have been a fresh auth that wasn't
 stored), or no input packets arriving. Next: serial log (PS4 connected/disconnected + stat pkts/s) during a P4 press,
 read with DTR/RTS held low so opening the port doesn't reset the board.
+**Controller battery readout added (build 6314000, OTA 2026-09-28 ~14:26):** /status `batt` (DS4 0..10, 11 = full while
+charging; −1 = no packet since boot) and `charging`, on the page's status line, and in the serial disconnect line. The
+value is the LAST reported, kept after a drop. Scott suspected the ~21 s drops were a dying controller battery (light
+wouldn't stay lit). **My OTA restart dropped a connection Scott had just made on USB charge power** — then "connected but
+no control": /status said conn false from the restart on. Don't flash while Scott is testing the controller.
+Board side meanwhile fine: idle show ran on its own (x/y moving), pca true.
