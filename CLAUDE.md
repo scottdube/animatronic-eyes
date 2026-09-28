@@ -1130,3 +1130,12 @@ the fallback if the ohms are ambiguous.
 **Output paths MEASURED whole (Scott, 2026-09-28):** unpowered, chip leg → header PWM pin, pins 6–11 → columns 0–5:
 all six read ~220 Ω. So every LED leg's joint, both arrays and their joints are intact: the resistor/joint branch is
 ruled out for ch 0–5. Supply legs (28 ↔ VCC, 14 ↔ GND) still to read before calling it the chip.
+**FOUND (Scott, 2026-09-28): bad solder joint on chip pin 14 (VSS).** Leg-to-GND-header did not read ~0 Ω (value not
+given); he had passed the joints under the microscope earlier. So the module's "dead chip" is, at least, a chip with
+no proper ground. **Cause of the dead outputs: hypothesis, untested until pin 14 is reflowed and the module is run.**
+A chip with VSS open still finds ground through the protection diodes of pins that ARE grounded (address pins, OE),
+so it can sit ~a diode drop off ground and answer I2C badly — which fits the prescale 254 readback on the DevKit.
+Pattern worth noting: **254 was read twice today and both times a ground was open** (here, and the D1's first boot
+with its GND pin unsoldered). Two cases, not a rule. Pin 28 ↔ VCC not yet reported.
+Consequence: the plan turns from salvage to repair. Reflow pin 14, re-read 14 ↔ GND ~0 Ω, then prove it powered
+(the 0x41 rig in the handoff is the way: the carrier's PCA is soldered in).
