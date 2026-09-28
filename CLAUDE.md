@@ -1145,3 +1145,10 @@ only fault found. Next: reflow 14, re-read ~0 Ω, then the powered 0x41 test.
 DevKit (same board family as the old DevKit) runs `firmware/pca_bench_test` — serial only, no Wi-Fi/BT, module alone
 at 0x40 on 21/22, so no A0 bridge. NOT the eyes firmware: it adopts the old DevKit's base MAC and would take .211 and
 the controller from the D1. The addr= change (9050011) stays committed, unflashed, unused.
+**Bench board flashed (2026-09-28):** spare USB-C DevKit = ESP32-D0WD-V3 rev 3.1, MAC 68:09:47:9e:97:3c, on
+/dev/cu.usbserial-0001, running pca_bench_test (2c098e7). **First result: I2C scan finds NOTHING, no ACK at 0x40, and a
+scan takes ~6 s** (an empty healthy bus NACKs in ~0.1 ms per address; ~50 ms each = Wire timeouts). Reads as a line
+held low or a stretched clock, not merely an absent device. Hypotheses, untested: module VCC not powered (its 10k
+pull-ups then drag SDA/SCL to 0 V), SDA/SCL not on 21/22, or the reflowed chip holding a line low. Asked Scott for
+module VCC, SDA, SCL to GND, powered (expect ~3.3 V each).
+Opening the port with DTR/RTS pre-set low still reset this board once (its boot banner reprinted).
