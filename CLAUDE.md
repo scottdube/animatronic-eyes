@@ -942,3 +942,8 @@ power cycle. Anything tuned on the DevKit after 09-25 is not on the D1 (the DevK
 D1's USB-end corner, where the two small parts sit (which one is the regulator: not identified). Power source for this
 shot not stated. Before the fix that corner was ~77 °F on carrier power and 115 °F on USB. 42 °C is an ordinary LDO
 temperature at ESP32 load (5 → 3.3 V); no action.
+**Controller CONNECTED to the D1 (2026-09-28): the "MAC alone" path works** — base MAC adopted, no NVS copy, no
+re-pair. /status: conn true, mode live, pca true, pcaPrescale 101 (= 25 MHz / (4096 × 60) − 1, correct). The first boot on
+the carrier logged prescale 254, read while the D1 GND pin was still unsoldered; after the fix and a power cycle it
+reads 101. Link between the two not tested. **Swap checklist complete:** flashed, .211 kept, settings restored,
+controller paired. The DevKit stays unplugged (same MAC).
