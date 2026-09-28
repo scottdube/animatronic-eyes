@@ -128,3 +128,9 @@ Top of the D1, lead to ground: 3V3 pin 3.3 V, 5V pin 5.2 V. Same pins from under
 exactly and 0 = 5V against itself, which is what a reference on the +5V net gives. On a milled board every leftover
 copper region looks like pour, and +5V is a copper region separated only by an isolation groove. Hypothesis until the
 reference spot is checked against TP5. Rule: clip the black lead to TP5/TP6, not to "the copper nearby".
+
+## An unsoldered GND pin reads as a low 3V3 rail, not as a dead board (2026-09-28)
+With a D1 GND header pin never soldered (a small pad on thermal-relief spokes that didn't look like it needed a joint), the
+ESP32 ran normally, Wi-Fi and I2C included, but its 3V3 read 2.7 V against carrier ground, and only on carrier power: on USB
+the cable grounds the module. Some other path is carrying the ground return, and the D1's ground sits ~0.6 V off. The
+regulator is fine. Before blaming a regulator, measure its output against ITS OWN ground pin, then that ground against TP5.

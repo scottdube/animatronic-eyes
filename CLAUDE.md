@@ -930,3 +930,8 @@ he used as ground underneath: the −1.9/0 pair is what a reference on the +5V n
 the 3V3 pin reads 3.3. Reference was ground (Scott) — which ground point, TP5 or the regulator's own GND pin, not
 recorded. Open split: output vs the REGULATOR's GND pin (3.3 → the regulator is fine and the D1's ground sits ~0.6 V off
 the carrier's, i.e. its GND pins/pour spokes; 2.7 → the regulator), plus the regulator GND pin vs TP5.
+**Likely cause found (Scott): a D1 GND pin was never soldered.** The pad has thermal-relief spokes to the pour and
+is small, so it did not read as needing a joint. Fits the ground-offset reading (regulator 3.3 V over its own ground,
+2.7 V against the carrier's; fine on USB, where the cable grounds the D1). Scott soldering it now; CONFIRMED only when
+3V3 reads 3.3 V against TP5 on carrier power. Design note for a V3: give the D1 GND pads solid pour connections like
+the PCA's pins 6/12, and mark them in the legend.
