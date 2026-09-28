@@ -1139,3 +1139,5 @@ Pattern worth noting: **254 was read twice today and both times a ground was ope
 with its GND pin unsoldered). Two cases, not a rule. Pin 28 ↔ VCC not yet reported.
 Consequence: the plan turns from salvage to repair. Reflow pin 14, re-read 14 ↔ GND ~0 Ω, then prove it powered
 (the 0x41 rig in the handoff is the way: the carrier's PCA is soldered in).
+**Pin 28 (VDD) ↔ VCC header = 0 Ω (Scott).** Every chip path measured is whole except pin 14. The open VSS joint is the
+only fault found. Next: reflow 14, re-read ~0 Ω, then the powered 0x41 test.
