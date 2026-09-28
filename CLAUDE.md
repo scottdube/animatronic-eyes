@@ -938,3 +938,7 @@ the PCA's pins 6/12, and mark them in the legend.
 **Settings restored on the D1 (2026-09-28, Scott's pick: the 09-25 snapshot, not a fresh DevKit read).** 22 differing
 keys POSTed to /set, then /save; /values read back matches the snapshot on all 42 keys, dirty false. Not re-read after a
 power cycle. Anything tuned on the DevKit after 09-25 is not on the D1 (the DevKit still holds it, unplugged).
+**Thermal after the GND fix (Scott, 2026-09-28):** ambient 75.0 °F, ESP32 can 89.2 °F, hot spot 107.6 °F (42 °C) at the
+D1's USB-end corner, where the two small parts sit (which one is the regulator: not identified). Power source for this
+shot not stated. Before the fix that corner was ~77 °F on carrier power and 115 °F on USB. 42 °C is an ordinary LDO
+temperature at ESP32 load (5 → 3.3 V); no action.
