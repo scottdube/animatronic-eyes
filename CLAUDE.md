@@ -935,3 +935,6 @@ is small, so it did not read as needing a joint. Fits the ground-offset reading 
 2.7 V against the carrier's; fine on USB, where the cable grounds the D1). **CONFIRMED 2026-09-28: soldered, 3V3 = 3.3 V against TP5
 on carrier power (Scott).** The carrier's power is done. Design note for a V3: give the D1 GND pads solid pour connections like
 the PCA's pins 6/12, and mark them in the legend.
+**Settings restored on the D1 (2026-09-28, Scott's pick: the 09-25 snapshot, not a fresh DevKit read).** 22 differing
+keys POSTed to /set, then /save; /values read back matches the snapshot on all 42 keys, dirty false. Not re-read after a
+power cycle. Anything tuned on the DevKit after 09-25 is not on the D1 (the DevKit still holds it, unplugged).
