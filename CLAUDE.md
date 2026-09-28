@@ -897,3 +897,6 @@ power through the D1's diode). I2C firmware change (27/25) committed and compile
 Pad maps re-read (footprints.py D1_NAMES 16=3V3/35=VCC, PCA_NAMES V+,VCC,SDA,SCL,OE,GND): consistent, not verified against the module.
 **TP3–TP5 powered off = 2 MΩ (Scott).** No static short on +3V3. Left: the D1 not actually getting 5 V at its own
 VCC/GND pins (joint or trace between TP2 and pad 35, or its GND pads), a weak regulator, or a boot-loop load (read the USB boot log).
+**Thermal photo, powered (Scott):** ambient 74.0 °F, ESP32 module can 91.2 °F (the hot spot), the part at the D1's top
+edge 76.7 °F (read as the regulator — which part it is is my guess from the image). No hot spot: rules out a heavy
+load and an overloaded regulator; an ESP32 running at ~+17 °F is normal. Module-pin 5V/3V3 readings still not taken.
