@@ -982,3 +982,6 @@ adjacent GND pin on the PCA header.
 **Scope, first look at the ch-0 signal pin (DHO914):** 200 mV/div, 500 ns/div, Normal trigger rising at 7 mV → flat 0 V
 with ±0.2–0.4 V noise bursts; the trigger fired on noise. Inconclusive at that setting (a 16.7 ms period can't show at
 500 ns/div). Re-taking at 1 V/div, 5 ms/div, trigger 1.5 V, Auto.
+**Scope, proper setup (5 ms/div, 1 V/div, trigger 1.5 V, sweep Auto): ch-0 signal pin has NO pulses** — flat, ~200 mV
+noise only (Scott). The PCA is configured (prescale 101 read back) and being written, yet emits nothing. Next: OE pin
+voltage, then OE bridged to GND.
