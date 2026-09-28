@@ -255,6 +255,10 @@ void webBegin() {
     }
     sendJson(eyeStatusJson());
   });
+  server.on("/pca", HTTP_GET, [] {  // PCA9685 registers: MODE1/2, prescale, ALL_LED, ch 0-5
+    if (!authorized()) return;
+    sendJson(pcaRegsJson());
+  });
   server.on("/railreset", HTTP_POST, [] {  // start the rail's min/max/dips afresh
     if (!authorized()) return;
     railReset();

@@ -12,4 +12,5 @@ void webHandle();  // every loop
 
 // Implemented in the sketch
 String eyeStatusJson();                     // live state for the page's status line
+String pcaRegsJson();                       // GET /pca: PCA9685 register dump
 void applyLiveSetting(const String &key);   // a setting just changed in RAM

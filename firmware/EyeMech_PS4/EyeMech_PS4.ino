@@ -114,6 +114,30 @@ void pcaCheck() {
   }
 }
 
+// GET /pca: the chip's own registers, for when I2C answers but nothing moves (2026-09-28,
+// carrier bring-up). The prescale alone can't see a stopped oscillator (MODE1 SLEEP/EXTCLK)
+// or an ALL_LED full-off. -1 = the read failed.
+int pcaReg(uint8_t reg) {
+  Wire.beginTransmission(0x40);
+  Wire.write(reg);
+  if (Wire.endTransmission(false) != 0) return -1;
+  if (Wire.requestFrom((uint8_t)0x40, (uint8_t)1) != 1) return -1;
+  return Wire.read();
+}
+
+String pcaRegsJson() {
+  String s = "{\"mode1\":" + String(pcaReg(0x00)) + ",\"mode2\":" + String(pcaReg(0x01)) +
+             ",\"prescale\":" + String(pcaReg(0xFE)) + ",\"allLed\":[";
+  for (uint8_t r = 0xFA; r <= 0xFD; r++) s += String(pcaReg(r)) + (r < 0xFD ? "," : "");
+  s += "],\"ch\":[";
+  for (uint8_t ch = 0; ch < 6; ch++) {  // ON_L, ON_H, OFF_L, OFF_H per channel
+    s += "[";
+    for (uint8_t i = 0; i < 4; i++) s += String(pcaReg(0x06 + 4 * ch + i)) + (i < 3 ? "," : "");
+    s += ch < 5 ? "]," : "]";
+  }
+  return s + "]}";
+}
+
 int xval = 512;
 int yval = 512;
 int switchval = LOW;
