@@ -989,3 +989,7 @@ voltage, then OE bridged to GND.
 mode sleep with sleepQuiet 1, which sets every channel full-off on purpose (no pulses by design). My miss — I didn't
 check the mode before asking for the scope. Sent lookL (mode rest, pulses on) for a re-take. Board had been
 power-cycled again (reset power-on, pcaResets back to 0).
+**Scope re-take in REST (lookL/lookR sweep 15:01:02–15:01:34, then resting at x 1023):** 5 ms/div, CH1 200 mV/div with
+−1.19 V offset (window ≈ 0.59–1.99 V), trigger 900 mV sweep Auto: NO trace in the window at all. 3.3 V pulses would cross
+it on every edge, so no pulses — but where the trace actually sits (0, 3.3, 5 V) is off-screen, so which pin the probe is
+on is not confirmed. Next: 1 V/div, offset zeroed.
