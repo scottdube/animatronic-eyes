@@ -6,7 +6,8 @@
 // Wiring: module VCC -> 3V3, GND -> GND, SDA -> GPIO21, SCL -> GPIO22, module OE -> GND.
 // V+ is not needed to scope the outputs.
 //
-// Serial 115200. On boot: I2C scan, set the chip up at 60 Hz, hold ch 0-5 HIGH, dump.
+// Serial 115200. On boot: I2C scan, set the chip up at 60 Hz, ch 0-5 PULSING 1.5 ms, dump.
+// Needs no serial at all: power it and scope a PWM pin. Keys below are optional.
 //   h = ch 0-5 full-on (steady 3.3 V, meter)   l = full-off (0 V)
 //   p = 1.5 ms pulses at 60 Hz (scope)          d = dump registers
 //   s = I2C scan                                i = set the chip up again
@@ -77,7 +78,7 @@ void setup() {
   Wire.begin(21, 22);
   Serial.println("\n=== PCA9685 bench test ===");
   scan();
-  if (setup60()) { setAll(1); dump(); }
+  if (setup60()) { setAll(2); dump(); }
 }
 
 void loop() {
