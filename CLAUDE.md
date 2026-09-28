@@ -974,3 +974,8 @@ only when limp): unchanged from the DevKit build except the Wire pins. **Leading
 own GND is not reaching the carrier** (same failure as the D1 pin): the servo GND row would float (servos can't move),
 the chip could still limp along on I2C through its pin diodes, which would also explain pcaResets 1. Check: V+ to the
 GND pin of the SAME servo header, and PCA GND pin ↔ TP5 continuity powered off. Then a scope on a signal pin.
+**PCA ground hypothesis FALSIFIED (Scott):** V+ to the same servo header's GND = 5 V. Servo power and ground are fine.
+Remaining: no pulses leaving the PCA. Next: DC meter on a channel-0 signal pin to GND (pulsing at 60 Hz × ~1.5 ms ≈ 0.3 V
+average; 0 V = nothing out), then OE: it is unconnected on the carrier (by design) and whether this PCA module pulls it
+low on its own board is not verified; OE-high disables every output while I2C still works. Test: jumper OE to the
+adjacent GND pin on the PCA header.
