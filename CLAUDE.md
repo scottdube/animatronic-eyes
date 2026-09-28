@@ -961,3 +961,9 @@ value is the LAST reported, kept after a drop. Scott suspected the ~21 s drops w
 wouldn't stay lit). **My OTA restart dropped a connection Scott had just made on USB charge power** — then "connected but
 no control": /status said conn false from the restart on. Don't flash while Scott is testing the controller.
 Board side meanwhile fine: idle show ran on its own (x/y moving), pca true.
+**Connected, no eye motion (Scott, 14:30, on USB charge power — so the DS4 DOES work over BT while charging).** Log:
+14:30:11 conn true, batt 9, charging; 14:30:15 mode live (stick takeover received); 14:30:29 rest. So packets and stick
+input reach the board: the fault is board → servos. **pcaResets = 1** since the 14:26 restart: the PCA lost its prescale
+once and was set up again (its logic power or I2C blinked). Correction: my "eyes fine, idle show running" at 14:27 was
+the board's commanded x/y, not seen motion. Next: did anything move since the servo move; V+ at a servo header; a
+page-driven "lookL" while Scott watches.
