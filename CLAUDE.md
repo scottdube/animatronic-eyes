@@ -999,3 +999,10 @@ Nothing moved on any of the six channels since the servo move, so the fault is c
 prescale reads 101, which rules out bus and power, NOT the output stage. Chip-wide causes that leave the prescale intact
 (hypotheses): MODE1 SLEEP set (oscillator stopped), EXTCLK latched with no clock, ALL_LED full-off, or OE high enough
 (0.25 V is below the 0.99 V threshold, so unlikely). Instrument: GET /pca register readback (build below).
+**PCA registers read back (build 030657e, GET /pca, 2026-09-28 ~15:15, mode rest):** MODE1 0x20 (auto-increment only:
+SLEEP clear, EXTCLK clear, oscillator running), MODE2 0x04 (totem-pole outputs, normal), prescale 101, ALL_LED all 0,
+channels 0–5 ON 0 / OFF 309, 387, 304, 375, 346, 330 counts (1.26–1.58 ms at 60 Hz). **The chip is configured, awake and
+loaded with valid pulses, so I2C works end to end** (the D1's writes come back exactly) and every chip-wide software cause
+is ruled out. The fault is between the chip's output stage and the header's signal pins: OE at the CHIP (pin 23; 0.25 V
+was read at the header), the chip itself, the module's series resistors, or the probe row. Scoping SCL/SDA (Scott asked)
+adds nothing now: a readback of what was written is stronger evidence than bus edges.
