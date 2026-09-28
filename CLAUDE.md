@@ -884,3 +884,7 @@ The BOM also has no line for the 12 V adapter, the M3 standoffs or the D1 Mini h
 (kicad-cli BOM): C1 220u, C2 100n, J1 KF301, U1 D1 Mini, U2 PCA9685, U3 LM2596, TP1/2/3/5/6, H1–H4. Still open
 at assembly: D1 Minis both allocated to BO-0009; stock 683 adapter is shrink-fit's; firmware still on the
 default I2C pins (carrier needs `Wire.begin(27, 25)`).
+**Carrier STUFFED (Scott, 2026-09-28).** Not yet powered. Bring-up not done: whether the LM2596 was set to 5.0 V
+before it was soldered in is not recorded (its OUT+ is hard-wired to C1 [10 V], PCA V+ and D1 VCC, so an unset pot can
+put ~11 V on all three). Firmware still calls `pwm.begin()` on the default Wire pins (21/22): the carrier needs
+`Wire.begin(27, 25)` before it or the PCA will not answer.
