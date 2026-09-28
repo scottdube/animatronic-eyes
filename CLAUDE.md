@@ -1152,3 +1152,8 @@ held low or a stretched clock, not merely an absent device. Hypotheses, untested
 pull-ups then drag SDA/SCL to 0 V), SDA/SCL not on 21/22, or the reflowed chip holding a line low. Asked Scott for
 module VCC, SDA, SCL to GND, powered (expect ~3.3 V each).
 Opening the port with DTR/RTS pre-set low still reset this board once (its boot banner reprinted).
+**Bench probe (build with `q`, 2026-09-28):** endTransmission to 0x40 AND to the empty 0x41 both return **code 5
+(timeout) in ~49.6 ms**; right after, **GPIO22 (SCL) reads 0** at the ESP while Scott's meter read SCL 3.3 V at the
+module (VCC 3.3, SDA 3.3). A timeout on an address nobody owns is a bus fault, not the chip. ESP pin low + module pin
+high = the SCL wire is not joining them (hypothesis; readings taken at different moments). Asked for unpowered
+continuity GPIO22 ↔ module SCL and GPIO21 ↔ module SDA.

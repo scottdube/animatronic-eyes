@@ -72,11 +72,24 @@ void dump() {
   }
 }
 
+// q = probe 0x40 and an empty 0x41 once each: endTransmission code (0 ACK, 2 address NACK,
+// 5 timeout, 4 other) and how long the call took. A clean empty bus NACKs in well under 1 ms.
+void probe() {
+  for (uint8_t a : {(uint8_t)0x40, (uint8_t)0x41}) {
+    uint32_t t = micros();
+    Wire.beginTransmission(a);
+    uint8_t e = Wire.endTransmission();
+    Serial.printf("probe 0x%02X: code %u in %lu us\n", a, e, (unsigned long)(micros() - t));
+  }
+  Serial.printf("pins now: SDA(21)=%d SCL(22)=%d\n", digitalRead(21), digitalRead(22));
+}
+
 void setup() {
   Serial.begin(115200);
   delay(500);
   Wire.begin(21, 22);
   Serial.println("\n=== PCA9685 bench test ===");
+  probe();
   scan();
   if (setup60()) { setAll(2); dump(); }
 }
@@ -90,6 +103,7 @@ void loop() {
     case 'p': setAll(2); dump(); break;
     case 'd': dump(); break;
     case 's': scan(); break;
+    case 'q': probe(); break;
     case 'i': if (setup60()) dump(); break;
   }
 }
