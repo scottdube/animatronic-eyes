@@ -1024,3 +1024,7 @@ still flat 0 V with OE jumpered to GND. **OE hypothesis FALSIFIED.** Build a89da
 (holds ch 0–5 full-on/off, bypassing the PWM counter; the loop stops writing them). Set to HIGH at ~15:33, /pca confirms
 ON_H 0x10 on all six. Meter on the PWM pin: 3.3 V → output stage fine, counter/oscillator not running; 0 V → the output
 path (chip pin → 220 Ω → header) is dead.
+**Which PCA (Scott, ~15:35): "Same exact board, bought at the same time."** Read as: same model, same purchase, a
+DIFFERENT unit from the one that drove the servos on the DevKit (not yet confirmed). If so, the carrier's PCA has never
+been proven working — a dead unit, or one damaged in soldering or during the unsoldered-D1-GND period — and the DevKit's
+module is the known-good comparison (see memory: compare the working unit).
