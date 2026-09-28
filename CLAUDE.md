@@ -950,3 +950,8 @@ controller paired. The DevKit stays unplugged (same MAC).
 **After moving the servos (2026-09-28): "can't reconnect the controller" (Scott).** /status right after his message:
 conn TRUE, mode sleep (lids 60, x/y 512) — so it HAD reconnected after the power-up and then gone to sleep on the
 hands-off timer (handsOffSecs 30). Seconds later conn false, still sleep. Cause of the drop not established.
+**Reconnect timed (14:23, /status every 2 s):** P4 → conn true at 14:23:36, false again at ~14:23:57 (~21 s), mode stayed
+sleep throughout (no takeover registered), no ESP reset. Connect-then-drop, repeatable. Candidates, none tested: the D1
+has no link key for this controller (NVS not copied; the first connection may have been a fresh auth that wasn't
+stored), or no input packets arriving. Next: serial log (PS4 connected/disconnected + stat pkts/s) during a P4 press,
+read with DTR/RTS held low so opening the port doesn't reset the board.
