@@ -1071,3 +1071,7 @@ the swapped servos get each other's closed pulse (240/400), the horns are seated
 channel's pulse rises (the bottom servo's CLOSING direction) and the bottom's falls (the top's closing direction), so both
 lids drive shut. The plugs were moved twice today (dead module, then the replacement). Kit map: ch 2 his-left top,
 3 his-left bottom, 4 his-right top, 5 his-right bottom.
+**CONFIRMED (Scott, ~16:50): the right eye's plugs were swapped on the replacement PCA; fixed.** Consequences: (1) that eye's
+horns were seated in Service while swapped, i.e. each at the OTHER servo's closed pulse — re-seat them in Service now that
+the plugs are right; (2) Scott's squint trims from this afternoon (sLBot 0→21, sRTop −9→10) were set on swapped plugs and
+are suspect; the 09-25 values are the reference.
