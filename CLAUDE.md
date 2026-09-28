@@ -1047,3 +1047,7 @@ gives a flat ch-0 line. DevKit state read right after: mode idle (show running, 
 the D1's first boot read). **The module is dead; the carrier and the D1 are not at fault.** Firmware gap found: pcaCheck
 compares against whatever pcaSetup read back, so a chip that reads 254 counts as "ok"; it should compare against the 60 Hz
 value (101). Not fixed yet. Next: the original (proven) PCA onto the carrier.
+**New PCA on the carrier WORKS (Scott's scope photo, ~16:05):** ch-0 pulses 3.3 V, ~1 ms wide, ~17 ms period. /status at the
+same time: build a89daaf (the D1), reset power-on, mode idle (power-up show), pca true, **prescale 101**, pcaResets 0; /pca
+ch 0 OFF 242 (0.98 ms), matching the photo. "New" per Scott = a third module, not the DevKit's original (not asked further).
+Next: servos plugged in, watch a show, then the controller.
