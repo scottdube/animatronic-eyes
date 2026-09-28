@@ -1039,5 +1039,5 @@ read one at SLN A3-R8C1 on 2026-09-25); test a replacement's outputs BEFORE sold
 But .211 is now answering as the **DevKit**: build c5cfdcd-dirty (DevKit firmware), no /pca route, rail divider wired
 (4.57 V), reset power-on, mode idle (the power-up show). So the pulses are the DevKit's PCA module, not the carrier's —
 which, if that is where the probe was, confirms the known-good module AND that this scope setup shows pulses when they
-exist. Not yet confirmed with Scott which board the probe was on. Carrier verdict above stands on its own evidence.
+exist. CONFIRMED by Scott: DevKit + the original PCA board, probe on the ch-0 signal pin. Known-good module and the scope method both proven. Carrier verdict above stands on its own evidence.
 Same MAC: the D1 and the DevKit must not both be powered.
