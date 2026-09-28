@@ -134,3 +134,8 @@ With a D1 GND header pin never soldered (a small pad on thermal-relief spokes th
 ESP32 ran normally, Wi-Fi and I2C included, but its 3V3 read 2.7 V against carrier ground, and only on carrier power: on USB
 the cable grounds the module. Some other path is carrying the ground return, and the D1's ground sits ~0.6 V off. The
 regulator is fine. Before blaming a regulator, measure its output against ITS OWN ground pin, then that ground against TP5.
+
+## DHO914: the front-panel AUTO key is autoscale, not the Auto trigger sweep (2026-09-28)
+Pressing AUTO re-sets V/div, timebase and trigger from whatever it finds, wiping a hand-set 1 V / 5 ms / 1.5 V setup.
+The Auto *sweep* (draws a trace with no trigger) is in the Trigger menu: Sweep → Auto. Side note: autoscale on the
+servo signal pin chose 200 mV/div and 500 ns/div, i.e. it found only noise there — a hint of no pulses, not proof.
