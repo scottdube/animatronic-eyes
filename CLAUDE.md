@@ -893,3 +893,5 @@ put ~11 V on all three). Firmware still calls `pwm.begin()` on the default Wire 
 moment. TP2 ~5 V → 3V3 is being loaded (bridge on the milled +3V3 lane, or the regulator is overloaded/boot-looping;
 check TP3–TP5 ohms powered off, and feel the D1's regulator). TP2 low → the supply side (buck set low, or USB-only
 power through the D1's diode). I2C firmware change (27/25) committed and compiled, not flashed.
+**TP2 = 5.08 V (Scott, same power-up).** Supply side ruled out: 3V3 is being loaded or the D1's regulator is failing.
+Pad maps re-read (footprints.py D1_NAMES 16=3V3/35=VCC, PCA_NAMES V+,VCC,SDA,SCL,OE,GND): consistent, not verified against the module.
