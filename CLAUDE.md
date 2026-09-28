@@ -1019,3 +1019,8 @@ the hands-off timer put it to sleep; when inside the OE test it went is not know
 The 15:05 capture (0 V, lookL held, rest) stays valid; the ~15:20 probe-row check may also have been in sleep. Sent lookL
 at ~15:27: /pca then showed ch 0 OFF 419 (1.7 ms), all channels loaded, mode rest, held until another command.
 **Rule for this bring-up: read /pca (OFF_H must not be 16) immediately before every scope or jumper test.**
+**OE re-take VALID (Scott, ~15:30):** /pca read right after showed rest, ch 0 OFF 419 loaded, not full-off — and ch 0
+still flat 0 V with OE jumpered to GND. **OE hypothesis FALSIFIED.** Build a89daaf adds POST /pcatest?out=high|low|run
+(holds ch 0–5 full-on/off, bypassing the PWM counter; the loop stops writing them). Set to HIGH at ~15:33, /pca confirms
+ON_H 0x10 on all six. Meter on the PWM pin: 3.3 V → output stage fine, counter/oscillator not running; 0 V → the output
+path (chip pin → 220 Ω → header) is dead.
