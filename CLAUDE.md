@@ -895,3 +895,5 @@ check TP3–TP5 ohms powered off, and feel the D1's regulator). TP2 low → the 
 power through the D1's diode). I2C firmware change (27/25) committed and compiled, not flashed.
 **TP2 = 5.08 V (Scott, same power-up).** Supply side ruled out: 3V3 is being loaded or the D1's regulator is failing.
 Pad maps re-read (footprints.py D1_NAMES 16=3V3/35=VCC, PCA_NAMES V+,VCC,SDA,SCL,OE,GND): consistent, not verified against the module.
+**TP3–TP5 powered off = 2 MΩ (Scott).** No static short on +3V3. Left: the D1 not actually getting 5 V at its own
+VCC/GND pins (joint or trace between TP2 and pad 35, or its GND pads), a weak regulator, or a boot-loop load (read the USB boot log).
