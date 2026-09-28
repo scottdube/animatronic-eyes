@@ -139,3 +139,9 @@ regulator is fine. Before blaming a regulator, measure its output against ITS OW
 Pressing AUTO re-sets V/div, timebase and trigger from whatever it finds, wiping a hand-set 1 V / 5 ms / 1.5 V setup.
 The Auto *sweep* (draws a trace with no trigger) is in the Trigger menu: Sweep → Auto. Side note: autoscale on the
 servo signal pin chose 200 mV/div and 500 ns/div, i.e. it found only noise there — a hint of no pulses, not proof.
+
+## esptool read-flash hard-resets the board into its firmware when it finishes (2026-09-28)
+The default `--after hard-reset` means a board plugged in holding BOOT, so it would not run, gets booted
+into its firmware anyway once the backup read ends. On the retired DevKit that briefly ran a second eyes host
+with the D1's MAC and IP for the ~15 s before the erase. The D1 kept the controller, luckily. On any board that
+must not run: pass `--after no-reset` on every esptool call.

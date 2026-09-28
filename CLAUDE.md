@@ -1097,3 +1097,10 @@ to be the DevKit.
 firmware never runs (it would take .211 and grab the controller). Take a last
 `read-flash` into `backup/` (its final rebuilt firmware plus NVS, unlike the
 09-24 backup of the original sketch), then run `erase-flash`.
+
+**Done 2026-09-28.** The factory MAC read d4:8a:fc:9e:7a:cc, confirming this was the DevKit. Last backup:
+`backup/devkit-final-2026-09-28.bin`, a full 4 MB read of the rebuilt firmware plus NVS, including the
+link key; hash in SHA256SUMS. Then `erase-flash`. A read-back of 0–64K (bootloader, partition table,
+NVS) was all 0xFF. The board is blank and stays in the bootloader. Afterwards the D1 still held the
+controller: df69225, live. Three photos are attached to stock 878. Trap: read-flash reset the board into
+its firmware in between (docs/TRAPS.md).
