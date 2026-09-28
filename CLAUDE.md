@@ -1075,3 +1075,6 @@ lids drive shut. The plugs were moved twice today (dead module, then the replace
 horns were seated in Service while swapped, i.e. each at the OTHER servo's closed pulse — re-seat them in Service now that
 the plugs are right; (2) Scott's squint trims from this afternoon (sLBot 0→21, sRTop −9→10) were set on swapped plugs and
 are suspect; the 09-25 values are the reference.
+**Prescale fix flashed (build df69225, app0, 2026-09-28 ~17:05):** after Scott saved (dirty false before the OTA). Boot reads
+pca true, prescale 101, pcaResets 0. All 42 settings identical before and after the restart. Scott's lid trims after the
+plug fix, saved: see /values (squint R top −22, R bot −25; normal R top −35).
