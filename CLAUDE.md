@@ -888,3 +888,8 @@ default I2C pins (carrier needs `Wire.begin(27, 25)`).
 before it was soldered in is not recorded (its OUT+ is hard-wired to C1 [10 V], PCA V+ and D1 VCC, so an unset pot can
 put ~11 V on all three). Firmware still calls `pwm.begin()` on the default Wire pins (21/22): the carrier needs
 `Wire.begin(27, 25)` before it or the PCA will not answer.
+**First power (Scott, 2026-09-28): 3V3 pin reads 2.7 V.** Everything else "looks good" (Scott). Not on Wi-Fi at
+.211 at the time (/status gave nothing). Cause NOT established. Discriminator asked for: TP2 (+5V) at the same
+moment. TP2 ~5 V → 3V3 is being loaded (bridge on the milled +3V3 lane, or the regulator is overloaded/boot-looping;
+check TP3–TP5 ohms powered off, and feel the D1's regulator). TP2 low → the supply side (buck set low, or USB-only
+power through the D1's diode). I2C firmware change (27/25) committed and compiled, not flashed.
