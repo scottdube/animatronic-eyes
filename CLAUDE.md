@@ -1056,3 +1056,10 @@ PCA9685, 12 V → LM2596 5.08 V, build a89daaf. What fixed the last "pulses on t
 (Scott didn't say; V+ at the new module was never read back to me). Still open: the pcaCheck fix (compare against 101, not
 the boot read); the dead module's fate (bin it, don't return it to stock); V3 carrier notes (solid pour on the D1 GND pads,
 OE pad tied to GND, female headers for U2 if the height allows).
+**Prescale check fixed (committed, NOT flashed — controller in use):** pcaCheck now compares against PCA_PRESCALE_60HZ = 101.
+**Lid mismatch after the swap (Scott, 2026-09-28 ~16:30):** tune squint so both eyes match, switch to normal, and the two
+eyes are off in opposite directions. Measured from /values vs the 09-25 snapshot: Scott's squint change was sLBot 0 → 21 and
+sRTop −9 → 10 (saved); normal/wide/closed trims are unchanged from 09-25. Firmware read: trims are per preset and blend
+between presets by lid % (trimAt), so a squint trim does not move normal — by design. Scott's hypothesis: the runaway
+before the swap knocked the horns/servos out of position. That fits: a horn shift offsets EVERY preset by about the same
+pulse count, and a per-preset trim fixes only the preset it was set in. Not tested.
