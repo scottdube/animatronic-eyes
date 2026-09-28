@@ -1051,3 +1051,8 @@ value (101). Not fixed yet. Next: the original (proven) PCA onto the carrier.
 same time: build a89daaf (the D1), reset power-on, mode idle (power-up show), pca true, **prescale 101**, pcaResets 0; /pca
 ch 0 OFF 242 (0.98 ms), matching the photo. "New" per Scott = a third module, not the DevKit's original (not asked further).
 Next: servos plugged in, watch a show, then the controller.
+**OPERATIONAL on the carrier (Scott, 2026-09-28 ~16:20):** eyes move under the controller. D1 Mini + carrier + replacement
+PCA9685, 12 V → LM2596 5.08 V, build a89daaf. What fixed the last "pulses on the pin, servos still" step is NOT recorded
+(Scott didn't say; V+ at the new module was never read back to me). Still open: the pcaCheck fix (compare against 101, not
+the boot read); the dead module's fate (bin it, don't return it to stock); V3 carrier notes (solid pour on the D1 GND pads,
+OE pad tied to GND, female headers for U2 if the height allows).
