@@ -1127,3 +1127,6 @@ joints are all in the path. ~220 Ω on ch 0–5, plus pin 28 ↔ VCC header and 
 whole and the fault is inside the chip. Any open → that joint/array. The "driven LOW" header reading does not
 settle it: a header pin cut off from the chip also reads 0 V into a scope probe. The 0x41 powered test stays as
 the fallback if the ohms are ambiguous.
+**Output paths MEASURED whole (Scott, 2026-09-28):** unpowered, chip leg → header PWM pin, pins 6–11 → columns 0–5:
+all six read ~220 Ω. So every LED leg's joint, both arrays and their joints are intact: the resistor/joint branch is
+ruled out for ch 0–5. Supply legs (28 ↔ VCC, 14 ↔ GND) still to read before calling it the chip.
