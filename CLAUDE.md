@@ -1041,3 +1041,9 @@ But .211 is now answering as the **DevKit**: build c5cfdcd-dirty (DevKit firmwar
 which, if that is where the probe was, confirms the known-good module AND that this scope setup shows pulses when they
 exist. CONFIRMED by Scott: DevKit + the original PCA board, probe on the ch-0 signal pin. Known-good module and the scope method both proven. Carrier verdict above stands on its own evidence.
 Same MAC: the D1 and the DevKit must not both be powered.
+**CONFIRMED on a known-good host (Scott, ~15:55):** the carrier's PCA module, unsoldered and wired to the DevKit, still
+gives a flat ch-0 line. DevKit state read right after: mode idle (show running, pulses expected, not quiet sleep), pca true,
+**pcaPrescale 254** (the carrier read 101 for this same chip; 254 = 0xFE, the prescale register's own address, and also what
+the D1's first boot read). **The module is dead; the carrier and the D1 are not at fault.** Firmware gap found: pcaCheck
+compares against whatever pcaSetup read back, so a chip that reads 254 counts as "ok"; it should compare against the 60 Hz
+value (101). Not fixed yet. Next: the original (proven) PCA onto the carrier.
