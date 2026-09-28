@@ -1079,3 +1079,21 @@ are suspect; the 09-25 values are the reference.
 pca true, prescale 101, pcaResets 0. All 42 settings identical before and after the restart. Scott's lid trims after the
 plug fix, saved: see /values (squint R top −22, R bot −25; normal R top −35).
 **Battery on the page VERIFIED (Scott, 2026-09-28):** after the df69225 flash and a P4 reconnect, the status line shows the level.
+
+## 2026-09-28: the retired DevKit goes to Florida
+
+The DevKit had never been in InvenTree. It was already wired into this project when
+B3-R6C3 was counted. It is now **stock 878**, part 63 (Teyleten 38P), at
+SLN/Electronics Bench:
+http://192.168.50.10:8001/web/stock/item/878/
+It is earmarked for Florida with `florida.py`. The part was identified by sight:
+micro-USB and the orange tantalum cap by the regulator. Part 62's photo is USB-C.
+
+**Why it goes:** the D1 carries this board's base MAC and IP (.211). Powered at
+the same time, the two collide, which is how "pulses on the scope" once turned out
+to be the DevKit.
+
+**Erase before it ships**, which Scott OK'd. Plug it in holding BOOT so the eyes
+firmware never runs (it would take .211 and grab the controller). Take a last
+`read-flash` into `backup/` (its final rebuilt firmware plus NVS, unlike the
+09-24 backup of the original sketch), then run `erase-flash`.
