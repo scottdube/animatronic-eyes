@@ -947,3 +947,6 @@ re-pair. /status: conn true, mode live, pca true, pcaPrescale 101 (= 25 MHz / (4
 the carrier logged prescale 254, read while the D1 GND pin was still unsoldered; after the fix and a power cycle it
 reads 101. Link between the two not tested. **Swap checklist complete:** flashed, .211 kept, settings restored,
 controller paired. The DevKit stays unplugged (same MAC).
+**After moving the servos (2026-09-28): "can't reconnect the controller" (Scott).** /status right after his message:
+conn TRUE, mode sleep (lids 60, x/y 512) — so it HAD reconnected after the power-up and then gone to sleep on the
+hands-off timer (handsOffSecs 30). Seconds later conn false, still sleep. Cause of the drop not established.
