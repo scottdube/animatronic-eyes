@@ -259,6 +259,12 @@ void webBegin() {
     if (!authorized()) return;
     sendJson(pcaRegsJson());
   });
+  server.on("/pcatest", HTTP_POST, [] {  // out=high|low|run: hold ch 0-5 full-on/off
+    if (!authorized()) return;
+    String o = server.arg("out");
+    setPcaTest(o == "high" ? 1 : o == "low" ? -1 : 0);
+    sendJson(pcaRegsJson());
+  });
   server.on("/railreset", HTTP_POST, [] {  // start the rail's min/max/dips afresh
     if (!authorized()) return;
     railReset();

@@ -125,6 +125,18 @@ int pcaReg(uint8_t reg) {
   return Wire.read();
 }
 
+// POST /pcatest?out=high|low|run: hold channels 0-5 full-on (steady 3.3 V) or full-off,
+// bypassing the PWM counter, so a meter can tell a dead output stage from a stopped
+// counter. run = back to normal. Not saved; a restart is back to run.
+int8_t pcaTest = 0;  // 0 run, 1 high, -1 low
+void setPcaTest(int8_t t) {
+  pcaTest = t;
+  for (int ch = 0; ch <= 5; ch++) {
+    if (t > 0) pwm.setPWM(ch, 4096, 0);
+    else if (t < 0) pwm.setPWM(ch, 0, 4096);
+  }
+}
+
 String pcaRegsJson() {
   String s = "{\"mode1\":" + String(pcaReg(0x00)) + ",\"mode2\":" + String(pcaReg(0x01)) +
              ",\"prescale\":" + String(pcaReg(0xFE)) + ",\"allLed\":[";
@@ -423,7 +435,9 @@ void loop() {
   altuplidpulse = lidPulse(240 + ((680 - upOpen) - 240) * topR, +1, trimAt(2, lidR)); // his right, top
   altlolidpulse = lidPulse(400 + ((680 - loOpen) - 400) * botR, -1, trimAt(3, lidR)); // his right, bottom
 
-  if (f.limp) {
+  if (pcaTest) {
+    // /pcatest holds the outputs; leave them alone
+  } else if (f.limp) {
     // Quiet sleep: no pulses at all (the PCA9685's full-off bit), so nothing hums
     for (int ch = 0; ch <= 5; ch++) pwm.setPWM(ch, 0, 4096);
   } else {
