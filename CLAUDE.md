@@ -1013,3 +1013,9 @@ hypothesis, untested: OE floats high at the chip.** On the carrier OE (U2 pad 5)
 **6-wire** jumper most likely carried OE to a low, and this module may have no pulldown of its own. The 0.25 V "OE" meter
 reading is also the same size as the probe's own offset, so it does not prove OE is held low. Test: jumper OE to the
 adjacent GND pin on the PCA header. V3: tie U2 pad 5 to GND on the carrier.
+**OE jumpered to GND: no change (Scott, ~15:25) — but that test is PROBABLY INVALID.** Read right after: mode SLEEP, every
+channel OFF_H 0x10 (full-off, quiet sleep). After the 15:15 OTA restart the board came up in rest with no look held, and
+the hands-off timer put it to sleep; when inside the OE test it went is not known. Same miss as the first scope capture.
+The 15:05 capture (0 V, lookL held, rest) stays valid; the ~15:20 probe-row check may also have been in sleep. Sent lookL
+at ~15:27: /pca then showed ch 0 OFF 419 (1.7 ms), all channels loaded, mode rest, held until another command.
+**Rule for this bring-up: read /pca (OFF_H must not be 16) immediately before every scope or jumper test.**
