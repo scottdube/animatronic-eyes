@@ -1028,3 +1028,10 @@ path (chip pin → 220 Ω → header) is dead.
 DIFFERENT unit from the one that drove the servos on the DevKit (not yet confirmed). If so, the carrier's PCA has never
 been proven working — a dead unit, or one damaged in soldering or during the unsoldered-D1-GND period — and the DevKit's
 module is the known-good comparison (see memory: compare the working unit).
+**VERDICT (Scott, ~15:40): full-on held (ON_H 0x10 on ch 0–5, confirmed by /pca at the time), ch-0 PWM pin still flat
+0 V on the scope. The carrier's PCA9685 module has dead outputs.** Registers write and read back, the chip is awake,
+OE is grounded, and a DC full-on still gives 0 V, so it is neither firmware, I2C, OE, nor the timer. Chip vs its 220 Ω
+arrays not split (one array covers ch 0–3, another 4–7; all six channels dead points at the chip) — moot, the module
+gets replaced either way. How it died (bad unit, soldering, or the open-D1-GND period) is NOT established.
+/pcatest set back to run. Fix: desolder U2, fit a known-good PCA9685 (the DevKit's proven module, or a stock one — Scott
+read one at SLN A3-R8C1 on 2026-09-25); test a replacement's outputs BEFORE soldering it in (DevKit + jumpers + /pcatest).
