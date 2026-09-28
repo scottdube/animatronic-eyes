@@ -926,3 +926,7 @@ fault — a header pin is one piece of metal top to bottom. Hypothesis until re-
 earlier 2.7 V is then also suspect as a probe-reference reading, not a rail fault. Open: that re-probe.
 **Correction (Scott): the black lead WAS on ground both times, not between the pins.** So the question is which copper
 he used as ground underneath: the −1.9/0 pair is what a reference on the +5V net reads. Check that spot to TP5.
+**Measured on the D1's regulator itself (Scott):** carrier-powered (12 V → buck), one pin 5 V and the output 2.7 V; on USB
+the 3V3 pin reads 3.3. Reference was ground (Scott) — which ground point, TP5 or the regulator's own GND pin, not
+recorded. Open split: output vs the REGULATOR's GND pin (3.3 → the regulator is fine and the D1's ground sits ~0.6 V off
+the carrier's, i.e. its GND pins/pour spokes; 2.7 → the regulator), plus the regulator GND pin vs TP5.
