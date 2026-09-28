@@ -993,3 +993,9 @@ power-cycled again (reset power-on, pcaResets back to 0).
 −1.19 V offset (window ≈ 0.59–1.99 V), trigger 900 mV sweep Auto: NO trace in the window at all. 3.3 V pulses would cross
 it on every edge, so no pulses — but where the trace actually sits (0, 3.3, 5 V) is off-screen, so which pin the probe is
 on is not confirmed. Next: 1 V/div, offset zeroed.
+**Scope at 1 V/div, offset 0, 5 ms/div, board in REST at x 1023 (Scott, ~15:05): ch-0 signal pin FLAT AT 0 V**, noise
+spikes only. Rest is not limp (limp = quiet sleep only, Scenes.cpp:486), so channel 0 should be pulsing ~1.8 ms at 60 Hz.
+Nothing moved on any of the six channels since the servo move, so the fault is chip-wide, not one pin: I2C works and the
+prescale reads 101, which rules out bus and power, NOT the output stage. Chip-wide causes that leave the prescale intact
+(hypotheses): MODE1 SLEEP set (oscillator stopped), EXTCLK latched with no clock, ALL_LED full-off, or OE high enough
+(0.25 V is below the 0.99 V threshold, so unlikely). Instrument: GET /pca register readback (build below).
