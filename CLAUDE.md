@@ -1157,3 +1157,8 @@ Opening the port with DTR/RTS pre-set low still reset this board once (its boot 
 module (VCC 3.3, SDA 3.3). A timeout on an address nobody owns is a bus fault, not the chip. ESP pin low + module pin
 high = the SCL wire is not joining them (hypothesis; readings taken at different moments). Asked for unpowered
 continuity GPIO22 ↔ module SCL and GPIO21 ↔ module SDA.
+**SCL was on the wrong ESP pin (Scott); fixed.** Probe now: 0x40 and 0x41 both **code 2 (address NACK) in ~0.2 ms**,
+SDA=1 SCL=1 — a clean, working bus. **The reflowed chip does not ACK at any address** (full scan empty). Before the
+reflow it ACKed (254 on the DevKit, 101 on the carrier). Not yet split: SDA wire / module GND not joined to the ESP
+(an unwired SDA reads 1 on the internal pull-up and NACKs exactly like this), an I2C leg joint (26/27), or the chip
+now dead (reflow heat, or already). Asked for continuity + the chip's own supply leg-to-leg.
