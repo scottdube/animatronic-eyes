@@ -1110,8 +1110,8 @@ its firmware in between (docs/TRAPS.md).
 `./build.sh ota` ran twice. Both times curl died mid-upload ("connection reset" / "broken pipe"),
 the D1 came back with reset=crash, and it booted df69225 from app0 again. /values was byte-identical
 before and after, and the trims match.
-**Measured:** heap about 28 KB before each try (27.5–28.8 KB). The PS4 controller was connected at the
-second try; at the first it was probably connected too (it dropped at the crash).
+**Measured:** heap about 28 KB before each try (27.5–28.8 KB). The PS4 controller was connected at BOTH tries (Scott confirmed the first;
+/status showed the second).
 **Hypothesis, not tested:** the upload runs out of memory with Bluetooth up. The df69225 OTA earlier
 today succeeded, and its heap was not recorded. Next: flash over the D1's USB (`./build.sh usb`), or
 OTA with the controller switched off, and log the heap.
