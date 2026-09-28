@@ -1006,3 +1006,10 @@ loaded with valid pulses, so I2C works end to end** (the D1's writes come back e
 is ruled out. The fault is between the chip's output stage and the header's signal pins: OE at the CHIP (pin 23; 0.25 V
 was read at the header), the chip itself, the module's series resistors, or the probe row. Scoping SCL/SDA (Scott asked)
 adds nothing now: a readback of what was written is stronger evidence than bus edges.
+**Probe row confirmed (Scott, ~15:20):** servo plug off, tip on the labeled PWM pin (the colored row, V+ next, GND outside):
+the pin sits at ~0 V; lifting the tip off drops the trace ~0.25 V below that. So the output is DRIVEN LOW, not floating.
+With MODE2 OUTNE = 00 (read 0x04), the PCA9685 drives every output LOW when OE is high: exactly this. **Leading
+hypothesis, untested: OE floats high at the chip.** On the carrier OE (U2 pad 5) is unconnected by design; the DevKit's
+**6-wire** jumper most likely carried OE to a low, and this module may have no pulldown of its own. The 0.25 V "OE" meter
+reading is also the same size as the probe's own offset, so it does not prove OE is held low. Test: jumper OE to the
+adjacent GND pin on the PCA header. V3: tie U2 pad 5 to GND on the carrier.
