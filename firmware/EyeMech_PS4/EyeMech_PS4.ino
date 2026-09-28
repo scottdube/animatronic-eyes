@@ -78,6 +78,11 @@ const bool INVERT_Y = false;
 // Rest position: restX()/restY() in EyeSettings.h. Full stick travel still
 // reaches both ends.
 
+// I2C to the PCA9685. The carrier routes SDA/SCL to IO27/IO25 (pads 24/26): IO21/IO22 are
+// inner-row pins with no way out on a single-sided board. The retired DevKit used 21/22.
+const int I2C_SDA = 27;
+const int I2C_SCL = 25;
+
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // The PCA9685 is set up once at boot. If its logic power blinks (a bumped jumper)
@@ -259,6 +264,7 @@ void setup() {
   wifiStart();
   webBegin();
 
+  Wire.begin(I2C_SDA, I2C_SCL);  // once: pcaCheck() re-runs pcaSetup() on the live bus
   pcaSetup();
   pcaOk = pcaPrescale != 0 && pcaPrescale != 0xFF;
   Serial.printf("PCA9685: prescale %u (%s)\n", pcaPrescale, pcaOk ? "answering" : "NOT answering");
