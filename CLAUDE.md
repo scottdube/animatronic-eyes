@@ -967,3 +967,10 @@ input reach the board: the fault is board → servos. **pcaResets = 1** since th
 once and was set up again (its logic power or I2C blinked). Correction: my "eyes fine, idle show running" at 14:27 was
 the board's commanded x/y, not seen motion. Next: did anything move since the servo move; V+ at a servo header; a
 page-driven "lookL" while Scott watches.
+**lookL test (14:3x):** POST /scene cmd=lookL → x 1023, pca true, prescale 101, nothing moved (Scott). Nothing has moved
+since the servo move, not even at power-up. Plugs are in the same positions/orientation as on the old board. V+ at a
+servo header 5.07 V — reference not stated, probably carrier ground. Firmware output path read (setPWM ch 0–5, full-off
+only when limp): unchanged from the DevKit build except the Wire pins. **Leading hypothesis, untested: the PCA module's
+own GND is not reaching the carrier** (same failure as the D1 pin): the servo GND row would float (servos can't move),
+the chip could still limp along on I2C through its pin diodes, which would also explain pcaResets 1. Check: V+ to the
+GND pin of the SAME servo header, and PCA GND pin ↔ TP5 continuity powered off. Then a scope on a signal pin.
