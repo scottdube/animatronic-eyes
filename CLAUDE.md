@@ -985,3 +985,7 @@ with ±0.2–0.4 V noise bursts; the trigger fired on noise. Inconclusive at tha
 **Scope, proper setup (5 ms/div, 1 V/div, trigger 1.5 V, sweep Auto): ch-0 signal pin has NO pulses** — flat, ~200 mV
 noise only (Scott). The PCA is configured (prescale 101 read back) and being written, yet emits nothing. Next: OE pin
 voltage, then OE bridged to GND.
+**OE = 0.25 V (Scott): low, outputs enabled — not the cause.** And the scope capture was INVALID: the board was in
+mode sleep with sleepQuiet 1, which sets every channel full-off on purpose (no pulses by design). My miss — I didn't
+check the mode before asking for the scope. Sent lookL (mode rest, pulses on) for a re-take. Board had been
+power-cycled again (reset power-on, pcaResets back to 0).
