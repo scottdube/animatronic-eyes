@@ -140,7 +140,16 @@ uint32_t loopCount = 0;
 unsigned long lastStat = 0;
 bool wifiWanted = true;
 
-void onPacket() { pktCount++; }
+// Controller battery from its status byte, kept after a disconnect so a drop can be read
+// against the level it last reported. DS4 scale: 0..10 on battery, up to 11 (full) charging.
+volatile int8_t battLast = -1;
+volatile bool battCharging = false;
+
+void onPacket() {
+  pktCount++;
+  battLast = PS4.Battery();
+  battCharging = PS4.Charging();
+}
 
 // WebUi hooks
 void applyLiveSetting(const String &key) {
@@ -172,12 +181,13 @@ String eyeStatusJson() {
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
            "\"mode\":\"%s\",\"nextShow\":%d,\"showLeft\":%d,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu,"
-           "\"rail\":%d,\"railMin\":%d,\"railMax\":%d,\"railDips\":%lu,\"reset\":\"%s\"}",
+           "\"rail\":%d,\"railMin\":%d,\"railMax\":%d,\"railDips\":%lu,\"reset\":\"%s\",\"batt\":%d,\"charging\":%s}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
            sceneModeName(), sceneNextShowSecs(), sceneShowLeftSecs(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
            pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets,
-           railNowMv(), railMinMv(), railMaxMv(), (unsigned long)railDips(), resetReasonName());
+           railNowMv(), railMinMv(), railMaxMv(), (unsigned long)railDips(), resetReasonName(),
+           battLast, battCharging ? "true" : "false");
   return buf;
 }
 
@@ -229,7 +239,7 @@ void onConnect() {
 }
 
 void onDisconnect() {
-  Serial.println("PS4 disconnected");
+  Serial.printf("PS4 disconnected (battery %d%s at the last packet)\n", battLast, battCharging ? ", charging" : "");
 }
 
 void setup() {

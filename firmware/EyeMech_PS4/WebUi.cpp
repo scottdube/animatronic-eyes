@@ -172,7 +172,8 @@ document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
  const r=await fetch('/scene?cmd='+b.dataset.c,{method:'POST'});
  $('scm').textContent=r.ok?'':'⚠ '+(await r.text());poll()});
 async function poll(){try{const s=await j('/status');
- $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+
+ const bt=s.batt<0?'':' · '+(s.batt<=2&&!s.charging?'⚠ ':'')+'battery '+Math.min(s.batt,10)+'/10'+(s.charging?(s.batt>=11?' (charged)':' (charging)'):'')+(s.conn?'':' at last contact');
+ $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+bt+
  ' &nbsp; '+(dirty?'✎ <b>Unsaved changes</b>':'✓ Saved')+' &nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
  $('mode').textContent=(M[s.mode]||s.mode)+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
  const v=x=>(x/1000).toFixed(2)+' V',low=s.railDips>0||s.rail<4400;
