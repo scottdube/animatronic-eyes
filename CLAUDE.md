@@ -1141,3 +1141,7 @@ Consequence: the plan turns from salvage to repair. Reflow pin 14, re-read 14 �
 (the 0x41 rig in the handoff is the way: the carrier's PCA is soldered in).
 **Pin 28 (VDD) ↔ VCC header = 0 Ω (Scott).** Every chip path measured is whole except pin 14. The open VSS joint is the
 only fault found. Next: reflow 14, re-read ~0 Ω, then the powered 0x41 test.
+**Pin 14 reflowed, reads 0 Ω to GND (Scott).** Powered proof moved OFF the eyes (Scott's call): a spare USB-C ESP32
+DevKit (same board family as the old DevKit) runs `firmware/pca_bench_test` — serial only, no Wi-Fi/BT, module alone
+at 0x40 on 21/22, so no A0 bridge. NOT the eyes firmware: it adopts the old DevKit's base MAC and would take .211 and
+the controller from the D1. The addr= change (9050011) stays committed, unflashed, unused.
