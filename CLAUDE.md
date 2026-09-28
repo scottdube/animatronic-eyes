@@ -979,3 +979,6 @@ Remaining: no pulses leaving the PCA. Next: DC meter on a channel-0 signal pin t
 average; 0 V = nothing out), then OE: it is unconnected on the carrier (by design) and whether this PCA module pulls it
 low on its own board is not verified; OE-high disables every output while I2C still works. Test: jumper OE to the
 adjacent GND pin on the PCA header.
+**Scope, first look at the ch-0 signal pin (DHO914):** 200 mV/div, 500 ns/div, Normal trigger rising at 7 mV → flat 0 V
+with ±0.2–0.4 V noise bursts; the trigger fired on noise. Inconclusive at that setting (a 16.7 ms period can't show at
+500 ns/div). Re-taking at 1 V/div, 5 ms/div, trigger 1.5 V, Auto.
