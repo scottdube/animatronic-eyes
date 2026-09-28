@@ -913,3 +913,9 @@ path — on USB the D1 feeds the carrier's whole +5V net (PCA V+, the buck's out
 (TP3 or the D1's pin) is not recorded. Next discriminator: the D1's own 3V3 pin to its own GND pin, then TP3 at the
 same moment. Equal → the module's regulator/rail is low. Pin 3.3, TP3 2.7 → an open or high-resistance joint in the
 milled +3V3 path (pad 16 → under the module → lane x −17.2 → PCA VCC).
+**Scott suspects the D1 pinout (2026-09-28).** Evidence so far, D1 side: the footprint's own map came from ratgdo (their
+board: 16 = +3.3V, 35 = +5V, 1/22/33 = GND), so that is not an independent check. The FUNCTION is: the ESP runs on 12 V
+through the buck (pad 35 + GND right) and the PCA answers on Wire.begin(27, 25) (pads 24/26 right; a mirrored or shifted
+footprint would put those on other pins). Pad 16 sits in the same footprint, so a wrong D1 map is unlikely but not
+ruled out: the Type-C "D1 Mini ESP32" clones are not all the MH-ET LIVE pinout. Decisive and cheap: read the module's
+own silkscreen at the pin the TP3 trace reaches.
