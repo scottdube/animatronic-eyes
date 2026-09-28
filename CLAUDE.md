@@ -1115,3 +1115,15 @@ before and after, and the trims match.
 **Hypothesis, not tested:** the upload runs out of memory with Bluetooth up. The df69225 OTA earlier
 today succeeded, and its heap was not recorded. Next: flash over the D1's USB (`./build.sh usb`), or
 OTA with the controller switched off, and log the heap.
+
+## 2026-09-28: dead PCA module forensics (handoff: docs/HANDOFF-pca-forensics.md)
+**TSSOP-28 pinout VERIFIED** against NXP PCA9685 datasheet Rev. 4, Table 3: pins 1–5 A0–A4, **6–11 LED0–LED5**,
+12–13 LED6–7, **14 VSS**, 15–22 LED8–15, **23 OE**, 24 A5, 25 EXTCLK, 26 SCL, 27 SDA, **28 VDD**. The handoff's
+from-memory list was right.
+**Plan changed: ohms first, no flash.** The 0x41 parallel-wiring plan needs an A0 bridge, a firmware change and a
+USB flash (drops the controller) to learn one thing a meter answers unpowered: is there ~220 Ω from each chip
+LED leg to its header PWM pin? Probe the chip's LEG (not the pad), so the leg's joint, the array and the array's
+joints are all in the path. ~220 Ω on ch 0–5, plus pin 28 ↔ VCC header and pin 14 ↔ GND header ~0 Ω → the path is
+whole and the fault is inside the chip. Any open → that joint/array. The "driven LOW" header reading does not
+settle it: a header pin cut off from the chip also reads 0 V into a scope probe. The 0x41 powered test stays as
+the fallback if the ohms are ambiguous.

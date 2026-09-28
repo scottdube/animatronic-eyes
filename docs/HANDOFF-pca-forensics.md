@@ -24,13 +24,15 @@ Scott has looked at the joints under the microscope and they look OK.
   cause is a hypothesis and untested. Flash over the D1's USB (`./build.sh usb`), or try OTA with
   the controller OFF. Don't loop OTA.
 
-## Proposed plan (Scott has not yet approved it)
+## Step 0 (added 2026-09-28, later): unpowered ohms, see CLAUDE.md. Pinout below VERIFIED vs datasheet.
+
+## Fallback plan if the ohms are ambiguous (Scott has not yet approved it)
 1. Bridge the dead module's **A0** pad so it answers at **0x41**. Wire its VCC/GND/SDA/SCL in
    parallel with the carrier's PCA header, so the working module at 0x40 keeps running.
 2. Firmware: add `?addr=` to `GET /pca` and `POST /pcatest` (currently hard-wired to 0x40), and
    flash it together with the new page, over USB.
 3. `POST /pcatest?addr=0x41&out=high`, then read `/pca?addr=0x41`. Probe at the chip, TSSOP-28
-   pinout from memory (verify against the datasheet first): **pin 6 LED0**, 28 VDD, 14 VSS,
+   pinout (verified vs NXP datasheet Rev. 4): **pin 6 LED0**, 28 VDD, 14 VSS,
    23 OE, 25 EXTCLK, 26 SCL, 27 SDA.
    - Chip pin 6 high but the header is 0 → resistor or joint.
    - Chip pin 6 low with VDD/VSS good → the chip.
