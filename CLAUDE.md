@@ -1063,3 +1063,11 @@ sRTop −9 → 10 (saved); normal/wide/closed trims are unchanged from 09-25. Fi
 between presets by lid % (trimAt), so a squint trim does not move normal — by design. Scott's hypothesis: the runaway
 before the swap knocked the horns/servos out of position. That fits: a horn shift offsets EVERY preset by about the same
 pulse count, and a per-preset trim fixes only the preset it was set in. Not tested.
+**Lid mismatch is NOT a horn shift (Scott, ~16:40):** in 🔧 Service (all lids at closed) he seated every linkage so both eyes
+seal, left Service, pressed Normal: one eye opened normally, **the other eye drove FURTHER CLOSED and bent its linkages.**
+A servo moving the wrong way from a correct closed seat = wrong channel, not wrong trim. **Leading hypothesis, untested:
+that eye's top and bottom plugs are swapped on the replacement PCA (ch 4↔5 or 2↔3).** It predicts exactly this: at closed,
+the swapped servos get each other's closed pulse (240/400), the horns are seated there so it seals; on opening, the top
+channel's pulse rises (the bottom servo's CLOSING direction) and the bottom's falls (the top's closing direction), so both
+lids drive shut. The plugs were moved twice today (dead module, then the replacement). Kit map: ch 2 his-left top,
+3 his-left bottom, 4 his-right top, 5 his-right bottom.
