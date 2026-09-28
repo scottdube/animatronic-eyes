@@ -1078,3 +1078,4 @@ are suspect; the 09-25 values are the reference.
 **Prescale fix flashed (build df69225, app0, 2026-09-28 ~17:05):** after Scott saved (dirty false before the OTA). Boot reads
 pca true, prescale 101, pcaResets 0. All 42 settings identical before and after the restart. Scott's lid trims after the
 plug fix, saved: see /values (squint R top −22, R bot −25; normal R top −35).
+**Battery on the page VERIFIED (Scott, 2026-09-28):** after the df69225 flash and a P4 reconnect, the status line shows the level.
