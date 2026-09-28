@@ -919,3 +919,8 @@ through the buck (pad 35 + GND right) and the PCA answers on Wire.begin(27, 25) 
 footprint would put those on other pins). Pad 16 sits in the same footprint, so a wrong D1 map is unlikely but not
 ruled out: the Type-C "D1 Mini ESP32" clones are not all the MH-ET LIVE pinout. Decisive and cheap: read the module's
 own silkscreen at the pin the TP3 trace reaches.
+**3V3 is 3.3 V at the D1's pins (Scott, top side, USB power): 3V3 pin 3.3, 5V pin 5.2.** Scott withdrew the pinout
+suspicion. From the copper side the "same" pins read −1.9 V (3V3) and 0 V (5V). −1.9 = 3.3 − 5.2 exactly, and 0 = 5V
+against itself: the fit is that the black lead sat on the 5V pin when probing from underneath (mirrored view), not a
+fault — a header pin is one piece of metal top to bottom. Hypothesis until re-probed underneath against TP5. The
+earlier 2.7 V is then also suspect as a probe-reference reading, not a rail fault. Open: that re-probe.

@@ -121,3 +121,9 @@ see a wrong-but-valid outline. The 1.5 mm basswood laser copy laid against the c
 found it in a minute. Rule: any outline that was edited after export gets a wood fit
 check before the mill runs, and once corrected, the generator's OUTLINE list is the
 master, not the DXF.
+
+## Probing the carrier from the copper side mirrors every pin (2026-09-28)
+Top of the D1: 3V3 pin 3.3 V, 5V pin 5.2 V. Same pins from underneath: −1.9 V and 0 V. −1.9 = 3.3 − 5.2, so the black
+lead was on +5V, not GND. The legend is on the component side, so from the copper side every position is mirrored and
+nothing is labelled. Clip the black lead to TP5/TP6 (GND) first, and read any "impossible" or negative number as
+arithmetic between two rails before calling it a fault. This probably also explains the 2.7 V "3V3" chased first.
