@@ -317,15 +317,25 @@ void webBegin() {
     }
     sendJson(eyeStatusJson());
   });
-  server.on("/pca", HTTP_GET, [] {  // PCA9685 registers: MODE1/2, prescale, ALL_LED, ch 0-5
+  // addr= picks a second module on the bus (default 0x40, the eyes' own chip)
+  auto pcaAddr = [] {
+    return server.hasArg("addr") ? (uint8_t)strtol(server.arg("addr").c_str(), nullptr, 0) : (uint8_t)0x40;
+  };
+  server.on("/pca", HTTP_GET, [pcaAddr] {  // PCA9685 registers: MODE1/2, prescale, ALL_LED, ch 0-5
     if (!authorized()) return;
-    sendJson(pcaRegsJson());
+    sendJson(pcaRegsJson(pcaAddr()));
   });
-  server.on("/pcatest", HTTP_POST, [] {  // out=high|low|run: hold ch 0-5 full-on/off
+  server.on("/pcatest", HTTP_POST, [pcaAddr] {  // out=high|low|run (|pulse off 0x40): ch 0-5
     if (!authorized()) return;
+    uint8_t a = pcaAddr();
     String o = server.arg("out");
-    setPcaTest(o == "high" ? 1 : o == "low" ? -1 : 0);
-    sendJson(pcaRegsJson());
+    if (a == 0x40) {
+      setPcaTest(o == "high" ? 1 : o == "low" ? -1 : 0);
+    } else if (!setPcaTestAt(a, o == "high" ? 1 : o == "low" ? -1 : 2)) {
+      server.send(404, "text/plain", "no ACK at that address\n");
+      return;
+    }
+    sendJson(pcaRegsJson(a));
   });
   server.on("/railreset", HTTP_POST, [] {  // start the rail's min/max/dips afresh
     if (!authorized()) return;

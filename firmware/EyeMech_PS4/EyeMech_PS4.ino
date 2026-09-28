@@ -121,12 +121,21 @@ void pcaCheck() {
 // GET /pca: the chip's own registers, for when I2C answers but nothing moves (2026-09-28,
 // carrier bring-up). The prescale alone can't see a stopped oscillator (MODE1 SLEEP/EXTCLK)
 // or an ALL_LED full-off. -1 = the read failed.
-int pcaReg(uint8_t reg) {
-  Wire.beginTransmission(0x40);
+// addr: 0x40 is the eyes' chip; any other address is a second module wired onto the same
+// bus for testing (the reflowed dead module at 0x41, 2026-09-28).
+int pcaReg(uint8_t reg, uint8_t addr = 0x40) {
+  Wire.beginTransmission(addr);
   Wire.write(reg);
   if (Wire.endTransmission(false) != 0) return -1;
-  if (Wire.requestFrom((uint8_t)0x40, (uint8_t)1) != 1) return -1;
+  if (Wire.requestFrom(addr, (uint8_t)1) != 1) return -1;
   return Wire.read();
+}
+
+bool pcaWrite(uint8_t addr, uint8_t reg, uint8_t val) {
+  Wire.beginTransmission(addr);
+  Wire.write(reg);
+  Wire.write(val);
+  return Wire.endTransmission() == 0;
 }
 
 // POST /pcatest?out=high|low|run: hold channels 0-5 full-on (steady 3.3 V) or full-off,
@@ -141,14 +150,37 @@ void setPcaTest(int8_t t) {
   }
 }
 
-String pcaRegsJson() {
-  String s = "{\"mode1\":" + String(pcaReg(0x00)) + ",\"mode2\":" + String(pcaReg(0x01)) +
-             ",\"prescale\":" + String(pcaReg(0xFE)) + ",\"allLed\":[";
-  for (uint8_t r = 0xFA; r <= 0xFD; r++) s += String(pcaReg(r)) + (r < 0xFD ? "," : "");
+// The same test on a second module at another address, by raw register writes so the eyes'
+// driver and its 0x40 watchdog are untouched. Sets the chip up first (a fresh module powers
+// up asleep at prescale 30): sleep, prescale 101, wake with auto-increment, totem-pole.
+// t: 1 full-on, -1 full-off, 2 = 1.5 ms pulses (369 counts at 60 Hz, a servo's centre).
+// Returns false if the chip didn't ACK.
+bool setPcaTestAt(uint8_t addr, int8_t t) {
+  if (!pcaWrite(addr, 0x00, 0x10)) return false;  // MODE1: SLEEP (prescale is only writable asleep)
+  pcaWrite(addr, 0xFE, PCA_PRESCALE_60HZ);
+  pcaWrite(addr, 0x00, 0x20);                     // MODE1: awake, auto-increment
+  delay(1);                                       // oscillator start-up, 500 us max
+  pcaWrite(addr, 0x01, 0x04);                     // MODE2: totem-pole outputs
+  for (uint8_t ch = 0; ch <= 5; ch++) {
+    uint8_t b = 0x06 + 4 * ch;  // ON_L, ON_H, OFF_L, OFF_H
+    uint16_t off = t == 2 ? 369 : 0;
+    pcaWrite(addr, b, 0);
+    pcaWrite(addr, b + 1, t == 1 ? 0x10 : 0);
+    pcaWrite(addr, b + 2, off & 0xFF);
+    pcaWrite(addr, b + 3, t == -1 ? 0x10 : off >> 8);
+  }
+  return true;
+}
+
+String pcaRegsJson(uint8_t addr) {
+  String s = "{\"addr\":" + String(addr) + ",\"mode1\":" + String(pcaReg(0x00, addr)) +
+             ",\"mode2\":" + String(pcaReg(0x01, addr)) +
+             ",\"prescale\":" + String(pcaReg(0xFE, addr)) + ",\"allLed\":[";
+  for (uint8_t r = 0xFA; r <= 0xFD; r++) s += String(pcaReg(r, addr)) + (r < 0xFD ? "," : "");
   s += "],\"ch\":[";
   for (uint8_t ch = 0; ch < 6; ch++) {  // ON_L, ON_H, OFF_L, OFF_H per channel
     s += "[";
-    for (uint8_t i = 0; i < 4; i++) s += String(pcaReg(0x06 + 4 * ch + i)) + (i < 3 ? "," : "");
+    for (uint8_t i = 0; i < 4; i++) s += String(pcaReg(0x06 + 4 * ch + i, addr)) + (i < 3 ? "," : "");
     s += ch < 5 ? "]," : "]";
   }
   return s + "]}";
