@@ -1168,16 +1168,21 @@ reflow it ACKed (254 on the DevKit, 101 on the carrier). Not yet split: SDA wire
 (an unwired SDA reads 1 on the internal pull-up and NACKs exactly like this), an I2C leg joint (26/27), or the chip
 now dead (reflow heat, or already). Asked for continuity + the chip's own supply leg-to-leg.
 
-## Kit STLs and Fusion conversion (2026-10-13)
-`hardware/kit-stl/` holds Cogley's 16 printable STLs, `Complete Model.stl` and the kit license, copied
+## Kit STLs and Fusion conversion (2026-10-13, DONE)
+`hardware/kit-stl/` holds Cogley's **15** printable STLs, `Complete Model.stl` and the kit license, copied
 from Drive `My Drive/#3D prints/basic_eyemech_download_package/Basic Eyemech/`. The Drive copies are
-online-only (0 B on disk until opened). Measured: all 16 parts closed and manifold, mm, 640–23k triangles;
+online-only (0 B on disk until opened). Measured: all 15 parts closed and manifold, mm, 640–23k triangles;
 `Complete Model.stl` has 126 non-manifold edges where assembled parts touch, so it stays STL-only.
-`hardware/kit-f3d/EyeMechKitToF3D.py` converts each part: base-feature mesh insert, Convert Mesh
-**Faceted** (Prismatic needs the Design Extension), `.f3d` exported beside the script, saved to hub folder
-"Basic EyeMech kit" in the **active Data Panel project**, log in `hardware/kit-f3d/import_log.txt`.
-A copy sits in Fusion's `API/Scripts/EyeMechKitToF3D`, so Shift+S runs it. **Not yet run.**
-Fusion MCP traps that day: a read-only script walking every hub project's root folder timed out and left
-Fusion unresponsive; after any timeout the connector reported "connected" but every call returned
-"Server Autodesk Fusion unavailable", across a Fusion restart. Run long jobs from Fusion's own Scripts
-dialog and read the log file instead.
+`hardware/kit-f3d/` holds the 15 converted designs as `.f3d`, plus `EyeMechKitToF3D.py` that made them:
+base-feature mesh insert, Convert Mesh **Faceted** (Prismatic needs the Design Extension). Also saved to the
+hub: project **Animatronic Eyes**, folder **Basic EyeMech kit**, 15 designs (listed 2026-10-13).
+Every solid's volume matches its STL's signed volume within 0.012% (`import_log.txt`). Faceted means flat
+triangles: one face per triangle, no cylinders to select. A native rebuild, as done for the eyeball in
+`docs/eyeball-cad.md`, is the route to editable features.
+The script also sits in Fusion's `API/Scripts/EyeMechKitToF3D` (Shift+S); `ONLY`/`LOG_MODE` run it in batches.
+Traps: `meshConvertFeatures.createInput` takes a Python **list** of MeshBody (an ObjectCollection is a
+TypeError); the method attribute is `meshConvertMethodType` = `MeshConvertMethodTypes.FacetedMeshConvertMethodType`.
+Fusion MCP: a read-only script walking every hub project's root folder timed out and left Fusion
+unresponsive; afterwards every call returned "Server Autodesk Fusion unavailable" while status said
+connected, through two Fusion restarts, until it came back on its own. All 15 parts ran in two calls,
+~8 s and ~26 s, well under the ~2 min timeout.

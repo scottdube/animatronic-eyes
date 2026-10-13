@@ -23,6 +23,8 @@ OUT_DIR = os.path.join(REPO, "hardware", "kit-f3d")
 HUB_FOLDER = "Basic EyeMech kit"
 SAVE_TO_HUB = True
 SKIP = {"Complete Model.stl"}
+ONLY = None          # list of STL filenames to limit a run (batches via the MCP)
+LOG_MODE = "w"       # "a" to append across batches
 
 _log = None
 
@@ -88,10 +90,8 @@ def convert_one(app, stl, folder):
     mesh = root.meshBodies.item(root.meshBodies.count - 1)
     log(f"  mesh: {mesh.mesh.triangleCount} triangles")
 
-    coll = adsk.core.ObjectCollection.create()
-    coll.add(mesh)
     mcf = root.features.meshConvertFeatures
-    inp = mcf.createInput(coll)
+    inp = mcf.createInput([mesh])   # a Python list; an ObjectCollection is a TypeError
     set_faceted(inp)
     feat = mcf.add(inp)
 
@@ -121,21 +121,25 @@ def run(context):
     global _log
     app = adsk.core.Application.get()
     os.makedirs(OUT_DIR, exist_ok=True)
-    _log = open(os.path.join(OUT_DIR, "import_log.txt"), "w")
+    _log = open(os.path.join(OUT_DIR, "import_log.txt"), LOG_MODE)
     log(f"Fusion {app.version}")
     failed = []
     try:
         folder = hub_folder(app) if SAVE_TO_HUB else None
         stls = sorted(f for f in os.listdir(STL_DIR)
-                      if f.lower().endswith(".stl") and f not in SKIP)
+                      if f.lower().endswith(".stl") and f not in SKIP
+                      and (ONLY is None or f in ONLY))
         log(f"{len(stls)} STLs")
         for stl in stls:
             log(stl)
+            before = app.documents.count
             try:
                 convert_one(app, stl, folder)
             except Exception:
                 failed.append(stl)
                 log("  FAILED\n" + traceback.format_exc())
+                if app.documents.count > before:
+                    app.activeDocument.close(False)
         log(f"done: {len(stls) - len(failed)} ok, {len(failed)} failed {failed}")
     finally:
         _log.close()

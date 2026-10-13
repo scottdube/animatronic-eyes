@@ -1,0 +1,98 @@
+17:51:03 Fusion 2705.1.30
+17:51:03 hub: creating Animatronic Eyes/Basic EyeMech kit
+17:51:04 8 STLs
+17:51:04 Bottom Lid Link (x2).stl
+17:51:04   mesh: 640 triangles
+17:51:04   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:04   body: Bottom Lid Link  solid=True  faces=640  volume=0.4268 cm3
+17:51:04   f3d: Bottom Lid Link (x2).f3d  197166 bytes
+17:51:04   hub: saved as Basic EyeMech kit/Bottom Lid Link (x2)
+17:51:04 Eye Holder.stl
+17:51:05   mesh: 1796 triangles
+17:51:05   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:05   body: Eye Holder  solid=True  faces=1796  volume=4.1973 cm3
+17:51:05   f3d: Eye Holder.f3d  492009 bytes
+17:51:05   hub: saved as Basic EyeMech kit/Eye Holder
+17:51:05 Fork (x2).stl
+17:51:05   mesh: 2144 triangles
+17:51:05   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:06   body: Fork  solid=True  faces=2144  volume=0.3824 cm3
+17:51:06   f3d: Fork (x2).f3d  605275 bytes
+17:51:06   hub: saved as Basic EyeMech kit/Fork (x2)
+17:51:06 Main Base.stl
+17:51:06   mesh: 3232 triangles
+17:51:06   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:07   body: Main Base  solid=True  faces=3232  volume=45.8199 cm3
+17:51:07   f3d: Main Base.f3d  774052 bytes
+17:51:07   hub: saved as Basic EyeMech kit/Main Base
+17:51:07 Sub Base.stl
+17:51:08   mesh: 2580 triangles
+17:51:08   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:08   body: Sub Base  solid=True  faces=2580  volume=4.5492 cm3
+17:51:08   f3d: Sub Base.f3d  662850 bytes
+17:51:08   hub: saved as Basic EyeMech kit/Sub Base
+17:51:08 Three-Point Connector.stl
+17:51:09   mesh: 1536 triangles
+17:51:09   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:09   body: Three-Point Connector  solid=True  faces=1536  volume=1.2972 cm3
+17:51:09   f3d: Three-Point Connector.f3d  422431 bytes
+17:51:09   hub: saved as Basic EyeMech kit/Three-Point Connector
+17:51:09 Top Lid Link (x2).stl
+17:51:09   mesh: 784 triangles
+17:51:09   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:09   body: Top Lid Link  solid=True  faces=784  volume=0.3294 cm3
+17:51:10   f3d: Top Lid Link (x2).f3d  242737 bytes
+17:51:10   hub: saved as Basic EyeMech kit/Top Lid Link (x2)
+17:51:10 Y-Arm.stl
+17:51:10   mesh: 1364 triangles
+17:51:10   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:10   body: Y-Arm  solid=True  faces=1364  volume=1.0732 cm3
+17:51:10   f3d: Y-Arm.f3d  406877 bytes
+17:51:11   hub: saved as Basic EyeMech kit/Y-Arm
+17:51:11 done: 8 ok, 0 failed []
+17:51:15 Fusion 2705.1.30
+17:51:16 hub: using Animatronic Eyes/Basic EyeMech kit
+17:51:16 7 STLs
+17:51:16 Bottom Left Lid.stl
+17:51:16   mesh: 13894 triangles
+17:51:16   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:18   body: Bottom Left Lid  solid=True  faces=13894  volume=2.3111 cm3
+17:51:19   f3d: Bottom Left Lid.f3d  3590846 bytes
+17:51:19   hub: saved as Basic EyeMech kit/Bottom Left Lid
+17:51:20 Bottom Right Lid.stl
+17:51:20   mesh: 13894 triangles
+17:51:20   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:21   body: Bottom Right Lid  solid=True  faces=13894  volume=2.3111 cm3
+17:51:22   f3d: Bottom Right Lid.f3d  3686884 bytes
+17:51:23   hub: saved as Basic EyeMech kit/Bottom Right Lid
+17:51:23 Eye Adaptor (x2).stl
+17:51:23   mesh: 7934 triangles
+17:51:23   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:24   body: Eye Adaptor  solid=True  faces=7930  volume=1.5492 cm3
+17:51:24   f3d: Eye Adaptor (x2).f3d  2133989 bytes
+17:51:25   hub: saved as Basic EyeMech kit/Eye Adaptor (x2)
+17:51:25 PlaceHolder Eye (x2).stl
+17:51:25   mesh: 22990 triangles
+17:51:25   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:31   body: PlaceHolder Eye  solid=True  faces=22990  volume=7.4508 cm3
+17:51:32   f3d: PlaceHolder Eye (x2).f3d  5897016 bytes
+17:51:33   hub: saved as Basic EyeMech kit/PlaceHolder Eye (x2)
+17:51:33 Servo Block.stl
+17:51:33   mesh: 7264 triangles
+17:51:33   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:34   body: Servo Block  solid=True  faces=7264  volume=18.3593 cm3
+17:51:34   f3d: Servo Block.f3d  1552262 bytes
+17:51:35   hub: saved as Basic EyeMech kit/Servo Block
+17:51:35 Top Left Lid.stl
+17:51:35   mesh: 14622 triangles
+17:51:35   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:37   body: Top Left Lid  solid=True  faces=14622  volume=2.2197 cm3
+17:51:37   f3d: Top Left Lid.f3d  3915215 bytes
+17:51:38   hub: saved as Basic EyeMech kit/Top Left Lid
+17:51:38 Top Right Lid.stl
+17:51:38   mesh: 14622 triangles
+17:51:38   method: meshConvertMethodType = MeshConvertMethodTypes.FacetedMeshConvertMethodType
+17:51:40   body: Top Right Lid  solid=True  faces=14622  volume=2.2197 cm3
+17:51:41   f3d: Top Right Lid.f3d  3892044 bytes
+17:51:41   hub: saved as Basic EyeMech kit/Top Right Lid
+17:51:41 done: 7 ok, 0 failed []
