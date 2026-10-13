@@ -1167,3 +1167,17 @@ SDA=1 SCL=1 — a clean, working bus. **The reflowed chip does not ACK at any ad
 reflow it ACKed (254 on the DevKit, 101 on the carrier). Not yet split: SDA wire / module GND not joined to the ESP
 (an unwired SDA reads 1 on the internal pull-up and NACKs exactly like this), an I2C leg joint (26/27), or the chip
 now dead (reflow heat, or already). Asked for continuity + the chip's own supply leg-to-leg.
+
+## Kit STLs and Fusion conversion (2026-10-13)
+`hardware/kit-stl/` holds Cogley's 16 printable STLs, `Complete Model.stl` and the kit license, copied
+from Drive `My Drive/#3D prints/basic_eyemech_download_package/Basic Eyemech/`. The Drive copies are
+online-only (0 B on disk until opened). Measured: all 16 parts closed and manifold, mm, 640–23k triangles;
+`Complete Model.stl` has 126 non-manifold edges where assembled parts touch, so it stays STL-only.
+`hardware/kit-f3d/EyeMechKitToF3D.py` converts each part: base-feature mesh insert, Convert Mesh
+**Faceted** (Prismatic needs the Design Extension), `.f3d` exported beside the script, saved to hub folder
+"Basic EyeMech kit" in the **active Data Panel project**, log in `hardware/kit-f3d/import_log.txt`.
+A copy sits in Fusion's `API/Scripts/EyeMechKitToF3D`, so Shift+S runs it. **Not yet run.**
+Fusion MCP traps that day: a read-only script walking every hub project's root folder timed out and left
+Fusion unresponsive; after any timeout the connector reported "connected" but every call returned
+"Server Autodesk Fusion unavailable", across a Fusion restart. Run long jobs from Fusion's own Scripts
+dialog and read the log file instead.
