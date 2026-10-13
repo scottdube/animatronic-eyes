@@ -60,6 +60,11 @@ static int idleLid = 75;          // % open; normal, with the odd squint or wide
 static uint32_t idleLidUntil = 0;
 static uint32_t nextGlance = 0, nextDrift = 0, nextBlink = 0, blinkEnd = 0, secondBlink = 0;
 static uint32_t lastIdleUpdate = 0;
+// A timed glance (glanceMs > 0): from (mx0,my0) toward the target it started for. A new target,
+// or the gaze moved by something else (a set piece, a reset), starts a fresh move from where it is.
+static float mx0 = 0, my0 = 0, mtx = 0, mty = 0;
+static uint32_t moveAt = 0;
+static bool moveStale = true;
 // Set pieces inside a show (Scott, 2026-09-25). Times in ms.
 // Wake: a show that starts from sleep opens wide and looks far to his left first.
 static const uint32_t WAKE_MS = 2500;
@@ -110,6 +115,7 @@ static void idleReset(uint32_t now, bool fromSleep) {
   blinkEnd = secondBlink = 0;
   idleLidUntil = 0;
   lastIdleUpdate = now;
+  moveStale = true;
 }
 
 // Far to his left: + x is his left (measured 2026-09-25), kept a little off the end stop
@@ -118,6 +124,8 @@ static float farLeft() { return 1023 - 40 - restX(); }
 // Stick space (-128..127, full travel each way) to the 0..1023 offset gx/gy use
 static float stickToOff(float v, int center) { return v >= 0 ? v * (1023 - center) / 127.0f : v * center / 128.0f; }
 static float smoothstep(float t) { t = constrain(t, 0.0f, 1.0f); return t * t * (3 - 2 * t); }
+// Minimum jerk: zero speed AND zero acceleration at both ends, so the gear train isn't jolted
+static float smootherstep(float t) { t = constrain(t, 0.0f, 1.0f); return t * t * t * (t * (t * 6 - 15) + 10); }
 
 // Ease the gaze toward a point on the edge of travel: angle a (0 = his left, 90 = up), r of full travel
 static void edgeTarget(float a, float r, float &x, float &y) {
@@ -196,6 +204,7 @@ static Frame idleFrame(uint32_t now) {
   Frame f;
   if (setPiece(now, f)) {
     lastIdleUpdate = now;
+    moveStale = true;
     blinkEnd = secondBlink = winkEnd = 0;
     f.sx = adcToStick(gx, restX());
     f.sy = adcToStick(gy, restY());
@@ -222,16 +231,28 @@ static Frame idleFrame(uint32_t now) {
       }
     }
   }
-  if (now >= nextDrift) {  // small wander between glances
+  bool moving = settings.glanceMs > 0 && !moveStale && now - moveAt < (uint32_t)settings.glanceMs;
+  if (settings.drift && now >= nextDrift && !moving) {  // small wander between glances, never mid-glance
     tx += (frand() * 2 - 1) * 10;
     ty += (frand() * 2 - 1) * 10;
     nextDrift = now + 300 + (uint32_t)(frand() * 400);
   }
   float dt = (float)(now - lastIdleUpdate);
   lastIdleUpdate = now;
-  float a = 1.0f - expf(-dt / 60.0f);  // saccade: ~60 ms time constant
-  gx += (tx - gx) * a;
-  gy += (ty - gy) * a;
+  if (settings.glanceMs <= 0) {
+    float a = 1.0f - expf(-dt / 60.0f);  // saccade: ~60 ms time constant
+    gx += (tx - gx) * a;
+    gy += (ty - gy) * a;
+    moveStale = true;
+  } else {
+    if (moveStale || tx != mtx || ty != mty) {
+      mx0 = gx, my0 = gy, mtx = tx, mty = ty, moveAt = now;
+      moveStale = false;
+    }
+    float u = smootherstep((float)(now - moveAt) / settings.glanceMs);
+    gx = mx0 + (tx - mx0) * u;
+    gy = my0 + (ty - my0) * u;
+  }
 
   if (now >= nextBlink) {
     blinkEnd = now + 150;

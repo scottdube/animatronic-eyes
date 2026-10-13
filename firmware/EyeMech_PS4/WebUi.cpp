@@ -147,6 +147,12 @@ circle around the edge of his travel.</p></details>
 <input type="range" id="glanceRange" min="10" max="100" step="5"></div>
 <div class="row"><label>Blinks per minute <span id="v_blinkRate"></span></label>
 <input type="range" id="blinkRate" min="0" max="30" step="1"></div>
+<div class="sub"><h3>Gear noise</h3>
+<div class="row"><label>Between glances</label>
+<select id="drift"><option value="1">Wander a little (original)</option><option value="0">Hold still (quieter)</option></select></div>
+<div class="row"><label>A glance takes <span><span id="v_glanceMs"></span> ms</span></label>
+<input type="range" id="glanceMs" min="0" max="600" step="20"><div class="mut">0 = snap (original). Longer eases in and out: quieter gears, lazier eyes</div></div>
+</div>
 </section>
 
 <section class="card" id="ctl">
@@ -200,7 +206,7 @@ circle around the edge of his travel.</p></details>
 <div class="bar" id="bar"><span id="sv">…</span><button class="pri" id="save">Save</button><button id="revert">Revert</button><button id="defaults">Defaults</button></div>
 <script>
 const K=['parkY','parkX','xCenter','yCenter','upMax','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
- 'glanceTenths','glanceRange','blinkRate','arriveAction','emptyMins'];
+ 'glanceTenths','glanceRange','blinkRate','drift','glanceMs','arriveAction','emptyMins'];
 const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting',service:'🔧 SERVICE: holding still, shows and controller off (🔧 again to end)'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
 const fm=t=>t<90?t+' s':Math.round(t/60)+' min';

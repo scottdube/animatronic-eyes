@@ -35,6 +35,7 @@ static const Field SETTINGS[] = {
     F(glanceTenths, 5, 50, 20),   F(glanceRange, 10, 100, 60),
     F(blinkRate, 0, 30, 12),      F(arriveAction, 0, 2, 1),
     F(emptyMins, 1, 60, 5),
+    F(drift, 0, 1, 1),            F(glanceMs, 0, 600, 0),
 };
 #undef F
 static_assert(offsetof(EyeSettings, wRBot) - offsetof(EyeSettings, cLTop) == 15 * sizeof(int),

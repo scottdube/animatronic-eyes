@@ -47,6 +47,10 @@ struct EyeSettings {
   int glanceTenths;  // mean time between glances, tenths of a second, 5..50
   int glanceRange;   // how far glances go, % of full travel, 10..100
   int blinkRate;     // idle blinks per minute, 0..30
+  // Gear noise (Scott, 2026-10-13): the SG90 gear train is the noise, and idle never let it rest
+  int drift;         // 1 = small wander every 0.3-0.7 s between glances (original), 0 = hold still
+  int glanceMs;      // 0 = snap (original ~60 ms exponential, full speed at the start); else a glance
+                     // takes this long, easing in and out so the gears aren't jolted, 0..600
   // Radar (Home Assistant calls /presence)
   int arriveAction;  // what a show is: 0 nothing, 1 alive idle, 2 play the recording then idle
   int emptyMins;     // lab empty this long before a return counts as a new arrival, 1..60
