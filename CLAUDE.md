@@ -295,6 +295,11 @@ WebServer (one client at a time) and several open pages polling /status every 2 
 
 ## Up/down servo RUNAWAY during idle (reported 2026-09-24, OPEN)
 
+> **Power state as of 2026-10-13 (Scott): servo power is a buck converter straight to the PCA9685 V+,
+> not the ESP32 5 V pin.** The "Cause" paragraph below describes the 09-24 wiring and is history; see
+> the LM2596 / carrier-board entries further down. A session on 2026-10-12 read this section's OPEN
+> header, missed the later entries, and told Scott to "fix the power first". Read to the end before citing.
+
 Scott, twice: while a scene (idle) ran, the bottom-centre servo (servo 1, eye up/down) swung
 the horn ~180° the wrong way, "up over the top" instead of small moves low down, and kept running
 until he cut power. Once the horn popped off and the motor ran on. The first horn loss
