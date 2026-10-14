@@ -482,8 +482,11 @@ The eyeball STL is rebuilt as a native Fusion solid ("Eye Ball native" in the "E
 document); decoded dimensions and the check against the mesh are in `docs/eyeball-cad.md`.
 **Eye Adaptor native (2026-10-13):** hub folder Basic EyeMech kit plus `hardware/native/Eye Adaptor native.f3d`,
 built by `hardware/native/eye_adaptor_native.py` (helpers in `fcad.py`). All 3,969 STL vertices are within
-0.0009 mm. The decode is in `docs/eye-adaptor-cad.md`. Next natively: Bottom Lid Link, Top Lid Link, Fork, Y-Arm,
-Three-Point Connector (Scott wants to edit the linkages).
+0.0009 mm. The decode is in `docs/eye-adaptor-cad.md`.
+**Linkages native (2026-10-13), for Scott to edit:** Bottom Lid Link, Top Lid Link, Y-Arm, Three-Point Connector
+(`plates_native.py`, profiles in `hardware/native/profiles/`) and Fork (`fork_native.py`, a real chamfer feature).
+All five are in the hub folder and in `hardware/native/*.f3d`, every STL vertex is within 0.0002 mm, and thickdiff
+is 0.00 mm³ off-wall. The sketches are unconstrained geometry in the STL frame. `docs/linkages-cad.md` has the decode.
 **First USB-only run (servos on the ESP32 5 V pin, 2026-09-25): Scott saw NO show.** Measured: last reset before
 the run was `brownout` (Scott was rewiring). Firmware ran the show (mode idle) 0–140 s with the rail flat at
 4.45–4.48 V, min 4.34 V, 0 dips: no sign of servo load at all. At ~145 s the board restarted (`power-on`),

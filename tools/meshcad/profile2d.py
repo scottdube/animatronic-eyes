@@ -71,8 +71,10 @@ def segment(P):
             j += 1
             idx = list(range(i, j + 2)) if j + 1 < n else list(range(i, n)) + [0]
             Q = P[[k % n for k in idx]]
+            # a rectangle's four corners are concyclic, so also refuse sharp corners inside an arc
             if j > i and (max(L[i:j + 1]) / min(L[i:j + 1]) > 1.6 or
-                          np.any(np.sign(turn[i + 1:j + 1]) != np.sign(turn[i + 1]))):
+                          np.any(np.sign(turn[i + 1:j + 1]) != np.sign(turn[i + 1])) or
+                          np.any(np.abs(turn[i + 1:j + 1]) > 1.0)):
                 break
             c, R, res = circfit(Q)
             if res > tol: break

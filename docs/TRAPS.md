@@ -157,3 +157,9 @@ A rebuild is only done when the vertex max is about 0.001 mm and thickdiff shows
 The Eye Adaptor finger-top arc is centred 0.026 mm off the part's mirror plane. Fitting one side and mirroring it
 left 0.04 mm at the other end. Fit both sides with a free centre before assuming symmetry. The tangent fillets
 then differ per side as well.
+
+## A rectangle's corners fit a circle exactly (2026-10-13)
+`profile2d.py` grows an arc over chords of similar length that turn the same way. On the Fork, each arm end
+(three ~5 mm sides of a rectangle) came out as one "arc" of R3.5 with residual 0.0000, because the four
+corners of any rectangle are concyclic. The fit residual cannot catch it. Fixed with a turn limit: no corner
+sharper than 1 rad inside an arc. The four committed plate profiles regenerate byte-identical with the guard.
