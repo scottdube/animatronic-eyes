@@ -260,3 +260,17 @@ Checking the exported assembly's vertices against every kit STL moved by its pla
 export puts its vertices on the true curves, the kit mesh's flat triangles sit inside them. The per-part gate runs
 the other way (kit vertices to the exact native body), and so must the assembly check: `AS_CHECK` measures each
 placed kit vertex against that occurrence's body in place, max 0.0012 mm except the Eye Holder's exempt ring.
+
+## Fusion joints from the MCP (2026-10-14)
+- **A `readOnly` script cannot drive a joint:** setting `jointMotion.rotationValue` raises "Cannot modify the design
+  from a read-only context". Run drive checks as normal scripts, and put every joint back to 0 at the end.
+- **"Cannot perform 'script' while a command dialog is open"** came twice, then cleared on its own. `fusion_mcp_read
+  activeCommand` showed only the default Select by the time it was checked. Read activeCommand before asking Scott
+  to close anything.
+- **Find a hole by its radius, not its axis direction, once a joint is driven:** a lookup for "R1.5 along Y" failed
+  as soon as Tilt turned the Fork. Whole-script rollback took the earlier pose's output with it.
+- **An as-built joint has no flip.** Its + sense comes from the cylinder face's axis, and a mirrored part's hole
+  faces the other way. Record the measured senses rather than assuming them.
+- **The Complete Model is a pose, not a mechanism:** its Y-Arm pivot hole sits 1.22 mm off the pin it turns on. Check
+  that pins are coaxial before an as-built joint, which keeps whatever pose it is given.
+

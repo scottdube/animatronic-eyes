@@ -95,12 +95,56 @@ every occurrence has the right part, the right transform and a live reference.
 What the placements are worth: each fits the coarse `Complete Model.stl` to 0.27–0.43 mm (chord error of that mesh).
 Exceptions: the Eye Adaptor R and PlaceHolder Eyes (2.1–3.0 mm, where the model's mirrored eye differs from a
 printable copy) and the right lid links, which the model leaves out. Read those numbers in `placements.json`
-(`max_mm`, `note`). The assembly is the kit **as the model poses it**, not a kinematic assembly: there are no
-joints yet, so nothing moves.
+(`max_mm`, `note`). The placements are the kit **as the model poses it**; `joints_native.py` adds the motion on
+top of that pose (below).
+
+## Joints (`hardware/native/joints_native.py`, 2026-10-14)
+
+The pivots were read off the placed parts' cylinders, not assumed. Every pin runs through a Ø3 hole in the part that
+holds it and a Ø3.5 clearance hole in the part that turns on it. All joints are **as-built revolutes**, so home
+(every joint at 0) is the Complete Model pose. Gaze is −Z, Y is up, and the right eye is at +X.
+
+| Joint | Turns | On | Axis | + direction (measured) |
+|---|---|---|---|---|
+| Tilt | Sub Base + Eye Holder (rigid group) | Main Base pins, inner walls x 20–23 / 52–55 | X through both eye centres | eyes look up |
+| Pan L, Pan R | Eye Adaptor + Fork + eye (rigid group, two lug pins) | Eye Holder's vertical pin | Y through each eye centre | toward −X; Pan R follows Pan L 1:1 |
+| Top Left Lid / Top Right Lid | the lid | Main Base pins (not the Sub Base: lids do not follow tilt) | X through eye centres | opens / closes |
+| Bottom Left Lid / Bottom Right Lid | the lid | Main Base pins | same | closes / opens |
+| Three-Point Connector | the connector | Fork L tail pin (z 14.5) | Y | counter-rotates against Pan L |
+| Y-Arm | the Y-Arm | Sub Base pin at (y 10.47, z 0) | X | counter-rotates against Tilt |
+| Top/Bottom Lid Link L/R | the link | its lid's Ø2 hole | X | counter-rotates against its lid |
+
+Rigid groups: Main Base + Servo Block, Sub Base + Eye Holder, and each eye's Adaptor + Fork + PlaceHolder Eye.
+Main Base is grounded.
+
+- **The lid signs are mixed** because the right-hand lids are mirrored parts whose holes face −X, and an as-built
+  joint has no flip. The kit's lid servos are mirrored the same way (closed: 2=400, 3=240, 4=240, 5=400).
+- **Couplers counter-rotate:** Fusion solves a tree, not the real four-bar loops, and the servo horns are not
+  modelled. Each coupler is pinned at its mechanism end and motion-linked −1:1 to the joint it rides on, so it keeps
+  its orientation and its servo end slides past where the horn would be. For the connector this is exact, because
+  the eyes and connector form a parallelogram; for the Y-Arm and lid links it is an approximation at the horn end.
+- **The Y-Arm was moved 1.22 mm** (0, −0.2405, −1.1969) onto its Sub Base pin before jointing. The Complete Model
+  poses its pivot hole that far off the pin, and an as-built joint keeps the pose it is given. `placements.json`
+  carries the moved matrix, so AS_CHECK still holds (Y-Arm 0.0001 mm).
+
+**Verified (JN_DRIVE, 2026-10-14):**
+
+- Pan L 25° turns all six eye-group occurrences 25°. The connector moves 6.277 mm without turning, and the right
+  Fork's tail pin stays within 0.0005 mm of its connector hole axis in every pose tried.
+- Tilt 15° turns the Sub Base, Eye Holder, connector and both eyes 15°. The Y-Arm moves 2.733 mm without turning
+  (2·10.47·sin 7.5° = 2.733).
+- Pan −25 with Tilt −15 composes to 29.09°, as expected for those two axes.
+- The lids turn 20°; their links translate 5.60 mm and turn ≤ 0.0008°.
+- Every pose returns to home within 1.4e-5 cm.
+
+**Not checked:**
+
+- Collisions at any pose: no interference run.
+- Joint limits: none are set, so the UI will drive a lid through the eye.
 
 ## Open
 
-- Joints (servo horn pivots, lid pivots, the eye gimbal) are not modelled. Add them in Fusion when motion is wanted.
+- Joint limits from the servo ranges, and an interference sweep of eye against lids.
 - The STEP's PRODUCT names are timestamps, because each native's root component kept its untitled-document name.
   The 20 instance names are right (`Fork native:1`, ...). Fixing it means renaming 15 root components and saving
   new versions.

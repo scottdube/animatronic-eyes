@@ -679,13 +679,13 @@
     0.0,
     0.9989464,
     -0.0458932,
-    1.8674719
+    1.6269342
    ],
    [
     0.0,
     0.0458932,
     0.9989464,
-    6.8022409
+    5.6053695
    ],
    [
     0.0,
@@ -697,6 +697,6 @@
   "shell": 55,
   "max_mm": 0.3122,
   "mean_mm": 0.1024,
-  "note": "+2.630 deg about X, x shift +45.2008"
+  "note": "+2.630 deg about X, x shift +45.2008; then moved (0, -0.2405, -1.1969) mm onto its Sub Base pin (joints_native.py, 2026-10-14): the Complete Model poses its pivot hole 1.22 mm off that pin. max_mm is the fit before the move"
  }
 ]
