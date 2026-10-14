@@ -114,6 +114,7 @@ def build(root):
             [("L", (-11.3654, -0.925)), ("A", (-11.3654, 0), (-11.3654, 0.925), 1),
              ("L", (-14, 0.925)), ("L", (-14, -0.925))], op="cut")
     body.name = "Eye Adaptor native"
+    fcad.constrain_all(root)
     return body
 
 

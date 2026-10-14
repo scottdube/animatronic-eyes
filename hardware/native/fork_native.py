@@ -80,6 +80,7 @@ def build(root):
     else:
         raise RuntimeError("chamfer distances did not land on either orientation")
     body.name = TITLE
+    fcad.constrain_all(root)
     return body
 
 

@@ -149,6 +149,124 @@ class Builder:
                           [("L", p0), ("A", (0.0, 0.0), p1, 1), ("L", (0.0, 0.0))])
 
 
+def _pts(c):
+    if isinstance(c, adsk.fusion.SketchLine):
+        return [c.startSketchPoint, c.endSketchPoint]
+    if isinstance(c, adsk.fusion.SketchArc):
+        return [c.startSketchPoint, c.endSketchPoint]
+    return []
+
+
+def _tangent_dir(c, p):
+    """Unit tangent of curve c at its end point p, in sketch space (sign ignored)."""
+    if isinstance(c, adsk.fusion.SketchLine):
+        a, b = c.startSketchPoint.geometry, c.endSketchPoint.geometry
+        dx, dy = b.x - a.x, b.y - a.y
+    else:
+        cc, q = c.centerSketchPoint.geometry, p.geometry
+        dx, dy = -(q.y - cc.y), q.x - cc.x
+    n = math.hypot(dx, dy)
+    return dx / n, dy / n
+
+
+def constrain_sketch(sk, tan_tol=0.02, log=None):
+    """Turn drawn geometry into a constrained, dimensioned sketch without moving it (beyond closing
+    fit noise): horizontal/vertical lines, tangency at smooth joints, centres on the origin or on each
+    other, a radius or diameter on every arc and circle, then horizontal/vertical distances from the
+    sketch origin to whatever points are still free. A dimension the solver rejects as redundant is
+    skipped; that greedy order always ends with every point fixed. Returns the number of free points left."""
+    gc, dims = sk.geometricConstraints, sk.sketchDimensions
+    org = sk.originPoint
+    H = adsk.fusion.DimensionOrientations.HorizontalDimensionOrientation
+    V = adsk.fusion.DimensionOrientations.VerticalDimensionOrientation
+    curves = [c for c in sk.sketchCurves if not c.isReference and not c.isConstruction]
+    stats = {"hv": 0, "tan": 0, "coin": 0, "rad": 0, "pos": 0, "skip": 0}
+
+    def tryadd(f, *a):
+        try:
+            r = f(*a)
+        except RuntimeError:
+            stats["skip"] += 1
+            return None
+        if r is not None and hasattr(r, "isDriving") and not r.isDriving:
+            r.deleteMe()
+            stats["skip"] += 1
+            return None
+        return r
+
+    tol = 1e-6
+    for c in curves:
+        if isinstance(c, adsk.fusion.SketchLine):
+            a, b = c.startSketchPoint.geometry, c.endSketchPoint.geometry
+            if abs(a.x - b.x) < tol:
+                stats["hv"] += tryadd(gc.addVertical, c) is not None
+            elif abs(a.y - b.y) < tol:
+                stats["hv"] += tryadd(gc.addHorizontal, c) is not None
+    # tangency where two curves meet with the same direction
+    by_pt = {}
+    for c in curves:
+        for p in _pts(c):
+            by_pt.setdefault(p.entityToken, (p, []))[1].append(c)
+    for p, cs in by_pt.values():
+        if len(cs) != 2 or all(isinstance(c, adsk.fusion.SketchLine) for c in cs):
+            continue
+        u, v = _tangent_dir(cs[0], p), _tangent_dir(cs[1], p)
+        if abs(u[0] * v[1] - u[1] * v[0]) < tan_tol:
+            stats["tan"] += tryadd(gc.addTangent, cs[0], cs[1]) is not None
+    # centres: on the origin, or on an earlier centre
+    centres = []
+    for c in curves:
+        if isinstance(c, (adsk.fusion.SketchArc, adsk.fusion.SketchCircle)):
+            cp = c.centerSketchPoint
+            g = cp.geometry
+            if math.hypot(g.x, g.y) < 1e-5:
+                stats["coin"] += tryadd(gc.addCoincident, cp, org) is not None
+            else:
+                for q in centres:
+                    if q.geometry.distanceTo(g) < 1e-5:
+                        stats["coin"] += tryadd(gc.addCoincident, cp, q) is not None
+                        break
+                else:
+                    centres.append(cp)
+    # equal radii were almost certainly designed equal: one dimension then drives both
+    rounds = [c for c in curves if isinstance(c, (adsk.fusion.SketchArc, adsk.fusion.SketchCircle))]
+    for i, c in enumerate(rounds):
+        for q in rounds[:i]:
+            if type(q) is type(c) and abs(q.radius - c.radius) < 2e-5:   # 2e-4 mm
+                stats["eq"] = stats.get("eq", 0) + (tryadd(gc.addEqual, q, c) is not None)
+                break
+    for c in curves:
+        if isinstance(c, (adsk.fusion.SketchArc, adsk.fusion.SketchCircle)):
+            g = c.centerSketchPoint.geometry
+            tp =adsk.core.Point3D.create(g.x + c.radius * 0.8, g.y + c.radius * 0.8, 0)
+            f = dims.addDiameterDimension if isinstance(c, adsk.fusion.SketchCircle) else dims.addRadialDimension
+            stats["rad"] += tryadd(f, c, tp) is not None
+    # positions, centres first
+    pts = [c.centerSketchPoint for c in curves if isinstance(c, (adsk.fusion.SketchArc, adsk.fusion.SketchCircle))]
+    pts += [p for p, _ in by_pt.values()]
+    for p in pts:
+        for orient in (H, V):
+            if p.isFullyConstrained:
+                break
+            g = p.geometry
+            d = g.x if orient == H else g.y
+            if abs(d) < tol:
+                f = gc.addVerticalPoints if orient == H else gc.addHorizontalPoints
+                stats["pos"] += tryadd(f, org, p) is not None
+            else:
+                tp = adsk.core.Point3D.create(g.x / 2 if orient == H else g.x + 1, g.y + 1 if orient == H else g.y / 2, 0)
+                stats["pos"] += tryadd(dims.addDistanceDimension, org, p, orient, tp) is not None
+    free = sum(1 for p in pts if not p.isFullyConstrained)
+    if log is not None:
+        log.append("%s: %s free %d" % (sk.name, stats, free))
+    return free
+
+
+def constrain_all(comp, log=None):
+    """constrain_sketch on every sketch in the component; returns total free points."""
+    return sum(constrain_sketch(sk, log=log) for sk in comp.sketches)
+
+
 def stl_vertices(path):
     """Unique vertices (mm) of a binary STL, pure Python (Fusion's interpreter has no numpy)."""
     d = open(path, "rb").read()

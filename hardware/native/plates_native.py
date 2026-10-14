@@ -61,6 +61,7 @@ def build(root, slug):
         else:
             b.prism(f"Cutout {k}", axis, lo, hi, st, sg, op="cut")
     body.name = title
+    fcad.constrain_all(root)
     return body, title, os.path.join(KIT, name + ".stl")
 
 
