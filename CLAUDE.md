@@ -492,7 +492,7 @@ a "<Part> native" design in the hub folder and `hardware/native/*.f3d`, every sk
 every STL vertex within 0.0012 mm. The ten later parts are spec files (`hardware/native/specs/`) built by
 `spec_native.py`, checked offline first by `tools/meshcad/xcsg.py`; edit the spec and rebuild with SP_SAVE.
 The assembly (`assembly_native.py`, placements from `placements.json`) REFERENCES the hub natives, so part edits
-reach it; posed as Complete Model has it. **Joints since 2026-10-14** (`joints_native.py`): Tilt, Pan L/R (linked), four lids, couplers counter-rotating; servo horns not modelled. Senses and the Y-Arm 1.22 mm snap are in the doc. Local copy is `hardware/native/EyeMech assembly.step` (a Fusion
+reach it; posed as Complete Model has it. **Joints since 2026-10-14** (`joints_native.py`): Tilt, Pan L/R (linked), four lids, couplers counter-rotating; servo horns not modelled. Limits from measured collisions (`limits_native.py`); eyes-down with top lids open still collides (connector), no limit can stop that. Senses and the Y-Arm 1.22 mm snap are in the doc. Local copy is `hardware/native/EyeMech assembly.step` (a Fusion
 archive of a referencing assembly holds no geometry). Fusion API traps from this work are in `docs/TRAPS.md`.
 **First USB-only run (servos on the ESP32 5 V pin, 2026-09-25): Scott saw NO show.** Measured: last reset before
 the run was `brownout` (Scott was rewiring). Firmware ran the show (mode idle) 0–140 s with the rail flat at

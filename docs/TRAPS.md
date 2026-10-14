@@ -273,4 +273,9 @@ placed kit vertex against that occurrence's body in place, max 0.0012 mm except 
   faces the other way. Record the measured senses rather than assuming them.
 - **The Complete Model is a pose, not a mechanism:** its Y-Arm pivot hole sits 1.22 mm off the pin it turns on. Check
   that pins are coaxial before an as-built joint, which keeps whatever pose it is given.
+- **A joint value outside its limits is ignored, not clamped.** `rotationValue = 90°` on a joint limited to ±30 left it
+  at 0, with no error. A sweep past a limit then quietly tests home. `limits_native.pose` reads every value back and
+  raises.
+- **An interference result's entity can be the native body** (`assemblyContext` None), which does not say which of two
+  occurrences of a part it was. Resolve it by the overlap body's centre against each occurrence's box.
 

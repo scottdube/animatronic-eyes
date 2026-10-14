@@ -137,14 +137,49 @@ Main Base is grounded.
 - The lids turn 20°; their links translate 5.60 mm and turn ≤ 0.0008°.
 - Every pose returns to home within 1.4e-5 cm.
 
-**Not checked:**
+## Limits and collisions (`hardware/native/limits_native.py`, 2026-10-14)
 
-- Collisions at any pose: no interference run.
-- Joint limits: none are set, so the UI will drive a lid through the eye.
+Each limit is a measured stop. A sweep drives the joint out from home until Fusion's interference analysis reports any
+overlap between any two of the 20 bodies, then bisects to 0.1°. At home nothing overlaps.
+
+| Joint | Limits (deg) | What stops it |
+|---|---|---|
+| Pan L, Pan R | −44.8 .. +41.9 | the eye's rim reaches the Eye Holder (both directions) |
+| Tilt | −32.3 .. +29.5 | up: Sub Base reaches Main Base. Down: connector reaches Y-Arm, **approximate** (the Y-Arm's angle is the counter-rotation stand-in); without the Y-Arm the next stop is the connector reaching the top lids at −46.5 |
+| Top Left / Bottom Right Lid | −25.7 .. +24.4 | closed: both lids of an eye meet, lip to lip (0 → 0.94 mm³ in 0.1°) when closing together |
+| Top Right / Bottom Left Lid | −24.4 .. +25.7 | open: the most both lids can open **together** at any pan with tilt 0 (below) |
+
+Lid opening, measured:
+- A lid alone opens further: top 46.5° (reaches the connector), bottom 53.3° (reaches the top lid's back edge).
+- Both lids of an eye opening together meet at the back at 26.6°.
+- With pan at −44.8° and both lids opening, the connector reaches the top lid at 24.4°, which sets the open limit.
+
+Couplers have no limits; they follow their motion links.
+
+**Verified clear (100 poses, every value read back from its joint):**
+- At tilt 0 and at +29.5: pan −44.8 / 0 / +41.9 × each of the four lids at its open or closed limit (96 poses).
+- At tilt −32.3: closed lids at all three pans, and everything at home.
+
+These are corners only, not the interior.
+
+**The one collision limits cannot prevent: eyes down with the top lids open.** The connector turns with Tilt about
+the same axis the lids turn on, so it reaches the top lids when the lid opening minus the tilt passes a threshold that
+depends on pan. Measured tilt-down still clear:
+
+| Top lids | Pan −44.8 | Pan 0 | Pan +41.9 |
+|---|---|---|---|
+| open (24.4) | 0.0 | −22.1 | −3.0 |
+| home (0) | −24.4 | −32.3 (limit) | −27.4 |
+| closed | −32.3 (limit) | −32.3 | −32.3 |
+
+The kit firmware moves the lids with the eyes' up/down ("lids track Y" in CLAUDE.md). That is probably why (hypothesis,
+not tested on the hardware). The alternative was a limit box with no collision anywhere, but it allows almost no
+tilt-down.
+
+How the limit angles relate to servo commands is not known, because the horns are not modelled.
 
 ## Open
 
-- Joint limits from the servo ranges, and an interference sweep of eye against lids.
-- The STEP's PRODUCT names are timestamps, because each native's root component kept its untitled-document name.
-  The 20 instance names are right (`Fork native:1`, ...). Fixing it means renaming 15 root components and saving
-  new versions.
+- Map servo commands (kit X 220–440, Y 250–500, lid closed 2=400 3=240 4=240 5=400) to joint angles. That needs
+  the horn geometry.
+- Interior poses are not swept, only corners.
