@@ -9,9 +9,13 @@ A spec module holds STL (path relative to the spec file) and FEATURES: a list of
     runs=[[(u, v), ...], ...]   a closed outline as runs of mesh vertices (caploops.py); spec_native draws a
                             two-point run as a line and a longer one as a fitted spline, here each is chords
     revolve=dict(centre=(cu, cv), pts=[(r, w), ...], a0=deg, a1=deg)   about the axis line through (cu, cv),
-                            angle from +u toward +v; lo/hi unused
+                            angle from +u toward +v; lo/hi unused. loop=(start, segs) in (r, w) in place of pts
+                            draws the half-section with arcs, revolved a full turn (spec_native builds this form)
 or op "chamfer": a Fusion chamfer feature (spec_native.py selects the edges); here its `csg` list of ordinary
 features stands in for it.
+FRAME = (axis, deg), optional: the features are drawn in a frame rotated from the STL's, and the built body is
+turned by deg about that axis (right-hand) to land in the STL frame (the eyelids: their lip planes sit 20 deg
+about the pivot). spec_native ends with the same rotation as a Move feature.
 hardware/native/spec_native.py builds the same list in Fusion. Here it is built with manifold3d, then the STL's
 solid is subtracted both ways and every leftover blob is listed with its volume and bounding box: "missing" is
 material the STL has and the spec does not, "extra" the reverse. A finished spec leaves only facet slivers
@@ -66,8 +70,9 @@ def feature_solid(f):
     m[:, :3] = P
     if "revolve" in f:
         r = f["revolve"]
-        cs = mf.CrossSection([np.array(r["pts"], float)], mf.FillRule.EvenOdd)
-        s = mf.Manifold.revolve(cs, 720, r["a1"] - r["a0"]).rotate((0, 0, r["a0"]))
+        pts = polygon(dict(name=f["name"], loop=r["loop"])) if "loop" in r else r["pts"]
+        cs = mf.CrossSection([np.array(pts, float)], mf.FillRule.EvenOdd)
+        s = mf.Manifold.revolve(cs, 720, r.get("a1", 360.0) - r.get("a0", 0.0)).rotate((0, 0, r.get("a0", 0.0)))
         m[:, 3] = P @ np.array([r["centre"][0], r["centre"][1], 0.0])
     else:
         cs = mf.CrossSection([np.array(polygon(f), float)], mf.FillRule.EvenOdd)
@@ -118,6 +123,9 @@ def main():
     spec.loader.exec_module(S)
     stl = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(spec_path)), S.STL)
     body = build(S.FEATURES)
+    if getattr(S, "FRAME", None):
+        ax, deg = S.FRAME
+        body = body.rotate(tuple(deg if a == ax else 0.0 for a in "xyz"))
     ref = stl_solid(stl)
     print(f"spec volume {body.volume():.3f}  STL volume {ref.volume():.3f}  genus {body.genus()} / {ref.genus()}")
     blobs(ref - body, "missing")

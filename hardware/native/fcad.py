@@ -161,6 +161,52 @@ class Builder:
             f.bodies.item(0).name = name
         return f
 
+    def revolve(self, name, axis, centre, start, segs, op="new"):
+        """Revolve an (r, w) half-section a full turn about the line parallel to `axis` through centre (cu, cv)
+        in that axis's (u, v): r runs along +u from the line, w is the coordinate along `axis`. The sketch sits
+        on the plane through the line normal to v, with a construction line on the revolve axis."""
+        a = _IDX[axis]
+        iu, iv = [k for k in range(3) if k != a]
+        cu, cv = centre
+        pa = "xyz"[iv]                                   # sketch plane normal to v, at v = cv
+        keep = [k for k in range(3) if k != iv]           # that plane's (u', v') in ascending axis order
+
+        def m(p):
+            q = [0.0, 0.0, 0.0]
+            q[iu], q[iv], q[a] = cu + p[0], cv, p[1]
+            return (q[keep[0]], q[keep[1]])
+        flip = -1 if keep[0] == a else 1                  # (r, w) -> (w, r) mirrors the turning sense
+        segs2 = [("L", m(s[1])) if s[0] == "L" else ("A", m(s[1]), m(s[2]), s[3] * flip) for s in segs]
+        sk = self.loop(name, pa, cv, m(start), segs2)
+        ws = [start[1]] + [s[-1][1] if s[0] == "L" else s[2][1] for s in segs]
+        p0, p1 = m((0.0, min(ws))), m((0.0, max(ws)))
+        to = lambda uv: sk.modelToSketchSpace(adsk.core.Point3D.create(
+            *(c * MM for c in self.to3d(pa, cv, uv[0], uv[1]))))
+        ax = sk.sketchCurves.sketchLines.addByTwoPoints(to(p0), to(p1))
+        ax.isConstruction = True
+        ops = {"new": adsk.fusion.FeatureOperations.NewBodyFeatureOperation,
+               "join": adsk.fusion.FeatureOperations.JoinFeatureOperation,
+               "cut": adsk.fusion.FeatureOperations.CutFeatureOperation}
+        ri = self.root.features.revolveFeatures.createInput(self.profile(sk), ax, ops[op])
+        ri.setAngleExtent(False, VI(2 * math.pi))
+        f = self.root.features.revolveFeatures.add(ri)
+        f.name = name
+        if op == "new":
+            f.bodies.item(0).name = name
+        return f
+
+    def rotate_body(self, body, axis, deg, name=None):
+        """Move feature turning the body about the model axis through the origin, right-hand, deg degrees."""
+        ca = {"x": self.root.xConstructionAxis, "y": self.root.yConstructionAxis, "z": self.root.zConstructionAxis}[axis]
+        oc = adsk.core.ObjectCollection.create()
+        oc.add(body)
+        mi = self.root.features.moveFeatures.createInput2(oc)
+        mi.defineAsRotate(ca, VI(math.radians(deg)))
+        f = self.root.features.moveFeatures.add(mi)
+        if name:
+            f.name = name
+        return f
+
     def combine(self, target, tools, how, name=None):
         oc = adsk.core.ObjectCollection.create()
         for t in tools:
@@ -213,7 +259,7 @@ def constrain_sketch(sk, tan_tol=0.02, log=None):
     org = sk.originPoint
     H = adsk.fusion.DimensionOrientations.HorizontalDimensionOrientation
     V = adsk.fusion.DimensionOrientations.VerticalDimensionOrientation
-    curves = [c for c in sk.sketchCurves if not c.isReference and not c.isConstruction]
+    curves = [c for c in sk.sketchCurves if not c.isReference]   # construction too: a revolve axis is dimensioned like an edge
     stats = {"hv": 0, "tan": 0, "coin": 0, "rad": 0, "pos": 0, "skip": 0}
 
     def tryadd(f, *a):

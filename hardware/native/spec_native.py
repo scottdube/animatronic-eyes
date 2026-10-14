@@ -1,5 +1,5 @@
 # Build a part spec (hardware/native/specs/<slug>.py, checked first with tools/meshcad/xcsg.py) as a native Fusion
-# design: one sketch + extrude per feature, Fusion chamfer features where the spec says chamfer, every sketch
+# design: one sketch + extrude (or full-turn revolve) per feature, an optional closing Move (FRAME), Fusion chamfer features where the spec says chamfer, every sketch
 # constrained and dimensioned (fcad.constrain_all), then the STL vertex check.
 # Run through the Fusion MCP. Env:
 #   SP_SPEC  spec slug, e.g. sub_base (required)
@@ -71,7 +71,12 @@ def build(root, S):
             print("  %s: %d %s" % (f["name"], n, "faces" if f.get("pick") else "edges"))
             continue
         mid = (f["lo"] + f["hi"]) / 2
-        if "circle" in f:
+        if "revolve" in f:
+            r = f["revolve"]
+            if "loop" not in r or r.get("a1", 360.0) - r.get("a0", 0.0) != 360.0:
+                raise RuntimeError(f"{f['name']}: Fusion revolves take a full-turn loop= half-section")
+            ft = b.revolve(f["name"], f["axis"], r["centre"], *r["loop"], op=f["op"])
+        elif "circle" in f:
             ft = b.extrude(b.circle(f["name"], f["axis"], mid, *f["circle"]), f["axis"], f["lo"], f["hi"],
                            f["op"], f["name"])
         elif "runs" in f:
@@ -84,6 +89,8 @@ def build(root, S):
         if f["op"] == "new":
             body = ft.bodies.item(0)
         assert root.bRepBodies.count == 1, f"{f['name']}: {root.bRepBodies.count} bodies"
+    if getattr(S, "FRAME", None):   # drawn in a turned frame (the eyelids): one Move turns it into the STL's
+        b.rotate_body(body, S.FRAME[0], S.FRAME[1], "Frame %s %+g deg" % S.FRAME)
     body.name = S.TITLE
     fcad.constrain_all(root)
     return body

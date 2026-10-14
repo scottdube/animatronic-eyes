@@ -197,3 +197,13 @@ shows +40 mm³ of wall-grazing columns at y -23.53; the off-wall number is the o
 
 ## zsh does not word-split an unquoted variable (2026-10-13)
 `for b in "x0 x1 y0 y1"; do verts.py stl $b; done` passes ONE argument in zsh. Use `${=b}`.
+
+## The eyelids are drawn 20 degrees off the STL axes, and the shell and ring have different centres (2026-10-13)
+Top Left Lid: the lip ring's top, underside, tab faces and the past-ear flats are all planes tilted 20 deg about
+x, so profile2d on the raw STL found no caps. `tools/meshcad/rotstl.py ... x 20` turns the mesh so they are
+axis-aligned; the spec draws in that frame and `FRAME = ("x", -20.0)` turns the body back (xcsg rotates before
+the compare, spec_native ends with a Move). In that frame the spherical shell is centred at STL (0, 0.1, 0) but
+the lip ring's outside (R19.858) and the ear axis are on the origin: fit each surface's centre separately.
+The STL plane y = 0.1 trims only the shell (its face spans z' -17.3..-1.6). Inside the bore at the right ear
+sits an R1 pocket along x whose floor is a cylinder about the bore's axis, not a flat end: a slab with a flat
+floor would miss by up to 0.9 mm. `section2d` at x 15.3 showed it; xcsg's 2.3 mm³ "extra" blob is what found it.
