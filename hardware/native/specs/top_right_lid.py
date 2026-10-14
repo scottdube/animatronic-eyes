@@ -1,9 +1,10 @@
 # Top Right Lid: the Top Left Lid with STL z negated (vertex sets identical to 0.0000 mm, 2026-10-13). In the
 # left lid's drawing frame that is z' -> -z', and the frame turn reverses: STL = Mz Rx(-20) q = Rx(+20) Mz q.
 # Every dimension is the left lid's (specs/top_left_lid.py); edit there and both follow.
-import os, sys
+import importlib, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _mirror
+importlib.reload(_mirror)   # Fusion's Python keeps modules between runs: never build from a stale copy
 
 _L = _mirror.load("top_left_lid")
 STL = "../../kit-stl/Top Right Lid.stl"

@@ -224,3 +224,10 @@ Move, and 1.52345 became 1.5 (read back from `MoveFeature.transform`). The shell
 errors sum to 20; ring B's top edge was 0.008 mm off. The top lids' -20 / +20 hid this. `fcad.Builder.rotate_body`
 now uses `defineAsFreeMove` with a `Matrix3D.setToRotation` matrix, which is exact (max 0.0012 mm after).
 Hypothesis, not tested: it rounds to the angle display precision in the preferences.
+
+## Fusion's Python keeps imported modules between MCP runs (2026-10-13)
+The first Bottom Right Lid build was 0.087 mm off and 7 mm³ heavy while xcsg passed the same spec. Its rotate op had
+not been negated: `import _mirror` inside the spec got the copy Fusion had cached from the Top Right Lid run, before
+`_mirror` learned about rotate ops. Read back from `MoveFeature.transform` (+1.52345 where -1.52345 was due). The
+mirrored specs now `importlib.reload(_mirror)`. Anything a spec imports by name has the same exposure; spec_native
+already reloads fcad. When Fusion and xcsg disagree on one spec, suspect a stale module before the geometry.
