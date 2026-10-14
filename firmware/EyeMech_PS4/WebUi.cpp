@@ -186,6 +186,13 @@ circle around the edge of his travel.</p></details>
 <div class="sc lk"><button data-c="lookL">◂ His left</button><button data-c="lookU">▴ Up</button><button data-c="lookR">His right ▸</button>
 <button data-c="lookC">● Center</button><button data-c="lookD">▾ Down</button><button data-c="stop">■ Stop</button></div>
 </div>
+<div class="sub nt"><h3>Noise test</h3>
+<div class="mut">Repeats one motion for 30 s so a sound meter can compare runs: out half travel and back, with a pause at each end. One servo: the other five get no pulses. All: everything moves. Hold: all six powered at rest, nothing moving. Stop, the controller or a show ends it.</div>
+<div class="sc"><button data-c="test0">0 ◂▸ Eyes</button><button data-c="test1">1 ▴▾ Eyes</button><button data-c="testA">∗ All</button><button data-c="testH">▬ Hold</button>
+<button data-c="test2">2 L top</button><button data-c="test3">3 L bottom</button><button data-c="test4">4 R top</button><button data-c="test5">5 R bottom</button></div>
+<div class="row"><label><span><input type="checkbox" id="ntSud"> Sudden moves (as fast as the servo goes, no easing)</span></label></div>
+<div class="sc lk"><button data-c="stop">■ Stop</button></div>
+</div>
 <div class="sub"><h3>Lid max open</h3>
 <div class="row"><label>Top lids <span id="v_lidMin"></span></label>
 <input type="range" id="lidMin" min="160" max="280" step="2"><div class="mut">Sets 100% open for the presets. 280 = kit, 250 = your original sketch, 200 matched to the re-seated horns. Lower opens further: watch for a straining servo</div></div>
@@ -207,7 +214,7 @@ circle around the edge of his travel.</p></details>
 <script>
 const K=['parkY','parkX','xCenter','yCenter','upMax','lidWide','lidNormal','lidSquint','lidClosed','lowLidCurve','lidMin','lowLidMax','lidFollow','blinkBtn','idleMode','arriveDelay','showSecs','showEvery','extendMins','handsOffSecs','sleepQuiet',
  'glanceTenths','glanceRange','blinkRate','drift','glanceMs','arriveAction','emptyMins'];
-const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting',service:'🔧 SERVICE: holding still, shows and controller off (🔧 again to end)'};let dirty=false,busy=false,pend=null;
+const M={live:'● Live: controller driving',idle:'∿ Show (alive idle)',play:'▶ Playing the recording',record:'⏺ RECORDING',sleep:'☾ Asleep (lids closed)',rest:'○ Resting',service:'🔧 SERVICE: holding still, shows and controller off (🔧 again to end)',test:'♪ Noise test'};let dirty=false,busy=false,pend=null;
 const $=id=>document.getElementById(id);
 const fm=t=>t<90?t+' s':Math.round(t/60)+' min';
 // Trims: one set of four sliders edits the selected preset's (prefix c/s/n/w)
@@ -236,14 +243,15 @@ $('defaults').onclick=e=>act(e.target,'/defaults','Defaults');
 document.querySelectorAll('.pr button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;tp=P[k][0];$('trp').textContent=P[k][1];showT();
  pend=k+'='+$(k).value;send()});
 document.querySelectorAll('.sc:not(.pr) button').forEach(b=>b.onclick=async()=>{
- const r=await fetch('/scene?cmd='+b.dataset.c,{method:'POST'});
+ const c=b.dataset.c+(c0=>c0.startsWith('test')&&c0!='testH'&&$('ntSud').checked?'s':'')(b.dataset.c);
+ const r=await fetch('/scene?cmd='+c,{method:'POST'});
  $('scm').textContent=r.ok?'':'⚠ '+(await r.text());poll()});
 async function poll(){try{const s=await j('/status');
  const bt=s.batt<0?'':' · '+(s.batt<=2&&!s.charging?'⚠ ':'')+'battery '+Math.min(s.batt,10)+'/10'+(s.charging?(s.batt>=11?' (charged)':' (charging)'):'')+(s.conn?'':' at last contact');
  $('st').innerHTML=(s.conn?'● Controller connected':'○ Controller not connected')+bt+
  ' &nbsp;·&nbsp; '+(s.present?'◉ Someone at the bench':'◌ Bench empty');
  $('sv').textContent=dirty?'✎ Unsaved changes: Save keeps them after power-off':'✓ All changes saved';$('bar').classList.toggle('dirty',dirty);
- $('mode').textContent=(M[s.mode]||s.mode)+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
+ $('mode').textContent=(M[s.mode]||s.mode)+(s.test?': '+s.test:'')+(s.showLeft>=0?' · '+fm(s.showLeft)+' left':'')+(s.nextShow>=0?' · next show in '+fm(s.nextShow):'')+' · recording '+(s.recMs?(s.recMs/1000).toFixed(1)+' s':'none');
  const v=x=>(x/1000).toFixed(2)+' V',low=s.railDips>0||s.rail<4400;
  $('pw').innerHTML=s.rail<1000?'Last restart: '+(s.reset=='brownout'?'<b>⚠ BROWNOUT</b>':s.reset):
   (low?'⚠':'✓')+' ⚡ 5 V rail '+v(s.rail)+' · min '+v(s.railMin)+' · max '+v(s.railMax)+' · sags over 0.4 V: '+s.railDips+

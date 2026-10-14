@@ -248,18 +248,18 @@ void applyLiveSetting(const String &key) {
 }
 
 String eyeStatusJson() {
-  char buf[512];
+  char buf[640];
   const esp_partition_t *run = esp_ota_get_running_partition();  // which OTA slot booted
   snprintf(buf, sizeof buf,
            "{\"conn\":%s,\"ip\":\"%s\",\"heap\":%lu,\"build\":\"%s\",\"slot\":\"%s\",\"lid\":%d,"
            "\"mode\":\"%s\",\"nextShow\":%d,\"showLeft\":%d,\"present\":%s,\"recMs\":%lu,\"x\":%d,\"y\":%d,\"pca\":%s,\"pcaPrescale\":%u,\"pcaResets\":%lu,"
-           "\"rail\":%d,\"railMin\":%d,\"railMax\":%d,\"railDips\":%lu,\"reset\":\"%s\",\"batt\":%d,\"charging\":%s}",
+           "\"rail\":%d,\"railMin\":%d,\"railMax\":%d,\"railDips\":%lu,\"reset\":\"%s\",\"batt\":%d,\"charging\":%s,\"test\":\"%s\"}",
            PS4.isConnected() ? "true" : "false", WiFi.localIP().toString().c_str(),
            (unsigned long)ESP.getFreeHeap(), BUILD_ID_STR, run ? run->label : "?", lidPct(lidIdx),
            sceneModeName(), sceneNextShowSecs(), sceneShowLeftSecs(), scenePresent() ? "true" : "false", (unsigned long)recordingMs(), xval, yval,
            pcaOk ? "true" : "false", pcaPrescale, (unsigned long)pcaResets,
            railNowMv(), railMinMv(), railMaxMv(), (unsigned long)railDips(), resetReasonName(),
-           battLast, battCharging ? "true" : "false");
+           battLast, battCharging ? "true" : "false", sceneTestLabel().c_str());
   return buf;
 }
 
@@ -473,17 +473,15 @@ void loop() {
 
   if (pcaTest) {
     // /pcatest holds the outputs; leave them alone
-  } else if (f.limp) {
-    // Quiet sleep: no pulses at all (the PCA9685's full-off bit), so nothing hums
-    for (int ch = 0; ch <= 5; ch++) pwm.setPWM(ch, 0, 4096);
   } else {
-    pwm.setPWM(0, 0, lexpulse);
-    pwm.setPWM(1, 0, leypulse);
-
-    pwm.setPWM(2, 0, uplidpulse);
-    pwm.setPWM(3, 0, lolidpulse);
-    pwm.setPWM(4, 0, altuplidpulse);
-    pwm.setPWM(5, 0, altlolidpulse);
+    // Quiet sleep (limp) and the noise test's idle servos get no pulses at all (the PCA9685's
+    // full-off bit), so they can't hum
+    int pulse[6] = {lexpulse, leypulse, uplidpulse, lolidpulse, altuplidpulse, altlolidpulse};
+    uint8_t on = f.limp ? 0 : f.power;
+    for (int ch = 0; ch <= 5; ch++) {
+      if (on & (1 << ch)) pwm.setPWM(ch, 0, pulse[ch]);
+      else pwm.setPWM(ch, 0, 4096);
+    }
   }
 
   if (millis() - lastPrint > 200) {

@@ -48,6 +48,15 @@ static void serviceStore(bool on) {
   }
 }
 static int lookSx = 0, lookSy = 0;
+// Noise test (page buttons, 2026-10-14): one fixed motion repeated for TEST_MS, so a sound meter
+// can compare runs and find which source is loud. One servo moves and the other five get no pulses
+// (they can't hum); "all" moves everything; "hold" pulses all six at rest without moving (holding
+// buzz). Out half travel and back, eased or sudden (as fast as the servo goes), with a pause at
+// each end. Anything else that happens ends it, and no show starts while it runs.
+static int testCh = -1;  // -1 off, 0-5 one servo, 6 all, 7 hold
+static bool testSudden = false;
+static uint32_t testAt = 0;
+static const uint32_t TEST_MS = 30000, TEST_MOVE = 800, TEST_DWELL = 700;
 
 // ---- alive idle generator --------------------------------------------------
 // Gaze is picked in the kit's 0..1023 units as an offset from the rest
@@ -428,6 +437,28 @@ static void arrivalShow(uint32_t now) {
   else if (settings.arriveAction == 2 && !startPlay(now, true)) startShow(now, settings.showSecs);
 }
 
+// Noise test motion: 0 at rest .. 1 at the far point. Out, pause, back, pause.
+static float testPhase(uint32_t t) {
+  uint32_t c = t % (2 * (TEST_MOVE + TEST_DWELL));
+  bool out = c < TEST_MOVE + TEST_DWELL;
+  uint32_t m = out ? c : c - TEST_MOVE - TEST_DWELL;
+  if (m >= TEST_MOVE || testSudden) return out ? 1 : 0;
+  float e = 0.5f - 0.5f * cosf(PI * m / TEST_MOVE);
+  return out ? e : 1 - e;
+}
+
+// Eyes from rest to half travel (his left, up); lids from the normal preset to squint, so nothing
+// reaches an end stop or the closed seal (both make a servo strain and buzz).
+static Frame testFrame(uint32_t now) {
+  float p = testCh == 7 ? 0 : testPhase(now - testAt);
+  Frame f = {0, 0, false, settings.lidNormal};
+  if (testCh == 0 || testCh == 6) f.sx = lroundf(64 * p);
+  if (testCh == 1 || testCh == 6) f.sy = lroundf(64 * p);
+  if (testCh >= 2 && testCh <= 6) f.lid = lroundf(settings.lidNormal + (settings.lidSquint - settings.lidNormal) * p);
+  f.power = testCh <= 5 ? 1 << testCh : 0x3F;
+  return f;
+}
+
 Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   if (pad.connected && !wasConnected) shownMode = (SceneMode)-1;  // fresh connection: resend the light bar
   wasConnected = pad.connected;
@@ -468,7 +499,11 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
     sleepAfterHands = false;
     mode = M_SLEEP;
   }
-  bool waiting = mode == M_REST || mode == M_SLEEP;
+  if (testCh >= 0 && now - testAt >= TEST_MS) {  // done: go quiet like the end of a show
+    testCh = -1;
+    endScene();
+  }
+  bool waiting = (mode == M_REST && testCh < 0) || mode == M_SLEEP;
   if (showPending && (int32_t)(now - showAt) >= 0) {
     showPending = false;
     if (waiting) arrivalShow(now);
@@ -483,12 +518,14 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
   prevMode = mode;
 
   if (mode != M_REST && mode != M_SERVICE) looking = false;
+  if (mode != M_REST) testCh = -1;
   Frame out = live;
   if (mode == M_SERVICE) out = {0, 0, false, live.lid};  // the page's preset, nothing from the sticks
   if (looking) {
     out.sx = lookSx;
     out.sy = lookSy;
   }
+  if (testCh >= 0) out = testFrame(now);
   switch (mode) {
     case M_IDLE:
       out = idleFrame(now);
@@ -524,6 +561,7 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now) {
 SceneMode sceneMode() { return mode; }
 
 const char *sceneModeName() {
+  if (mode == M_REST && testCh >= 0) return "test";
   switch (mode) {
     case M_LIVE: return "live";
     case M_IDLE: return "idle";
@@ -561,9 +599,22 @@ bool sceneCommand(const String &cmd) {
     lookSx = c == 'L' ? 127 : c == 'R' ? -128 : 0;
     lookSy = c == 'U' ? 127 : c == 'D' ? -128 : 0;
     looking = true;
+    testCh = -1;
     return true;
   }
   looking = false;
+  int n = cmd.length();
+  if (cmd.startsWith("test") && (n == 5 || (n == 6 && cmd[5] == 's')) && strchr("012345AH", cmd[4])) {
+    if (mode == M_SERVICE) return false;
+    stopScene();
+    showPending = false;
+    sleepAfterHands = false;
+    testCh = isdigit(cmd[4]) ? cmd[4] - '0' : cmd[4] == 'A' ? 6 : 7;
+    testSudden = n == 6;
+    testAt = now;
+    return true;
+  }
+  testCh = -1;
   if (mode == M_SERVICE) return cmd == "stop";  // only the page's own holds; the rest waits
   if (cmd == "idle" || cmd == "show") return startShow(now, settings.showSecs);
   else if (cmd == "extended") return startShow(now, settings.extendMins * 60UL);
@@ -614,6 +665,16 @@ void scenePresence(bool on) {
 }
 
 bool scenePresent() { return present; }
+
+String sceneTestLabel() {
+  if (testCh < 0) return "";
+  static const char *const NAMES[] = {"servo 0, left/right", "servo 1, up/down", "servo 2, his left top lid",
+                                      "servo 3, his left bottom lid", "servo 4, his right top lid",
+                                      "servo 5, his right bottom lid", "all six moving", "all six holding still"};
+  String s = NAMES[testCh];
+  if (testCh < 7) s += testSudden ? ", sudden" : ", eased";
+  return s + ", " + String((TEST_MS - min<uint32_t>(TEST_MS, millis() - testAt)) / 1000) + " s left";
+}
 
 // Seconds to the next show the eyes will start on their own, -1 = none scheduled
 int sceneNextShowSecs() {

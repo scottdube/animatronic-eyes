@@ -11,6 +11,7 @@ struct Frame {
   int lid;      // lids % open, 0 = closed .. 100 = wide (EyeSettings lid presets)
   bool limp = false;  // stop the servo pulses (quiet sleep)
   int wink = 0;       // one eye closed: 0 none, 1 his left, 2 his right (his own left/right)
+  uint8_t power = 0x3F;  // PCA channels that get pulses (bit n = channel n); the rest go full-off
 };
 
 struct PadState {
@@ -29,8 +30,9 @@ Frame scenesUpdate(const PadState &pad, const Frame &live, uint32_t now);
 SceneMode sceneMode();
 const char *sceneModeName();   // "live", "idle", ... for /status
 // From the web page / Home Assistant: show (= idle) | extended | play | record | stop | sleep | wake |
-// service (toggle) | look<L|R|U|D|C>
+// service (toggle) | look<L|R|U|D|C> | test<0-5|A|H>[s] (noise test: one servo, all, or hold; s = sudden moves)
 bool sceneCommand(const String &cmd);
+String sceneTestLabel();           // the running noise test in words, "" = none
 void scenePresence(bool present);  // from Home Assistant via /presence
 bool scenePresent();
 int sceneNextShowSecs();           // to the next show the eyes start on their own, -1 = none
