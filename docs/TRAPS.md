@@ -231,3 +231,9 @@ not been negated: `import _mirror` inside the spec got the copy Fusion had cache
 `_mirror` learned about rotate ops. Read back from `MoveFeature.transform` (+1.52345 where -1.52345 was due). The
 mirrored specs now `importlib.reload(_mirror)`. Anything a spec imports by name has the same exposure; spec_native
 already reloads fcad. When Fusion and xcsg disagree on one spec, suspect a stale module before the geometry.
+
+## Fusion's symmetric revolve takes the angle PER SIDE (2026-10-13)
+`RevolveFeatureInput.setAngleExtent(True, angle)` (symmetric) swept `angle` each way from the sketch plane, so the
+PlaceHolder Eye's 42° / 42° / 92° snap recesses came out 84° / 84° / 184°: 0.667 mm off on the bore wall between
+them, 140 mm³ light (a full ring of recess is ~277 mm³, the three sectors ~135). `fcad.SECTOR_SCALE = 0.5` halves it.
+Extrudes differ: `setSymmetricExtent(distance, isFullLength)` says which it means; the revolve call has no such flag.

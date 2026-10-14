@@ -7,6 +7,7 @@ import adsk.core, adsk.fusion
 
 MM = 0.1
 _IDX = {"x": 0, "y": 1, "z": 2}
+SECTOR_SCALE = 0.5   # symmetric revolve: Fusion takes the angle PER SIDE (measured on the PlaceHolder Eye; TRAPS)
 
 
 def VI(v):
@@ -39,15 +40,17 @@ class Builder:
     def to3d(axis, c, u, v):
         return {"x": (c, u, v), "y": (u, c, v), "z": (u, v, c)}[axis]
 
-    def loop(self, name, axis, c, start, segs):
+    def loop(self, name, axis, c, start, segs, pl=None, map3=None):
         """One closed loop on the plane axis=c in (u, v) coords: x->(y,z), y->(x,z), z->(x,y).
         segs: ("L", (u,v)) line to point; ("A", (cu,cv), (u,v), dir) arc about centre,
-        dir +1 counter-clockwise in (u,v), -1 clockwise. The last segment must end at start."""
-        sk = self.root.sketches.add(self.plane(axis, c))
+        dir +1 counter-clockwise in (u,v), -1 clockwise. The last segment must end at start.
+        pl + map3: draw on that plane instead, map3(u, v) -> model (x, y, z) mm, an isometry onto it."""
+        sk = self.root.sketches.add(pl or self.plane(axis, c))
         sk.name = name
+        m3 = map3 or (lambda u, v: self.to3d(axis, c, u, v))
 
         def sp(uv):
-            x, y, z = self.to3d(axis, c, uv[0], uv[1])
+            x, y, z = m3(uv[0], uv[1])
             return sk.modelToSketchSpace(adsk.core.Point3D.create(x * MM, y * MM, z * MM))
 
         lines, arcs = sk.sketchCurves.sketchLines, sk.sketchCurves.sketchArcs
@@ -159,6 +162,44 @@ class Builder:
         f.name = name
         if op == "new":
             f.bodies.item(0).name = name
+        return f
+
+    def plane_at_angle(self, deg):
+        """Construction plane through the Z axis, turned deg from +X toward +Y. setByAngle's sense is not
+        documented, so try +deg, check the plane holds the point at that angle, else -deg (as plane())."""
+        u = (math.cos(math.radians(deg)), math.sin(math.radians(deg)), 0.0)
+        cps = self.root.constructionPlanes
+        for sgn in (1, -1):
+            pi = cps.createInput()
+            pi.setByAngle(self.root.zConstructionAxis, VI(sgn * math.radians(deg)), self.root.xZConstructionPlane)
+            pl = cps.add(pi)
+            n = pl.geometry.normal
+            if abs(n.x * u[0] + n.y * u[1] + n.z * u[2]) < 1e-9:
+                return pl
+            pl.deleteMe()
+        raise RuntimeError(f"could not place plane at {deg} deg")
+
+    def revolve_sector(self, name, centre, start, segs, a0, a1, op="cut"):
+        """Revolve an (r, w) half-section about the Z axis line through centre (cx, cy) from angle a0 to a1 (deg,
+        +X toward +Y). Sketched on the plane at the middle angle and revolved symmetrically, so the sense of
+        Fusion's angle never matters."""
+        am = (a0 + a1) / 2
+        assert abs(centre[0]) < 1e-12 and abs(centre[1]) < 1e-12, "revolve_sector: axis through the origin only"
+        pl = self.plane_at_angle(am)
+        ca, sa = math.cos(math.radians(am)), math.sin(math.radians(am))
+        m3 = lambda r, w: (r * ca, r * sa, w)
+        sk = self.loop(name, "z", 0.0, start, segs, pl=pl, map3=m3)
+        ws = [start[1]] + [s[-1][1] if s[0] == "L" else s[2][1] for s in segs]
+        to = lambda r, w: sk.modelToSketchSpace(adsk.core.Point3D.create(*(c * MM for c in m3(r, w))))
+        ax = sk.sketchCurves.sketchLines.addByTwoPoints(to(0.0, min(ws)), to(0.0, max(ws)))
+        ax.isConstruction = True
+        ops = {"new": adsk.fusion.FeatureOperations.NewBodyFeatureOperation,
+               "join": adsk.fusion.FeatureOperations.JoinFeatureOperation,
+               "cut": adsk.fusion.FeatureOperations.CutFeatureOperation}
+        ri = self.root.features.revolveFeatures.createInput(self.profile(sk), ax, ops[op])
+        ri.setAngleExtent(True, VI(math.radians(a1 - a0) * SECTOR_SCALE))
+        f = self.root.features.revolveFeatures.add(ri)
+        f.name = name
         return f
 
     def revolve(self, name, axis, centre, start, segs, op="new"):

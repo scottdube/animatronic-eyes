@@ -10,7 +10,8 @@ A spec module holds STL (path relative to the spec file) and FEATURES: a list of
                             two-point run as a line and a longer one as a fitted spline, here each is chords
     revolve=dict(centre=(cu, cv), pts=[(r, w), ...], a0=deg, a1=deg)   about the axis line through (cu, cv),
                             angle from +u toward +v; lo/hi unused. loop=(start, segs) in (r, w) in place of pts
-                            draws the half-section with arcs, revolved a full turn (spec_native builds this form)
+                            draws the half-section with arcs (spec_native builds this form: a full turn, or
+                            an a0..a1 sector about Z through the origin)
 or op "rotate" (axis, deg): turn the body built so far about that model axis, right-hand, so later features are
 drawn in a second frame (the bottom lids: shell in one frame, lip ring in another; spec_native makes it a Move);
 or op "chamfer": a Fusion chamfer feature (spec_native.py selects the edges); here its `csg` list of ordinary

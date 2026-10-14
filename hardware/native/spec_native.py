@@ -76,9 +76,13 @@ def build(root, S):
         mid = (f["lo"] + f["hi"]) / 2
         if "revolve" in f:
             r = f["revolve"]
-            if "loop" not in r or r.get("a1", 360.0) - r.get("a0", 0.0) != 360.0:
-                raise RuntimeError(f"{f['name']}: Fusion revolves take a full-turn loop= half-section")
-            ft = b.revolve(f["name"], f["axis"], r["centre"], *r["loop"], op=f["op"])
+            if "loop" not in r:
+                raise RuntimeError(f"{f['name']}: Fusion revolves take a loop= half-section")
+            if r.get("a1", 360.0) - r.get("a0", 0.0) != 360.0:   # a sector (the eye's snap recesses): Z only
+                assert f["axis"] == "z", f"{f['name']}: sector revolves are about Z only"
+                ft = b.revolve_sector(f["name"], r["centre"], *r["loop"], r["a0"], r["a1"], op=f["op"])
+            else:
+                ft = b.revolve(f["name"], f["axis"], r["centre"], *r["loop"], op=f["op"])
         elif "circle" in f:
             ft = b.extrude(b.circle(f["name"], f["axis"], mid, *f["circle"]), f["axis"], f["lo"], f["hi"],
                            f["op"], f["name"])
