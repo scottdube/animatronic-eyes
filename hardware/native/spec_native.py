@@ -30,11 +30,25 @@ def load_spec(slug):
 
 
 def chamfer(root, body, f):
-    """Equal-distance chamfer on the body edges lying in the plane f['face'], except those lying in f['skip']."""
+    """Equal-distance chamfer on the body edges lying in the plane f['face'], except those lying in f['skip'];
+    or, with f['pick'] (points in mm), on the edge through each point plus its tangent chain."""
+    oc = adsk.core.ObjectCollection.create()
+    if f.get("pick"):
+        for p in f["pick"]:
+            pt = adsk.core.Point3D.create(*(c * MM for c in p))
+            hits = body.parentComponent.findBRepUsingPoint(pt, adsk.fusion.BRepEntityTypes.BRepEdgeEntityType,
+                                                          1e-4, True)
+            assert hits.count == 1, f"{f['name']}: {hits.count} edges at {p}"
+            oc.add(hits.item(0))
+        cf = root.features.chamferFeatures
+        ci = cf.createInput2()
+        ci.chamferEdgeSets.addEqualDistanceChamferEdgeSet(oc, VI(f["d"] * MM), True)
+        ft = cf.add(ci)
+        ft.name = f["name"]
+        return sum(1 for e in ft.faces)
     ax, c = _IDX[f["face"][0]], f["face"][1] * MM
     sk = (_IDX[f["skip"][0]], f["skip"][1] * MM) if f.get("skip") else None
     on = lambda p, k, v: abs([p.x, p.y, p.z][k] - v) < 1e-6
-    oc = adsk.core.ObjectCollection.create()
     for e in body.edges:
         ends = [e.startVertex.geometry, e.endVertex.geometry]
         if all(on(p, ax, c) for p in ends) and not (sk and all(on(p, *sk) for p in ends)):
@@ -54,7 +68,7 @@ def build(root, S):
     for f in S.FEATURES:
         if f["op"] == "chamfer":
             n = chamfer(root, body, f)
-            print("  %s: %d edges" % (f["name"], n))
+            print("  %s: %d %s" % (f["name"], n, "faces" if f.get("pick") else "edges"))
             continue
         mid = (f["lo"] + f["hi"]) / 2
         if "circle" in f:
