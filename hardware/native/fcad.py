@@ -280,10 +280,11 @@ def stl_vertices(path):
     return sorted(seen)
 
 
-def vertex_check(body, path, every=1, worst=8):
-    """Minimum distance (mm) from STL vertices to the body. Returns (max, mean, n, worst list)."""
+def vertex_check(body, path, every=1, worst=8, skip=None):
+    """Minimum distance (mm) from STL vertices to the body. Returns (max, mean, n, worst list).
+    skip(x, y, z) -> True leaves a vertex out (a mesh artefact the spec documents)."""
     mm = adsk.core.Application.get().measureManager
-    verts = stl_vertices(path)[::every]
+    verts = [v for v in stl_vertices(path)[::every] if not (skip and skip(*v))]
     out = []
     for x, y, z in verts:
         d = mm.measureMinimumDistance(body, adsk.core.Point3D.create(x * MM, y * MM, z * MM)).value / MM

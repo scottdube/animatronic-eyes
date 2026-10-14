@@ -92,11 +92,14 @@ def run(_context):
         o.meshRefinement = adsk.fusion.MeshRefinementSettings.MeshRefinementHigh
         o.sendToPrintUtility = False
         design.exportManager.execute(o)
-    mx, mean, n, worst = fcad.vertex_check(body, S.STL_PATH, 1, 5)
+    # EXEMPT: boxes ((x0, y0, z0), (x1, y1, z1)) of STL vertices that are mesh artefacts, each with its reason
+    boxes = [e["box"] for e in getattr(S, "EXEMPT", [])]
+    inbox = lambda x, y, z: any(all(a <= c <= b for a, c, b in zip(lo, (x, y, z), hi)) for lo, hi in boxes)
+    mx, mean, n, worst = fcad.vertex_check(body, S.STL_PATH, 1, 5, inbox if boxes else None)
     print("%s solid %s vol %.4f cm3  %d sketches (%d not fully constrained), %d dimensions" % (
         S.TITLE, body.isSolid, body.volume, root.sketches.count, len(bad), ndim))
-    print("  vertices n=%d max %.4f mean %.5f mm  worst %s" % (
-        n, mx, mean, "; ".join("%.4f@(%.2f,%.2f,%.2f)" % (d, *p) for d, p in worst)))
+    print("  vertices n=%d (%d exempt boxes) max %.4f mean %.5f mm  worst %s" % (
+        n, len(boxes), mx, mean, "; ".join("%.4f@(%.2f,%.2f,%.2f)" % (d, *p) for d, p in worst)))
     if os.environ.get("SP_SAVE"):
         assert mx < 0.002 and not bad, "not saving: check failed"
         em = design.exportManager
