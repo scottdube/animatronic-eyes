@@ -1,0 +1,702 @@
+[
+ {
+  "occurrence": "Main Base",
+  "part": "Main Base",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 76,
+  "max_mm": 0.3311,
+  "mean_mm": 0.0924,
+  "note": ""
+ },
+ {
+  "occurrence": "Servo Block",
+  "part": "Servo Block",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 15,
+  "max_mm": 0.3745,
+  "mean_mm": 0.0992,
+  "note": ""
+ },
+ {
+  "occurrence": "Sub Base",
+  "part": "Sub Base",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 56,
+  "max_mm": 0.331,
+  "mean_mm": 0.0979,
+  "note": ""
+ },
+ {
+  "occurrence": "Eye Holder",
+  "part": "Eye Holder",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 78,
+  "max_mm": 0.3312,
+  "mean_mm": 0.0936,
+  "note": ""
+ },
+ {
+  "occurrence": "Three-Point Connector",
+  "part": "Three-Point Connector",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 9,
+  "max_mm": 0.3436,
+  "mean_mm": 0.1039,
+  "note": ""
+ },
+ {
+  "occurrence": "Eye Adaptor L",
+  "part": "Eye Adaptor (x2)",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 5,
+  "max_mm": 0.3406,
+  "mean_mm": 0.1046,
+  "note": ""
+ },
+ {
+  "occurrence": "Eye Adaptor R",
+  "part": "Eye Adaptor (x2)",
+  "kind": "copy+75",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    75.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 86,
+  "max_mm": 2.9965,
+  "mean_mm": 0.2913,
+  "note": "model mirrors this one"
+ },
+ {
+  "occurrence": "Fork L",
+  "part": "Fork (x2)",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 11,
+  "max_mm": 0.3172,
+  "mean_mm": 0.104,
+  "note": ""
+ },
+ {
+  "occurrence": "Fork R",
+  "part": "Fork (x2)",
+  "kind": "copy+75",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    75.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 80,
+  "max_mm": 0.3203,
+  "mean_mm": 0.1023,
+  "note": "model mirrors this one"
+ },
+ {
+  "occurrence": "PlaceHolder Eye L",
+  "part": "PlaceHolder Eye (x2)",
+  "kind": "identity",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 10,
+  "max_mm": 2.1147,
+  "mean_mm": 0.1482,
+  "note": ""
+ },
+ {
+  "occurrence": "PlaceHolder Eye R",
+  "part": "PlaceHolder Eye (x2)",
+  "kind": "copy+75",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    75.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 81,
+  "max_mm": 2.2154,
+  "mean_mm": 0.1575,
+  "note": "model mirrors this one"
+ },
+ {
+  "occurrence": "Top Left Lid",
+  "part": "Top Left Lid",
+  "kind": "lid",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.909642,
+    -0.4153931,
+    0.0
+   ],
+   [
+    0.0,
+    0.4153931,
+    0.909642,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 22,
+  "max_mm": 0.398,
+  "mean_mm": 0.1278,
+  "note": "+24.544 deg about X"
+ },
+ {
+  "occurrence": "Top Right Lid",
+  "part": "Top Right Lid",
+  "kind": "rlid",
+  "matrix": [
+   [
+    -1.0,
+    0.0,
+    0.0,
+    75.0
+   ],
+   [
+    0.0,
+    0.909642,
+    0.4153931,
+    0.0
+   ],
+   [
+    0.0,
+    0.4153931,
+    -0.909642,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 69,
+  "max_mm": 0.404,
+  "mean_mm": 0.1287,
+  "note": "Right STL = Left reflected in Z to 0.0000 mm"
+ },
+ {
+  "occurrence": "Bottom Left Lid",
+  "part": "Bottom Left Lid",
+  "kind": "lid",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.89664,
+    0.4427603,
+    0.0
+   ],
+   [
+    0.0,
+    -0.4427603,
+    0.89664,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 2,
+  "max_mm": 0.4256,
+  "mean_mm": 0.129,
+  "note": "-26.280 deg about X"
+ },
+ {
+  "occurrence": "Bottom Right Lid",
+  "part": "Bottom Right Lid",
+  "kind": "rlid",
+  "matrix": [
+   [
+    -1.0,
+    0.0,
+    0.0,
+    75.0
+   ],
+   [
+    0.0,
+    0.89664,
+    -0.4427603,
+    0.0
+   ],
+   [
+    0.0,
+    -0.4427603,
+    -0.89664,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 89,
+  "max_mm": 0.398,
+  "mean_mm": 0.1288,
+  "note": "Right STL = Left reflected in Z to 0.0000 mm"
+ },
+ {
+  "occurrence": "Top Lid Link L",
+  "part": "Top Lid Link (x2)",
+  "kind": "plate",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.9998591,
+    0.0167865,
+    0.1386603
+   ],
+   [
+    0.0,
+    -0.0167865,
+    0.9998591,
+    7.1104137
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 1,
+  "max_mm": 0.2885,
+  "mean_mm": 0.0896,
+  "note": "-0.962 deg about X, x shift +0.0000"
+ },
+ {
+  "occurrence": "Top Lid Link R",
+  "part": "Top Lid Link (x2)",
+  "kind": "mirror",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    105.8695145
+   ],
+   [
+    0.0,
+    0.9998591,
+    0.0167865,
+    0.1386603
+   ],
+   [
+    0.0,
+    -0.0167865,
+    0.9998591,
+    7.1104137
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": null,
+  "max_mm": null,
+  "mean_mm": null,
+  "note": "not in Complete Model"
+ },
+ {
+  "occurrence": "Bottom Lid Link L",
+  "part": "Bottom Lid Link (x2)",
+  "kind": "plate",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.9998857,
+    -0.0151208,
+    0.069214
+   ],
+   [
+    0.0,
+    0.0151208,
+    0.9998857,
+    7.5574386
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 0,
+  "max_mm": 0.2745,
+  "mean_mm": 0.0927,
+  "note": "+0.866 deg about X, x shift +0.0000"
+ },
+ {
+  "occurrence": "Bottom Lid Link R",
+  "part": "Bottom Lid Link (x2)",
+  "kind": "mirror",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    105.8695145
+   ],
+   [
+    0.0,
+    0.9998857,
+    -0.0151208,
+    0.069214
+   ],
+   [
+    0.0,
+    0.0151208,
+    0.9998857,
+    7.5574386
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": null,
+  "max_mm": null,
+  "mean_mm": null,
+  "note": "not in Complete Model"
+ },
+ {
+  "occurrence": "Y-Arm",
+  "part": "Y-Arm",
+  "kind": "plate",
+  "matrix": [
+   [
+    1.0,
+    0.0,
+    0.0,
+    45.2007561
+   ],
+   [
+    0.0,
+    0.9989464,
+    -0.0458932,
+    1.8674719
+   ],
+   [
+    0.0,
+    0.0458932,
+    0.9989464,
+    6.8022409
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "shell": 55,
+  "max_mm": 0.3122,
+  "mean_mm": 0.1024,
+  "note": "+2.630 deg about X, x shift +45.2008"
+ }
+]
