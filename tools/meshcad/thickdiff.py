@@ -1,7 +1,8 @@
 # Column-thickness comparison of two closed meshes: for a grid of vertical lines, total material
 # length along each line in A and in B. Prints the volume each implies and where they differ most.
 # Catches what a vertex-to-body check cannot: material one side has that the other lacks.
-# usage: thickdiff.py A.stl B.stl toolsdir [step_mm] [min_diff_mm]
+# usage: thickdiff.py A.stl B.stl toolsdir [step_mm] [min_diff_mm] [axis]
+# axis (0|1|2, default 2) is the column direction: give a plate's extrusion axis so the grid covers its profile.
 import sys
 sys.path.insert(0, sys.argv[3])
 import numpy as np
@@ -34,6 +35,9 @@ def thickness(T, xs, ys):
 
 
 A, B = load(sys.argv[1])[0], load(sys.argv[2])[0]
+ax = int(sys.argv[6]) if len(sys.argv) > 6 else 2
+perm = [(ax + 1) % 3, (ax + 2) % 3, ax]  # cyclic, so the column axis becomes z
+A, B = A[:, :, perm], B[:, :, perm]
 step = float(sys.argv[4]) if len(sys.argv) > 4 else 0.2
 mind = float(sys.argv[5]) if len(sys.argv) > 5 else 0.05
 lo = min(A[:, :, :2].min(), B[:, :, :2].min()) - step
