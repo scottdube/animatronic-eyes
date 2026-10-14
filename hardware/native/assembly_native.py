@@ -1,8 +1,10 @@
 # Build "EyeMech assembly": every kit part occurrence in placements.json (tools/meshcad/placements.py, fitted against
-# Complete Model.stl), inserted as a REFERENCE to its "<Part> native" design in the hub folder "Basic EyeMech kit", so
-# an edit to a native part shows up here. The natives are built in their STL's frame, which is the frame placements.json
-# moves, so each occurrence's transform is the placement matrix as it stands (mm -> cm). Every matrix is a rigid
-# motion: placements.py composes the right eye's mirrored plates and lids into one, so no occurrence is reflected.
+# Complete Model.stl; the SG90s and horns by tools/meshcad/servo_placements.py, checked against their own STL in
+# kit-stl/from-complete-model/ named by the row's "stl"), inserted as a REFERENCE to its "<Part> native" design in the
+# hub folder "Basic EyeMech kit", so an edit to a native part shows up here. The natives are built in their STL's
+# frame, which is the frame placements.json moves, so each occurrence's transform is the placement matrix as it stands
+# (mm -> cm). Every matrix is a rigid motion: placements.py composes the right eye's mirrored plates and lids into one,
+# and servo_placements.py reads the right servos' frames off their geometry, so no occurrence is reflected.
 # Run through the Fusion MCP. Env:
 #   AS_NEW    1 = start a new design document (otherwise insert into the active one)
 #   AS_RANGE  "a:b" = insert placements[a:b] (unset: insert nothing; a failed call rolls back its inserts)
@@ -81,7 +83,8 @@ def run(_context):
             M = e["matrix"]
             body = occ.bRepBodies.item(0)
             worst = (-1.0, ())
-            for x, y, z in fcad.stl_vertices(os.path.join(HERE, "..", "kit-stl", e["part"] + ".stl"))[::stride]:
+            stl = os.path.join(HERE, "..", "kit-stl", e.get("stl", e["part"] + ".stl"))
+            for x, y, z in fcad.stl_vertices(stl)[::stride]:
                 p = [sum(M[r][c] * v for c, v in enumerate((x, y, z))) + M[r][3] for r in range(3)]
                 d = mm.measureMinimumDistance(body, adsk.core.Point3D.create(*(c * 0.1 for c in p))).value * 10
                 worst = max(worst, (d, (x, y, z)))
@@ -100,7 +103,7 @@ def run(_context):
     if os.environ.get("AS_SAVE"):
         assert root.occurrences.count == len(P), "not saving: %d of %d occurrences" % (root.occurrences.count, len(P))
         root.occurrences.item(0).isGrounded = True
-        print("  saved", doc.saveAs(TITLE, folder, DESCRIPTION, ""))
+        print("  saved", doc.save(DESCRIPTION) if doc.dataFile else doc.saveAs(TITLE, folder, DESCRIPTION, ""))
     if os.environ.get("AS_STEP"):
         em = design.exportManager
         print("  step", em.execute(em.createSTEPExportOptions(os.path.join(HERE, TITLE + ".step"), root)))

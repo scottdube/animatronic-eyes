@@ -279,3 +279,40 @@ placed kit vertex against that occurrence's body in place, max 0.0012 mm except 
 - **An interference result's entity can be the native body** (`assemblyContext` None), which does not say which of two
   occurrences of a part it was. Resolve it by the overlap body's centre against each occurrence's box.
 
+  When both entities are copies of one part (two SG90 horns touching), both resolved to the same name until `who`
+  was told to pick a different occurrence for the second.
+
+## A motion-link leader can wander when a joint that carries it moves (2026-10-14)
+With the pan horn LEADING Pan L, setting the horn and then Tilt let Fusion re-solve the pan: horn 22 came back 20.34
+at tilt +29.5, and from 30 up it ran to its limit (42.08). Setting Tilt first, then the horn, held exactly. With the
+horn link suppressed, Pan L itself drifted 20 -> 17.86 the same way. Reversed (Pan L leads, the horn follows), the
+horn held to 0.002 deg in either order, at every pan/tilt corner, and that is how all six servo links are built.
+Before the servos existed Pan L led Pan R and held to 1e-6, so "the follower holds" is what was measured here, not a
+rule about Fusion. Driving a follower still moves its leader, so the servo stays the joint to drive.
+- Moving the servos into the holders' own rigid groups (one group per holder, instead of an extra overlapping group)
+  changed nothing; it was kept for tidiness, not as the fix.
+
+## The right-hand servos are mirrored meshes: fit them by geometry, not point to point (2026-10-14)
+The Complete Model's left and pan/tilt servos are one mesh in one triangle order (4066 tris), so an ordered Procrustes
+fit is exact. The right two are mirror copies (3916 tris, det -1, different order). `servo_placements.py` reads every
+servo's frame off its geometry instead (case centre -> spline end, spline top, tab underside), and the check is
+vertex-to-SURFACE: vertex-to-vertex read 3.4 mm on the right servos, which was only the different tessellation. To
+the surface they are 0.1 mm, at the four internal case screws, which are not mirror-symmetric.
+
+## The Complete Model's right lid horns do not meet the right lid links (2026-10-14)
+The right links are not in the Complete Model (placements.json mirrors the left ones), and its right horns sit at
++-20 / 160 deg, 6.7 and 7.1 mm from the mirrored links' servo ends. The horns are turned to meet them (mirror of the
+left horns' 9.58 / 172.26 deg, to 0.005 mm). The tilt horn is turned 6.71 deg to meet the Y-Arm, which
+`joints_native` had moved 1.2 mm onto its pin; it still sits 0.17 mm off radially (horn hole r10.45, arm end r10.28).
+
+## The two lid horns of one eye share a plane and can hit each other (2026-10-14)
+Both lid servos of an eye face the same way on shafts 13 mm apart, and a double-arm horn reaches 16.05 mm, so the
+arms' sweep circles overlap. At the lid joints' limits (both lids open, or both closed) the two horns intersect
+(see docs/native-parts-cad.md for the sweep). Whether the real kit trims an arm is NOT known.
+
+## A joint value set through the API is rounded to the angular display precision (2026-10-14)
+`rotationValue = radians(10.25)` read back 10.3 on every joint, linked or not, with
+`preferences.unitAndValuePreferences.angularPrecision` = 1. Values a motion link computes are not rounded (Pan L
+41.322). The earlier limit sweeps bisected through values like x.125 and read them back to 1e-6, so the precision was
+higher then or the rounding is new; which one was NOT established. It is Scott's preference, so it was left alone;
+`limits_native` now poses and bisects on that grid (`grid()`).

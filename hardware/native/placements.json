@@ -698,5 +698,401 @@
   "max_mm": 0.3122,
   "mean_mm": 0.1024,
   "note": "+2.630 deg about X, x shift +45.2008; then moved (0, -0.2405, -1.1969) mm onto its Sub Base pin (joints_native.py, 2026-10-14): the Complete Model poses its pivot hole 1.22 mm off that pin. max_mm is the fit before the move"
+ },
+ {
+  "occurrence": "Servo 0 Pan",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    1.0,
+    -1e-07,
+    0.0,
+    37.4997725
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    -4.4322441
+   ],
+   [
+    -1e-07,
+    -1.0,
+    0.0,
+    -0.0007296
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [0.0, 1.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 0 Pan",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    1.0,
+    -0.0,
+    0.0,
+    37.4997725
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    -4.4322441
+   ],
+   [
+    -0.0,
+    -1.0,
+    0.0,
+    -0.0007296
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "-0.0000 deg about the shaft, as in Complete Model"
+ },
+ {
+  "occurrence": "Servo 1 Tilt",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    40.6507561
+   ],
+   [
+    -0.0,
+    1.0,
+    0.0,
+    0.0267325
+   ],
+   [
+    -1.0,
+    -0.0,
+    0.0,
+    41.2592277
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [1.0, 0.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 1 Tilt",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    40.6507561
+   ],
+   [
+    -0.1128326,
+    0.993614,
+    0.0,
+    0.0267325
+   ],
+   [
+    -0.993614,
+    -0.1128326,
+    0.0,
+    41.2592277
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "-6.4786 deg about the shaft, turned -6.71 deg from the Complete Model's 0.23 to meet Y-Arm (hole radius 10.278, horn hole 10.45)"
+ },
+ {
+  "occurrence": "Servo 2 Top Left Lid",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    -1.0,
+    -4.8847569
+   ],
+   [
+    1e-07,
+    1.0,
+    0.0,
+    0.0267325
+   ],
+   [
+    1.0,
+    -1e-07,
+    0.0,
+    41.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [-1.0, 0.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 2 Top Left Lid",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    -1.0,
+    -4.8847569
+   ],
+   [
+    0.1346371,
+    -0.990895,
+    0.0,
+    0.0267325
+   ],
+   [
+    -0.990895,
+    -0.1346371,
+    0.0,
+    41.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "172.2624 deg about the shaft, as in Complete Model"
+ },
+ {
+  "occurrence": "Servo 3 Bottom Left Lid",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    -1.0,
+    -4.8847569
+   ],
+   [
+    1e-07,
+    1.0,
+    0.0,
+    0.0267335
+   ],
+   [
+    1.0,
+    -1e-07,
+    0.0,
+    54.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [-1.0, 0.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 3 Bottom Left Lid",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    -1.0,
+    -4.8847569
+   ],
+   [
+    0.1664425,
+    0.9860512,
+    0.0,
+    0.0267335
+   ],
+   [
+    0.9860512,
+    -0.1664425,
+    0.0,
+    54.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "9.5810 deg about the shaft, as in Complete Model"
+ },
+ {
+  "occurrence": "Servo 4 Top Right Lid",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    79.8847534
+   ],
+   [
+    -1e-07,
+    1.0,
+    0.0,
+    0.0267325
+   ],
+   [
+    -1.0,
+    -1e-07,
+    0.0,
+    41.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [1.0, 0.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 4 Top Right Lid",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    79.8847534
+   ],
+   [
+    -0.1338482,
+    -0.9910018,
+    0.0,
+    0.0267325
+   ],
+   [
+    0.9910018,
+    -0.1338482,
+    0.0,
+    41.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "187.6920 deg about the shaft, turned +27.69 deg from the Complete Model's 160.00 to meet Top Lid Link R (hole radius 14.455, horn hole 14.45)"
+ },
+ {
+  "occurrence": "Servo 5 Bottom Right Lid",
+  "part": "SG90",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    79.8847534
+   ],
+   [
+    -1e-07,
+    1.0,
+    0.0,
+    0.0267335
+   ],
+   [
+    -1.0,
+    -1e-07,
+    0.0,
+    54.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90.stl",
+  "note": "shaft along [1.0, 0.0, 0.0]"
+ },
+ {
+  "occurrence": "Horn 5 Bottom Right Lid",
+  "part": "SG90 Horn",
+  "kind": "servo",
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    1.0,
+    79.8847534
+   ],
+   [
+    -0.1663627,
+    0.9860646,
+    0.0,
+    0.0267335
+   ],
+   [
+    -0.9860646,
+    -0.1663627,
+    0.0,
+    54.2427725
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "stl": "from-complete-model/SG90 Horn.stl",
+  "note": "-9.5764 deg about the shaft, turned -29.58 deg from the Complete Model's 20.00 to meet Bottom Lid Link R (hole radius 14.455, horn hole 14.45)"
  }
 ]

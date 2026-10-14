@@ -132,7 +132,8 @@ def run(_context):
     print("  vertices n=%d (%d exempt boxes) max %.4f mean %.5f mm  worst %s" % (
         n, len(boxes), mx, mean, "; ".join("%.4f@(%.2f,%.2f,%.2f)" % (d, *p) for d, p in worst)))
     if os.environ.get("SP_SAVE"):
-        assert mx < 0.002 and not bad, "not saving: check failed"
+        # GATE_MM: a simplified bought part (the SG90) says how far its spec departs from the mesh, and why
+        assert mx < getattr(S, "GATE_MM", 0.002) and not bad, "not saving: check failed"
         em = design.exportManager
         em.execute(em.createFusionArchiveExportOptions(os.path.join(HERE, S.TITLE + ".f3d")))
         folder = app.data.findFileById(KIT_FILE).parentFolder
