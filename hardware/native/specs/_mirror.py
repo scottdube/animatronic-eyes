@@ -1,6 +1,7 @@
 # Mirror a spec's FEATURES across a drawing-frame plane (coordinate k -> -k), for kit parts that are exact mirror
 # images of another (the Right lids are the Left lids with STL z negated: mircmp max 0.0000 mm). Arcs reverse
-# their turning sense; a feature extruded along k swaps and negates lo/hi.
+# their turning sense; a feature extruded along k swaps and negates lo/hi; a rotate op about any axis but k turns
+# the other way (S R(a) S = R(-a)).
 import importlib.util, os
 
 _UV = {"x": (1, 2), "y": (0, 2), "z": (0, 1)}
@@ -31,6 +32,11 @@ def mirror(features, k):
         f = dict(f)
         assert f["op"] != "chamfer", "mirror: chamfer picks not handled"
         k_i = _I[k]
+        if f["op"] == "rotate":
+            if f["axis"] != k:
+                f["deg"] = -f["deg"]
+            out.append(f)
+            continue
         if f["axis"] == k:
             s, flip = (1, 1), 1
             f["lo"], f["hi"] = -f["hi"], -f["lo"]

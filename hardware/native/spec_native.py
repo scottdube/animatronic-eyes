@@ -70,6 +70,9 @@ def build(root, S):
             n = chamfer(root, body, f)
             print("  %s: %d %s" % (f["name"], n, "faces" if f.get("pick") else "edges"))
             continue
+        if f["op"] == "rotate":    # second drawing frame: turn what is built so far (see xcsg.py)
+            b.rotate_body(body, f["axis"], f["deg"], f["name"])
+            continue
         mid = (f["lo"] + f["hi"]) / 2
         if "revolve" in f:
             r = f["revolve"]

@@ -196,12 +196,15 @@ class Builder:
         return f
 
     def rotate_body(self, body, axis, deg, name=None):
-        """Move feature turning the body about the model axis through the origin, right-hand, deg degrees."""
-        ca = {"x": self.root.xConstructionAxis, "y": self.root.yConstructionAxis, "z": self.root.zConstructionAxis}[axis]
+        """Move feature turning the body about the model axis through the origin, right-hand, deg degrees.
+        A free move by the exact matrix: defineAsRotate rounds its angle (18.47655 deg came out 18.5; TRAPS)."""
+        ax = adsk.core.Vector3D.create(*[1.0 if a == axis else 0.0 for a in "xyz"])
+        m = adsk.core.Matrix3D.create()
+        m.setToRotation(math.radians(deg), ax, adsk.core.Point3D.create(0, 0, 0))
         oc = adsk.core.ObjectCollection.create()
         oc.add(body)
         mi = self.root.features.moveFeatures.createInput2(oc)
-        mi.defineAsRotate(ca, VI(math.radians(deg)))
+        mi.defineAsFreeMove(m)
         f = self.root.features.moveFeatures.add(mi)
         if name:
             f.name = name

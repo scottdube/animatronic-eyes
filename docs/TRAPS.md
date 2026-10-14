@@ -207,3 +207,20 @@ the lip ring's outside (R19.858) and the ear axis are on the origin: fit each su
 The STL plane y = 0.1 trims only the shell (its face spans z' -17.3..-1.6). Inside the bore at the right ear
 sits an R1 pocket along x whose floor is a cylinder about the bore's axis, not a flat end: a slab with a flat
 floor would miss by up to 0.9 mm. `section2d` at x 15.3 showed it; xcsg's 2.3 mm³ "extra" blob is what found it.
+
+## The bottom lids are built in TWO frames: 20 deg shell, 18.47655 deg lip (2026-10-13)
+Bottom Left Lid: the lip planes' normal fits (0, -0.316917, 0.948453), which is 18.47655 deg, not the top lids' 20.
+The shell is still at 20 deg about STL (0, -0.1, 0). The two are a union: ring A (shell frame, R16.5..19.842 about the
+shell centre) shows its underside below the lip for |x| < 10.92, and the bore is ring A's wall (normal tilted 1.52 deg)
+below z' ~2.06 and ring B's vertical wall above it. Reading the bore triangles one by one settled it; a single
+cylinder fit to the band gave a 0.006 mm residual and an axis that made no sense. Specs now have a mid-sequence
+`op="rotate"` (xcsg turns the manifold, spec_native adds a Move), and `_mirror` negates its angle.
+The ears are R4 squared off toward the ring (profile2d on the x 19.7 cap), and under the ears the ring is NOT cut by
+the R4.5 pivot clearance; cutting it there disconnected the ears (xcsg genus 0 / 2 was the tell).
+
+## Fusion's Move "defineAsRotate" rounds the angle (2026-10-13)
+`moveFeatures.createInput2(...).defineAsRotate(axis, ValueInput.createByReal(radians(18.47655)))` built an 18.5 deg
+Move, and 1.52345 became 1.5 (read back from `MoveFeature.transform`). The shell still landed right because the two
+errors sum to 20; ring B's top edge was 0.008 mm off. The top lids' -20 / +20 hid this. `fcad.Builder.rotate_body`
+now uses `defineAsFreeMove` with a `Matrix3D.setToRotation` matrix, which is exact (max 0.0012 mm after).
+Hypothesis, not tested: it rounds to the angle display precision in the preferences.
