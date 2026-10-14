@@ -163,3 +163,37 @@ then differ per side as well.
 (three ~5 mm sides of a rectangle) came out as one "arc" of R3.5 with residual 0.0000, because the four
 corners of any rectangle are concyclic. The fit residual cannot catch it. Fixed with a turn limit: no corner
 sharper than 1 rad inside an arc. The four committed plate profiles regenerate byte-identical with the guard.
+
+## manifold3d: a join across a shared face only is two bodies; a cut flush with a face can be a void (2026-10-13)
+`tools/meshcad/xcsg.py` builds specs with manifold3d. Two prisms that only touch on a face stay two shells after
+`+`, so joins overlap by 0.5 mm. The mirror case bit on the Servo Block: an Ø3 blind hole whose cut started
+exactly on the end face came back as an inverted inner shell (a sealed void of -70.68 mm³), and genus read 4
+against the STL's 14 with the volume still right. Every cut now starts 0.5 mm outside the face it enters.
+Volume alone does not catch either; compare genus, and `decompose()` when it differs.
+
+## Fusion: a fitted spline handed SketchPoints makes its own end points (2026-10-13)
+`sketchFittedSplines.add` given an ObjectCollection holding existing SketchPoints draws through their positions
+but creates new fit points, so the originals stay behind, unconnected and free, and the sketch reads "not fully
+constrained" while the profile still closes. `fcad.Builder.runs_loop` now joins adjacent run ends with
+coincident constraints and deletes the orphans. Spline fit points are fixed (`isFixed`), not dimensioned:
+the Servo Block logo is traced artwork with about 290 points.
+
+## A loop helper fed a repeated point draws a zero-length line (2026-10-13)
+The Servo Block's front wall loop got `(57.0848, mid_z)` then `(57.0848, 57.7428)` with `mid_z` 57.7428.
+The extrude was fine; the zero-length line could not be constrained and the sketch stayed under-constrained
+with 0 free points reported. Skip repeated points when a loop is built from parameters.
+
+## Chamfer by picked edge stops where Fusion's edge chain stops; the csg stand-in does not (2026-10-13)
+`spec_native.chamfer` with `pick` chamfers the edge through a point plus its tangent chain, and Fusion ends it
+cleanly against the next face. The manifold stand-in in `xcsg.py` is a set of cuts that run as far as they are
+drawn: on the Main Base the outer chamfer's cut ran past the gusset plane, where the mesh carries on for 0.4 mm
+below z 5, and needed a "ch stop" join to match. When the stand-in and Fusion disagree, Fusion's result is the one checked against
+the STL.
+
+## The kit's Main Base mesh has a 0.032 mm seam crack; the rebuild fills it (2026-10-13)
+A hairline wedge between the block's bottom chamfer and the plate face, 0.032 mm at z 25 closing at z 34.06.
+It is a source-CAD seam nobody could print, so `specs/main_base.py` fills it. thickdiff then
+shows +40 mm³ of wall-grazing columns at y -23.53; the off-wall number is the one to read.
+
+## zsh does not word-split an unquoted variable (2026-10-13)
+`for b in "x0 x1 y0 y1"; do verts.py stl $b; done` passes ONE argument in zsh. Use `${=b}`.

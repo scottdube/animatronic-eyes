@@ -74,6 +74,9 @@ def build(root, S):
         if "circle" in f:
             ft = b.extrude(b.circle(f["name"], f["axis"], mid, *f["circle"]), f["axis"], f["lo"], f["hi"],
                            f["op"], f["name"])
+        elif "runs" in f:
+            ft = b.extrude(b.runs_loop(f["name"], f["axis"], mid, f["runs"]), f["axis"], f["lo"], f["hi"],
+                           f["op"], f["name"])
         elif "loop" in f:
             ft = b.prism(f["name"], f["axis"], f["lo"], f["hi"], *f["loop"], op=f["op"])
         else:

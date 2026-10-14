@@ -80,6 +80,40 @@ class Builder:
             cur_uv = end_uv
         return sk
 
+    def runs_loop(self, name, axis, c, runs):
+        """A closed free-form outline (caploops.py): consecutive runs of (u, v) mesh vertices sharing end points.
+        A two-point run is a line, a longer one a fitted spline through every vertex."""
+        sk = self.root.sketches.add(self.plane(axis, c))
+        sk.name = name
+
+        def sp(uv):
+            x, y, z = self.to3d(axis, c, uv[0], uv[1])
+            return sk.modelToSketchSpace(adsk.core.Point3D.create(x * MM, y * MM, z * MM))
+
+        # a spline handed SketchPoints makes its own end points, so ends meet by coincidence constraints
+        ends = [sk.sketchPoints.add(sp(r[0])) for r in runs]
+        tips = []
+        for k, r in enumerate(runs):
+            a, b = ends[k], ends[(k + 1) % len(runs)]
+            if len(r) == 2:
+                ln = sk.sketchCurves.sketchLines.addByTwoPoints(a, b)
+                tips.append((ln.startSketchPoint, ln.endSketchPoint))
+            else:
+                oc = adsk.core.ObjectCollection.create()
+                for p in r:
+                    oc.add(sp(p))
+                s = sk.sketchCurves.sketchFittedSplines.add(oc)
+                tips.append((s.fitPoints.item(0), s.fitPoints.item(s.fitPoints.count - 1)))
+        gc = sk.geometricConstraints
+        for k in range(len(runs)):
+            p, q = tips[k - 1][1], tips[k][0]
+            if p.entityToken != q.entityToken:
+                gc.addCoincident(p, q)
+        for p in ends:
+            if not p.connectedEntities or p.connectedEntities.count == 0:
+                p.deleteMe()
+        return sk
+
     def circle(self, name, axis, c, centre, r):
         sk = self.root.sketches.add(self.plane(axis, c))
         sk.name = name
@@ -194,6 +228,12 @@ def constrain_sketch(sk, tan_tol=0.02, log=None):
             return None
         return r
 
+    # a fitted spline is a traced free-form outline (a logo), not something to dimension: fix its fit points
+    for c in curves:
+        if isinstance(c, adsk.fusion.SketchFittedSpline):
+            for p in c.fitPoints:
+                p.isFixed = True
+            stats["fix"] = stats.get("fix", 0) + c.fitPoints.count
     tol = 1e-6
     for c in curves:
         if isinstance(c, adsk.fusion.SketchLine):

@@ -6,6 +6,8 @@ A spec module holds STL (path relative to the spec file) and FEATURES: a list of
     name, op ("new" | "join" | "cut"), axis ("x" | "y" | "z"), lo, hi (mm along the axis), and either
     loop=(start, segs)      segs as fcad.Builder.loop takes them, in (u, v): x->(y,z), y->(x,z), z->(x,y)
     circle=((cu, cv), r)
+    runs=[[(u, v), ...], ...]   a closed outline as runs of mesh vertices (caploops.py); spec_native draws a
+                            two-point run as a line and a longer one as a fitted spline, here each is chords
     revolve=dict(centre=(cu, cv), pts=[(r, w), ...], a0=deg, a1=deg)   about the axis line through (cu, cv),
                             angle from +u toward +v; lo/hi unused
 or op "chamfer": a Fusion chamfer feature (spec_native.py selects the edges); here its `csg` list of ordinary
@@ -38,6 +40,8 @@ def polygon(f):
         (cu, cv), r = f["circle"]
         n = 720
         return [(cu + r * math.cos(2 * math.pi * k / n), cv + r * math.sin(2 * math.pi * k / n)) for k in range(n)]
+    if "runs" in f:
+        return [tuple(p) for run in f["runs"] for p in run[:-1]]
     start, segs = f["loop"]
     pts, cur = [tuple(start)], tuple(start)
     for s in segs:
