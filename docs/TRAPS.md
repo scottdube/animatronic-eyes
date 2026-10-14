@@ -237,3 +237,26 @@ already reloads fcad. When Fusion and xcsg disagree on one spec, suspect a stale
 PlaceHolder Eye's 42° / 42° / 92° snap recesses came out 84° / 84° / 184°: 0.667 mm off on the bore wall between
 them, 140 mm³ light (a full ring of recess is ~277 mm³, the three sectors ~135). `fcad.SECTOR_SCALE = 0.5` halves it.
 Extrudes differ: `setSymmetricExtent(distance, isFullLength)` says which it means; the revolve call has no such flag.
+
+## addByInsert rejects a rotation that is orthonormal only to 7 digits (2026-10-13)
+`Occurrences.addByInsert(dataFile, transform, True)` raised "3 : invalid argument transform" on the first lid
+placement. placements.json keeps 7 digits, so the fitted rotations' R·Rᵀ is off identity by 4e-9..1e-7, and Fusion's
+tolerance is tighter than that. `assembly_native.orthonormal` Gram-Schmidts the rows (moves a point 50 mm out by
+~5e-6 mm). The identity and copy+75 placements went in fine, which is what pointed at the rotations.
+
+## A failed MCP script rolls back everything it did (2026-10-13)
+That same call had already inserted six occurrences when the seventh raised; afterwards the design had none of the
+six (14 occurrences, not 20, after the next batch). The MCP runs a script as one transaction. Re-run the whole
+failed range, and count occurrences (or features) after every batch rather than trusting the printed progress.
+
+## A Fusion archive of a referencing assembly holds no part geometry (2026-10-13)
+`createFusionArchiveExportOptions("EyeMech assembly.f3z")` wrote `EyeMech assembly.f3z.f3d` (the extension is
+appended, not replaced), 61 KB, with no Breps in it: only the top level and its links to the hub designs. Useless
+off the hub. The local copy is a STEP export of the root instead (15 solids, 20 named instances). Its PRODUCT names
+are the natives' root-component names, which are the untitled-document timestamps they were created under.
+
+## An assembly STL against the kit meshes measures the kit's chord sag (2026-10-13)
+Checking the exported assembly's vertices against every kit STL moved by its placement read max 0.21 mm: the native
+export puts its vertices on the true curves, the kit mesh's flat triangles sit inside them. The per-part gate runs
+the other way (kit vertices to the exact native body), and so must the assembly check: `AS_CHECK` measures each
+placed kit vertex against that occurrence's body in place, max 0.0012 mm except the Eye Holder's exempt ring.

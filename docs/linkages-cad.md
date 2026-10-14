@@ -26,8 +26,9 @@ The only differing columns graze a profile wall, where the two meshes' facets di
    `fcad.Builder.loop` takes. Those are `hardware/native/profiles/*.json`.
 3. `plates_native.py`: the largest loop is extruded, and full-circle loops are cut as holes.
 
-The sketches hold plain lines and arcs, with no dimensions or constraints. To edit one, add the dimensions you
-want to drive in Fusion, or change the JSON and rerun the builder.
+The sketches were built as plain lines and arcs; since 1bec20a (`constrain_docs.py`, `fcad.constrain_all`) every one
+is fully constrained and dimensioned in place. To edit one, change a dimension in Fusion, or change the JSON and
+rerun the builder. All 15 parts and the assembly: `native-parts-cad.md`.
 
 ## Plate profiles (y, z or x, z in mm)
 

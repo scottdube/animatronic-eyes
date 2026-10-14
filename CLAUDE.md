@@ -486,7 +486,14 @@ built by `hardware/native/eye_adaptor_native.py` (helpers in `fcad.py`). All 3,9
 **Linkages native (2026-10-13), for Scott to edit:** Bottom Lid Link, Top Lid Link, Y-Arm, Three-Point Connector
 (`plates_native.py`, profiles in `hardware/native/profiles/`) and Fork (`fork_native.py`, a real chamfer feature).
 All five are in the hub folder and in `hardware/native/*.f3d`, every STL vertex is within 0.0002 mm, and thickdiff
-is 0.00 mm³ off-wall. The sketches are unconstrained geometry in the STL frame. `docs/linkages-cad.md` has the decode.
+is 0.00 mm³ off-wall. `docs/linkages-cad.md` has the decode.
+**All 15 kit parts native + "EyeMech assembly" (2026-10-13). Read `docs/native-parts-cad.md` first.** Every part is
+a "<Part> native" design in the hub folder and `hardware/native/*.f3d`, every sketch fully constrained and dimensioned,
+every STL vertex within 0.0012 mm. The ten later parts are spec files (`hardware/native/specs/`) built by
+`spec_native.py`, checked offline first by `tools/meshcad/xcsg.py`; edit the spec and rebuild with SP_SAVE.
+The assembly (`assembly_native.py`, placements from `placements.json`) REFERENCES the hub natives, so part edits
+reach it; posed as Complete Model has it, no joints. Local copy is `hardware/native/EyeMech assembly.step` (a Fusion
+archive of a referencing assembly holds no geometry). Fusion API traps from this work are in `docs/TRAPS.md`.
 **First USB-only run (servos on the ESP32 5 V pin, 2026-09-25): Scott saw NO show.** Measured: last reset before
 the run was `brownout` (Scott was rewiring). Firmware ran the show (mode idle) 0–140 s with the rail flat at
 4.45–4.48 V, min 4.34 V, 0 dips: no sign of servo load at all. At ~145 s the board restarted (`power-on`),
