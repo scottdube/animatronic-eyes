@@ -1200,3 +1200,17 @@ Fusion MCP: a read-only script walking every hub project's root folder timed out
 unresponsive; afterwards every call returned "Server Autodesk Fusion unavailable" while status said
 connected, through two Fusion restarts, until it came back on its own. All 15 parts ran in two calls,
 ~8 s and ~26 s, well under the ~2 min timeout.
+
+## Noise test (build f7b1bfa, 2026-10-14)
+Scott's goal is fewer noise sources (shoulder bolts on the linkages were the first idea). Candidate sources, none
+measured yet: servo motor/gear noise while moving, holding buzz (strain at a stop or the closed seal), the printed
+base radiating servo vibration, joint rattle at reversals (the only one shoulder bolts fix). **Measure before buying.**
+Page → 🔧 Calibration → **Noise test**, or `POST /scene?cmd=test<0-5|A|H>[s]`: 30 s of one fixed motion (half travel
+out and back for the eyes, normal ↔ squint for the lids; 0.8 s moves, 0.7 s pauses), then quiet sleep. One-servo tests
+power only that channel (`Frame.power`; the other five are full-off); A = all six moving; H = all six holding at rest;
+`s` = sudden moves instead of eased. /status `mode` "test" plus `test` in words. Verified over HTTP and the page:
+ch 2 alone pulsing with 0–1, 3–5 full-off; all six pulsing under H; test9 refused (409); ends in sleep, all full-off.
+Not yet used for a measurement. Suggested runs (phone dB/spectrum app, fixed distance): each servo with its link
+on vs off (same = servo noise); H (holding buzz); A with a towel under the base (soundboard); a hand on an eye during A (rattle).
+**This OTA reported `curl: (56) Connection reset by peer` and still took** (build read back f7b1bfa, app0) — so (56) does
+not always mean failed: read `build` in /status.
