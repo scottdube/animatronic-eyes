@@ -145,3 +145,15 @@ The default `--after hard-reset` means a board plugged in holding BOOT, so it wo
 into its firmware anyway once the backup read ends. On the retired DevKit that briefly ran a second eyes host
 with the D1's MAC and IP for the ~15 s before the erase. The D1 kept the controller, luckily. On any board that
 must not run: pass `--after no-reset` on every esptool call.
+
+## A vertex-to-body check cannot see material the rebuild is missing on a face (2026-10-13)
+On the Eye Adaptor every STL vertex sat within 0.04 mm of the native body, but the volume was still 3.7 mm³ short.
+Two errors produced no off-body vertices: lug holes cut 0.1 too deep into the gusset, and a missing flat on the
+gusset top whose two ends happened to lie on the surfaces that were built. `tools/meshcad/thickdiff.py`, a
+column-thickness comparison against a High-refinement STL export of the rebuild, found both. Run both checks.
+A rebuild is only done when the vertex max is about 0.001 mm and thickdiff shows only rim-facet noise.
+
+## Cogley's geometry is not exactly symmetric (2026-10-13)
+The Eye Adaptor finger-top arc is centred 0.026 mm off the part's mirror plane. Fitting one side and mirroring it
+left 0.04 mm at the other end. Fit both sides with a free centre before assuming symmetry. The tangent fillets
+then differ per side as well.

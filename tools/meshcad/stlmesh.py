@@ -37,3 +37,16 @@ def circfit(P2):
     (cx,cy,c),*_ = np.linalg.lstsq(M,b,rcond=None); R = np.sqrt(c+cx*cx+cy*cy)
     res = np.hypot(x-cx,y-cy)-R
     return cx,cy,R,np.abs(res).max(),len(x)
+
+def section_plane(T, n, c):
+    """Segments where the plane n.x = c cuts the triangles; returns (k,2,3)."""
+    n = np.asarray(n, float); s = T @ n - c
+    out = []
+    for tri, sv in zip(T, s):
+        pts = []
+        for i in range(3):
+            j = (i+1) % 3
+            if (sv[i] > 0) != (sv[j] > 0):
+                t = sv[i]/(sv[i]-sv[j]); pts.append(tri[i] + t*(tri[j]-tri[i]))
+        if len(pts) == 2: out.append(pts)
+    return np.array(out)
