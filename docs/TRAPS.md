@@ -316,3 +316,11 @@ arms' sweep circles overlap. At the lid joints' limits (both lids open, or both 
 41.322). The earlier limit sweeps bisected through values like x.125 and read them back to 1e-6, so the precision was
 higher then or the rounding is new; which one was NOT established. It is Scott's preference, so it was left alone;
 `limits_native` now poses and bisects on that grid (`grid()`).
+
+## A flash dump carries the Wi-Fi passphrase (found 2026-10-26)
+
+`backup/devkit-final-2026-09-28.bin` is a full-chip read, so it includes the NVS partition, and NVS holds the
+station SSID and passphrase in the clear. A byte search found the IoT passphrase in it; `board-flash-2026-09-24.bin`
+did not have it. `secrets.h.template` keeping the source clean does not keep a dump clean. **Before this repo goes
+public, `backup/*.bin` must be purged from history**, not just deleted at HEAD. Full audit:
+`~/code/docs/repo-visibility-audit-2026-10-26.md`.
