@@ -70,6 +70,14 @@ The installed copy is `~/Documents/Arduino/libraries/PS4Controller`
 
 ## Flash backup of the working board: `backup/`
 
+**The `.bin` dumps are not in git (since 2026-10-26).** A full-chip read includes
+NVS, which holds the Wi-Fi passphrase and the controller link key in the clear, so
+they were purged from history before this repo went public and are now ignored.
+They sit in `backup/` on the laptop only, with copies of both plus `SHA256SUMS` on
+Google Drive (below). The pre-purge history is the private repo
+`scottdube/animatronic-eyes-prescrub`; old commit IDs (build IDs such as df69225)
+map to new ones in `~/code/docs/rewrites/animatronic-eyes-commit-map.txt`.
+
 `board-flash-2026-09-24.bin` is the full 4 MB read of the board before anything
 was flashed over it. It was verified with `verify-flash` (digest matched), and
 `SHA256SUMS` is alongside. This is the only surviving copy of the lost sketch,
@@ -82,7 +90,8 @@ at 0x9000). To restore it:
 
 **Second copy on Google Drive:** `My Drive/#3D prints/basic_eyemech_download_package/Board flash backup/`
 (bin plus SHA256SUMS). The Drive API showed it server-side on 2026-09-24 at
-4194304 bytes.
+4194304 bytes. `devkit-final-2026-09-28.bin` and the updated SHA256SUMS were added on
+2026-10-26 (checksums verified in the Drive folder).
 
 **Baud trap:** this board's CP2102 corrupts reads at 921600 and 460800. Use
 115200 (a 4 MB read takes about 6.5 min).

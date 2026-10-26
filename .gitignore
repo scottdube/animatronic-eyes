@@ -2,3 +2,6 @@ firmware/EyeMech_PS4/secrets.h
 firmware/EyeMech_PS4/build_id.h
 build/
 __pycache__/
+
+# Full-chip flash dumps carry NVS (Wi-Fi passphrase, BT link key); Drive holds the copies
+backup/*.bin

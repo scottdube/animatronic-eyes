@@ -324,3 +324,6 @@ station SSID and passphrase in the clear. A byte search found the IoT passphrase
 did not have it. `secrets.h.template` keeping the source clean does not keep a dump clean. **Before this repo goes
 public, `backup/*.bin` must be purged from history**, not just deleted at HEAD. Full audit:
 `~/code/docs/repo-visibility-audit-2026-10-26.md`.
+
+**Done 2026-10-26:** purged with `git filter-repo`, scrubbed history pushed to a fresh repo, old one kept private as
+`animatronic-eyes-prescrub`. See CLAUDE.md, "Flash backup of the working board".
