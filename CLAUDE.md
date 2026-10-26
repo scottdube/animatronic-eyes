@@ -4,10 +4,15 @@ Will Cogley / Nilheim Mechatronics **Basic EyeMech** — two eyes (X/Y each) and
 four eyelid servos on an Adafruit PCA9685 servo driver over I2C. Kit downloaded
 May 2024. License is **CC BY-NC-SA 4.0** (`reference/License.html`), so the
 kit files may be shared with attribution, non-commercially, under the same
-license. Keep that in mind before this repo gets a public remote.
+license. `README.md` carries the attribution and says which folders are his;
+`LICENSE` is the CC BY-NC-SA 4.0 legal code, and the whole repo is under it
+(firmware derives from his sketch, the natives are adaptations of his parts).
 
-**Remote: `scottdube/animatronic-eyes`, PRIVATE (created 2026-09-24). Keep it private:
-the flash backup holds the controller link key, and the kit is NC-SA.**
+**Remote: `scottdube/animatronic-eyes`, history scrubbed 2026-10-26 and readied to go
+public** (flash dumps purged, John's surname dropped, README + LICENSE added). It is
+public only once Scott flips it. **Never commit `backup/*.bin` or `secrets.h`:** a
+flash dump carries the Wi-Fi passphrase and the controller link key (docs/TRAPS.md).
+The pre-scrub history is the PRIVATE `animatronic-eyes-prescrub`; never publish that one.
 
 ## State: the controller version was lost, then RECOVERED 2026-09-24
 
@@ -104,8 +109,8 @@ at 0x9000). To restore it:
   from an absence, so treat it as likely rather than proven.
 - No web page or HTML strings. The Wi-Fi and SSID strings are IDF SmartConfig
   logs from the core, not the sketch.
-- **The dump contains the pairing link key.** Do not push this repo to a public
-  remote. The kit's NC-SA license is a second reason.
+- **The dump contains the pairing link key** (and NVS holds the Wi-Fi passphrase).
+  That is why the dumps stay out of git.
 
 **Upload without "Erase All Flash".** A normal upload leaves NVS, and with it
 the bond, intact. A full erase throws the pairing away.

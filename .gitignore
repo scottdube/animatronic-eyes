@@ -5,3 +5,4 @@ __pycache__/
 
 # Full-chip flash dumps carry NVS (Wi-Fi passphrase, BT link key); Drive holds the copies
 backup/*.bin
+.DS_Store
