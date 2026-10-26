@@ -8,9 +8,8 @@ license. `README.md` carries the attribution and says which folders are his;
 `LICENSE` is the CC BY-NC-SA 4.0 legal code, and the whole repo is under it
 (firmware derives from his sketch, the natives are adaptations of his parts).
 
-**Remote: `scottdube/animatronic-eyes`, history scrubbed 2026-10-26 and readied to go
-public** (flash dumps purged, John's surname dropped, README + LICENSE added). It is
-public only once Scott flips it. **Never commit `backup/*.bin` or `secrets.h`:** a
+**Remote: `scottdube/animatronic-eyes`, PUBLIC since 2026-10-26** (history scrubbed
+first: flash dumps purged, John's surname dropped, README + LICENSE added). **Never commit `backup/*.bin` or `secrets.h`:** a
 flash dump carries the Wi-Fi passphrase and the controller link key (docs/TRAPS.md).
 The pre-scrub history is the PRIVATE `animatronic-eyes-prescrub`; never publish that one.
 
